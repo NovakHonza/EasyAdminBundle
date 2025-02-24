@@ -140,16 +140,11 @@ jobs:
                   composer show
 
             - name: Run tests
+              shell: bash
               continue-on-error: ${{ matrix.stability == 'dev' || matrix.symfony_version == '7.3' }}
-              env:
-                  SYMFONY_DEPRECATIONS_HELPER: "max[total]=999999&ignoreFile=./tests/baseline-ignore.txt"
               run: |
-                  ./vendor/bin/simple-phpunit --exclude-group pretty_urls
-
-            - name: Run Pretty URLs tests
-              continue-on-error: ${{ matrix.stability == 'dev' || matrix.symfony_version == '7.3' }}
-              env:
-                  USE_PRETTY_URLS: "1"
-                  SYMFONY_DEPRECATIONS_HELPER: "max[total]=999999&ignoreFile=./tests/baseline-ignore.txt"
-              run: |
-                  ./vendor/bin/simple-phpunit tests/Controller/PrettyUrls/PrettyUrlsControllerTest.php
+                  if [ "${{ matrix.composer_args }}" = "--prefer-lowest" ]; then
+                    SYMFONY_DEPRECATIONS_HELPER=weak make tests
+                  else
+                    make tests
+                  fi

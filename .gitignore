@@ -3,6 +3,7 @@
 composer.lock
 .phpunit.result.cache
 /phpunit.xml
+var
 vendor/*
 
 /node_modules/

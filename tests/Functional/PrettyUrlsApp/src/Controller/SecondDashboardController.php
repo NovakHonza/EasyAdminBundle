@@ -1,12 +1,12 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\PrettyUrlsApp\Controller;
 
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Entity\User;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\PrettyUrlsApp\Entity\User;
 use Symfony\Component\HttpFoundation\Response;
 
 #[AdminDashboard(
@@ -20,7 +20,7 @@ use Symfony\Component\HttpFoundation\Response;
     ],
     allowedControllers: [UserCrudController::class]
 )]
-class PrettyUrlsSecondDashboardController extends AbstractDashboardController
+class SecondDashboardController extends AbstractDashboardController
 {
     public function index(): Response
     {

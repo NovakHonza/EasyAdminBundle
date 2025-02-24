@@ -4,7 +4,7 @@ $finder = PhpCsFixer\Finder::create()
     ->in(__DIR__)
     ->ignoreDotFiles(true)
     ->ignoreVCS(true)
-    ->exclude(array('build', 'vendor'))
+    ->exclude(array('build', 'var', 'vendor'))
     ->files()
     ->name('*.php')
 ;
@@ -12,6 +12,7 @@ $finder = PhpCsFixer\Finder::create()
 $config = new PhpCsFixer\Config();
 
 return $config
+    ->setParallelConfig(PhpCsFixer\Runner\Parallel\ParallelConfigFactory::detect())
     ->setUsingCache(true)
     ->setRiskyAllowed(true)
     ->setFinder($finder)
