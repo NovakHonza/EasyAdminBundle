@@ -126,7 +126,7 @@ return static function (ContainerConfigurator $container) {
             // initialization done after generating each URL
             ->arg(0, service('service_locator_'.AdminUrlGenerator::class))
             ->arg(1, service(AdminContextProvider::class))
-            ->arg(4, service('translator'))
+            ->arg(2, service('translator'))
             ->tag('twig.extension')
 
         ->set(EaCrudFormTypeExtension::class)

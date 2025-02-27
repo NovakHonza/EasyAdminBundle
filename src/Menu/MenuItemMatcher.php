@@ -72,7 +72,7 @@ class MenuItemMatcher implements MenuItemMatcherInterface
             }
 
             // remove host part from the menu item link URL
-            $urlParts = parse_url($menuItemDto->getLinkUrl());
+            $urlParts = parse_url($menuItemDto->getLinkUrl() ?? '');
             $menuItemUrlWithoutHost = $urlParts['path'] ?? '';
             if (\array_key_exists('query', $urlParts)) {
                 $menuItemUrlWithoutHost .= '?'.$urlParts['query'];

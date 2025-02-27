@@ -18,8 +18,7 @@
     <testsuites>
         <testsuite name="EasyAdmin Test Suite">
             <directory>tests/</directory>
-            <exclude>tests/Controller/PrettyUrls/</exclude>
-            <exclude>tests/EventListener/</exclude>
+            <exclude>tests/Functional/</exclude>
         </testsuite>
     </testsuites>
 
