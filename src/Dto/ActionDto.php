@@ -12,7 +12,7 @@ final class ActionDto
 {
     private ?string $type = null;
     private ?string $name = null;
-    /** @var TranslatableInterface|string|(callable(object): string)|null */
+    /** @var TranslatableInterface|string|(callable(object): string)|false|null */
     private mixed $label = null;
     private ?string $icon = null;
     private string $cssClass = '';
@@ -251,6 +251,8 @@ final class ActionDto
 
         if ('a' === $this->htmlElement) {
             $action->displayAsLink();
+        } elseif ('form' === $this->htmlElement) {
+            $action->displayAsForm();
         } else {
             $action->displayAsButton();
         }

@@ -79,7 +79,6 @@ Now, define the main route of your dashboard class using the following PHP attri
     use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
     use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
     use Symfony\Component\HttpFoundation\Response;
-    use Symfony\Component\Routing\Attribute\Route;
 
     #[AdminDashboard(routePath: '/admin', routeName: 'admin')]
     class DashboardController extends AbstractDashboardController
@@ -134,7 +133,7 @@ Defining the Route in the ``index()`` Method
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Using the ``#[AdminDashboard]`` attribute is the recommended way to define the
-dashboard route. However, you can also define the dashboard route aplying the
+dashboard route. However, you can also define the dashboard route applying the
 ``#[Route]`` attribute on the ``index()`` method::
 
     // ...
@@ -1038,7 +1037,7 @@ applications can rely on its default values:
 
     class SecurityController extends AbstractController
     {
-        #[Route("/login", name="login")]
+        #[Route("/login", name: "login")]
         public function login(AuthenticationUtils $authenticationUtils): Response
         {
             $error = $authenticationUtils->getLastAuthenticationError();
