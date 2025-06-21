@@ -391,7 +391,7 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
     }
 
     /**
-     * @param array<string, mixed> $routeOptions
+     * @param array<string, mixed>                       $routeOptions
      * @param class-string<DashboardControllerInterface> $dashboardFqcn
      */
     private function createDashboardRoute(string $routePath, array $routeOptions, string $dashboardFqcn): Route

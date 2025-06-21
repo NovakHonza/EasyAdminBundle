@@ -197,5 +197,11 @@ final class Kernel extends SymfonyKernel
                 ['path' => '^/admin', 'roles' => ['ROLE_ADMIN']],
             ],
         ]);
+
+        $container->extension('zenstruck_foundry', [
+            'persistence' => [
+                'flush_once' => true,
+            ],
+        ]);
     }
 }
