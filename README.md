@@ -15,8 +15,8 @@ Installation
 EasyAdmin 5 requires PHP 8.2.0 or higher and Symfony 6.4 or higher. Run the
 following command to install it in your application:
 
-```
-$ composer require easycorp/easyadmin-bundle
+```bash
+composer require easycorp/easyadmin-bundle
 ```
 
 Documentation
@@ -31,7 +31,7 @@ Versions
 | Repository Branch | EasyAdmin Version | Symfony Compatibility  | PHP Compatibility | Status               | Docs
 | ----------------- | ----------------- | ---------------------- | ----------------- | -------------------- | ---
 | `5.x`             | `5.x`             | `6.4`, `7.x` and `8.x` | `8.2.0` or higher | New features and bug fixes | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/4.x/index.html)
-| `4.x`             | `4.x`             | `5.4`, `6.x` and `7.x` | `8.0.2` or higher | Bug fixes only; no new features | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/4.x/index.html)
+| `4.x`             | `4.x`             | `5.4`, `6.x` and `7.x` | `8.1` or higher   | Bug fixes only; no new features | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/4.x/index.html)
 | `3.x`             | `3.x`             | `4.4`, and `5.x`       | `7.2.5` or higher | No longer maintained | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/3.x/index.html)
 | `2.x`             | `2.x`             | `4.x`, and `5.x`       | `7.1.3` or higher | No longer maintained | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/2.x/index.html)
 | `1.x`             | `1.x`             | `2.x`, `3.x` and `4.x` | `5.3.0` or higher | No longer maintained | -
@@ -47,7 +47,7 @@ Dev Environment
 ---------------
 
 EasyAdmin ships a DDEV environment, which allows you to run EasyAdmin in a Symfony Framework project
-providing example entities and CRUD Controllers. 
+providing example entities and CRUD Controllers.
 
 **Requirements:**
 

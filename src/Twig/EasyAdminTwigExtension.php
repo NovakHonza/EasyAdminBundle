@@ -33,6 +33,7 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
     public function getFunctions(): array
     {
         return [
+            new TwigFunction('ea', [$this, 'ea']),
             new TwigFunction('ea_url', [$this, 'getAdminUrlGenerator']),
             new TwigFunction('ea_form_ealabel', null, ['node_class' => 'Symfony\Bridge\Twig\Node\SearchAndRenderBlockNode', 'is_safe' => ['html']]),
         ];
@@ -49,13 +50,22 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
 
     public function getGlobals(): array
     {
-        // this is needed to make the admin context available on any Twig template via the short named variable 'ea'
         return ['ea' => $this->adminContextProvider];
+    }
+
+    public function ea(): ?AdminContextInterface
+    {
+        return $this->adminContextProvider->getContext();
     }
 
     /**
      * Transforms ['a' => 'foo', 'b' => ['c' => ['d' => 7]]] into ['a' => 'foo', 'b[c][d]' => 7]
      * It's useful to submit nested arrays (e.g. query string parameters) as form fields.
+     *
+     * @param mixed[]     $array
+     * @param string|null $parentKey
+     *
+     * @return mixed[]
      */
     public function flattenArray($array, $parentKey = null): array
     {
@@ -77,9 +87,17 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
     public function fileSize(int $bytes): string
     {
         $size = ['B', 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
-        $factor = (int) floor(log($bytes) / log(1024));
 
-        return (int) ($bytes / (1024 ** $factor)).@$size[$factor];
+        if (0 === $bytes) {
+            return '0B';
+        }
+
+        $factor = (int) floor(log($bytes) / log(1024));
+        $factor = min($factor, \count($size) - 1);
+
+        $scaledValue = (int) ($bytes / (1024 ** $factor));
+
+        return sprintf('%d%s', $scaledValue, $size[$factor]);
     }
 
     public function representAsString($value, string|callable|null $toStringMethod = null): string

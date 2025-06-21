@@ -8,10 +8,14 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Dto;
 class BatchActionDto
 {
     private string $name;
+    /** @var array<mixed> */
     private array $entityIds;
     private string $entityFqcn;
     private string $csrfToken;
 
+    /**
+     * @param array<mixed> $entityIds
+     */
     public function __construct(string $name, array $entityIds, string $entityFqcn, string $csrfToken)
     {
         $this->name = $name;
@@ -25,6 +29,9 @@ class BatchActionDto
         return $this->name;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getEntityIds(): array
     {
         return $this->entityIds;

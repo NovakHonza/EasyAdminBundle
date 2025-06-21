@@ -28,7 +28,7 @@ final class FormField implements FieldInterface
     /**
      * @internal Use the other named constructors instead (addFieldset(), etc.)
      */
-    public static function new(string $propertyName, TranslatableInterface|string|bool|null $label = null)
+    public static function new(string $propertyName, TranslatableInterface|string|bool|null $label = null): self
     {
         throw new \RuntimeException('Instead of this method, use any of the methods to add elements: "addFieldset()", "addTab()", etc.');
     }

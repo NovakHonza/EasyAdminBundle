@@ -24,7 +24,7 @@ final class AdminRouteLoader extends Loader
         return self::ROUTE_LOADER_TYPE === $type;
     }
 
-    public function load($resource, ?string $type = null): RouteCollection
+    public function load(mixed $resource, ?string $type = null): RouteCollection
     {
         return $this->adminRouteGenerator->generateAll();
     }

@@ -102,10 +102,12 @@ final class IntlFormatter implements IntlFormatterInterface
         'monetary_grouping_separator' => \NumberFormatter::MONETARY_GROUPING_SEPARATOR_SYMBOL,
     ];
 
+    /** @var array<\IntlDateFormatter> */
     private array $dateFormatters = [];
+    /** @var array<\NumberFormatter> */
     private array $numberFormatters = [];
 
-    public function formatCurrency($amount, string $currency, array $attrs = [], ?string $locale = null): string
+    public function formatCurrency(int|float $amount, string $currency, array $attrs = [], ?string $locale = null): string
     {
         $formatter = $this->createNumberFormatter($locale, 'currency', $attrs);
         $formattedCurrency = $formatter->formatCurrency($amount, $currency);
@@ -190,6 +192,9 @@ final class IntlFormatter implements IntlFormatterInterface
         return $this->dateFormatters[$hash];
     }
 
+    /**
+     * @param array<string, string|int|float> $attrs
+     */
     private function createNumberFormatter(?string $locale, string $style, array $attrs = []): \NumberFormatter
     {
         if (!isset(self::NUMBER_STYLES[$style])) {
@@ -256,6 +261,9 @@ final class IntlFormatter implements IntlFormatterInterface
         return $this->numberFormatters[$hash];
     }
 
+    /**
+     * @param \DateTimeZone|string|bool|null $timezone $timezone
+     */
     private function convertDate(?\DateTimeInterface $date, $timezone = null): ?\DateTimeInterface
     {
         if (null === $date) {

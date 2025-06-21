@@ -21,19 +21,30 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+ *
+ * @template TEntity of object = object
  */
 final class EntityDto
 {
     private bool $isAccessible = true;
+    /** @var class-string<TEntity> */
     private string $fqcn;
+    /** @var ClassMetadata<TEntity> */
     private ClassMetadata $metadata;
+    /** @var TEntity|null */
     private $instance;
+    /** @var string|null */
     private $primaryKeyName;
     private mixed $primaryKeyValue = null;
     private string|Expression|null $permission;
     private ?FieldCollection $fields = null;
     private ?ActionCollection $actions = null;
 
+    /**
+     * @param class-string<TEntity>  $entityFqcn
+     * @param ClassMetadata<TEntity> $entityMetadata
+     * @param TEntity|null           $entityInstance
+     */
     public function __construct(string $entityFqcn, ClassMetadata $entityMetadata, string|Expression|null $entityPermission = null, ?object $entityInstance = null)
     {
         $this->fqcn = $entityFqcn;
@@ -48,6 +59,9 @@ final class EntityDto
         return $this->toString();
     }
 
+    /**
+     * @return class-string<TEntity>
+     */
     public function getFqcn(): string
     {
         return $this->fqcn;
@@ -71,6 +85,9 @@ final class EntityDto
         return sprintf('%s #%s', $this->getName(), substr($this->getPrimaryKeyValueAsString(), 0, 16));
     }
 
+    /**
+     * @phpstan-return TEntity|null
+     */
     public function getInstance(): ?object
     {
         return $this->instance;
@@ -149,6 +166,8 @@ final class EntityDto
     /**
      * Returns the names of all properties defined in the entity, no matter
      * if they are used or not in the application.
+     *
+     * @return array<string>
      */
     public function getAllPropertyNames(): array
     {
@@ -195,6 +214,9 @@ final class EntityDto
         throw new \InvalidArgumentException(sprintf('The "%s" field does not exist in the "%s" entity.', $propertyName, $this->getFqcn()));
     }
 
+    /**
+     * @return string
+     */
     public function getPropertyDataType(string $propertyName)
     {
         return $this->getPropertyMetadata($propertyName)->get('type');
@@ -233,6 +255,9 @@ final class EntityDto
         return \array_key_exists($propertyNameParts[0], $this->metadata->embeddedClasses);
     }
 
+    /**
+     * @param TEntity|null $newEntityInstance
+     */
     public function setInstance(?object $newEntityInstance): void
     {
         if (null !== $this->instance && null !== $newEntityInstance && !$newEntityInstance instanceof $this->fqcn) {
@@ -243,6 +268,9 @@ final class EntityDto
         $this->primaryKeyValue = null;
     }
 
+    /**
+     * @param TEntity $newEntityInstance
+     */
     public function newWithInstance(object $newEntityInstance): self
     {
         if (null !== $this->instance && !$newEntityInstance instanceof $this->fqcn) {

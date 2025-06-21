@@ -61,7 +61,7 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
         return $this;
     }
 
-    public function setEntityId($entityId): AdminUrlGeneratorInterface
+    public function setEntityId(mixed $entityId): AdminUrlGeneratorInterface
     {
         $this->setRouteParameter(EA::ENTITY_ID, $entityId);
 
@@ -77,7 +77,7 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
         return $this->routeParameters[$paramName] ?? null;
     }
 
-    public function set(string $paramName, $paramValue): AdminUrlGeneratorInterface
+    public function set(string $paramName, mixed $paramValue): AdminUrlGeneratorInterface
     {
         if (false === $this->isInitialized) {
             $this->initialize();
@@ -212,7 +212,7 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
         return $url;
     }
 
-    private function setRouteParameter(string $parameterName, $parameterValue): void
+    private function setRouteParameter(string $parameterName, mixed $parameterValue): void
     {
         if (false === $this->isInitialized) {
             $this->initialize();

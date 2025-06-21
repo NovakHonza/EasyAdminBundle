@@ -342,6 +342,9 @@ final class FormLayoutFactory
             ->getAsDto();
     }
 
+    /**
+     * @param array<string, FieldDto> $tabs
+     */
     private function createTabListField(array $tabs): FieldDto
     {
         return Field::new('ea_form_tablist')

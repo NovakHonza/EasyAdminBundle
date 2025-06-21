@@ -141,6 +141,9 @@ final class Action
         return $this;
     }
 
+    /**
+     * @param array<string, string> $attributes
+     */
     public function setHtmlAttributes(array $attributes): self
     {
         $this->dto->setHtmlAttributes($attributes);
@@ -163,7 +166,7 @@ final class Action
     }
 
     /**
-     * @param array|callable $routeParameters The callable has the signature: function ($entity): array
+     * @param array<string, mixed>|callable $routeParameters The callable has the signature: function ($entity): array
      *
      * Route parameters can be defined as a callable with the signature: function ($entityInstance): array
      * Example: ->linkToRoute('invoice_send', fn (Invoice $entity) => ['uuid' => $entity->getId()]);
@@ -183,6 +186,9 @@ final class Action
         return $this;
     }
 
+    /**
+     * @param array<string, mixed> $parameters
+     */
     public function setTranslationParameters(array $parameters): self
     {
         $this->dto->setTranslationParameters($parameters);
