@@ -354,7 +354,7 @@ class ActionGroupsCrudControllerTest extends AbstractCrudTestCase
         $hasValidLinks = false;
         $linkActions->each(function ($link) use (&$hasValidLinks) {
             $href = $link->attr('href');
-            if (str_contains($href, 'action=') || str_contains($href, 'crudAction=')) {
+            if ('http://localhost/secure_admin/action-groups/a-global-action' === $href) {
                 $hasValidLinks = true;
             }
         });
