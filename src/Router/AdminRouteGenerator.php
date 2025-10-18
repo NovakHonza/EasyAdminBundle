@@ -199,7 +199,7 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
                     $adminRouteName = sprintf('%s_%s_%s', $dashboardRouteConfig['routeName'], $crudControllerRouteConfig['routeName'], $actionRouteConfig['routeName'] ?? $actionNameSnakeCase);
 
                     if (\in_array($adminRouteName, $addedRouteNames, true)) {
-                        throw new \RuntimeException(sprintf('When using pretty URLs, all CRUD controller actions must generate unique route names. However, in your application there are at least two CRUD actions that would generate the same route "%s". This happens (1) when your application has at least two controllers with the same class name (even if they are in different namespaces) or (2) when you applied more than one #[AdminRoute] attribute to the same CRUD controller action and didn\'t define a custom route name at least for one of them.', $adminRouteName));
+                        throw new \RuntimeException(sprintf('The EasyAdmin CRUD controllers defined in your application must have unique PHP class names in order to generate unique route names. However, your application has at least two controllers with the FQCN "%s", generating the route "%s". Even if both CRUD controllers are in different namespaces, they cannot have the same class name. Rename one of these controllers to resolve the issue.', $crudControllerFqcn, $adminRouteName));
                     }
 
                     $defaults = [
