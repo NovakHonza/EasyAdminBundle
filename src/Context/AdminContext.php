@@ -28,6 +28,9 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final class AdminContext implements AdminContextInterface
 {
+    private ?MainMenuDto $mainMenuDto = null;
+    private ?UserMenuDto $userMenuDto = null;
+
     public function __construct(
         private readonly Request $request,
         private readonly ?UserInterface $user,
