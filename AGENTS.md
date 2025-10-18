@@ -34,7 +34,7 @@ Welcome, 🤖 AI assistant! Please follow these guidelines when contributing to 
 - Write in American English with second person (you), avoid first person (we)
 - Use gender-neutral language (they/them)
 - Avoid belittling or exclusionary words (e.g. "just", "obviously", "easy")
-- Contractions are allowed (e.g. "it's", "you're")
+- Always prefer contractions over expanded forms (e.g. "it's", "you're", "don't")
 
 ## Commands
 
@@ -52,6 +52,7 @@ Welcome, 🤖 AI assistant! Please follow these guidelines when contributing to 
 - Use modern PHP 8.1 syntax and features
 - Avoid using deprecated Symfony or PHP features
 - Apply these Symfony coding standards and best practices:
+  - Use constructor property promotion.
   - Follow PSR-1, PSR-2, PSR-4, and PSR-12 coding standards.
   - Use Yoda conditions for comparisons (e.g. `if (null === $value)`).
   - Always use strict (`===`) and not loose (`==`) comparisons.
@@ -83,6 +84,7 @@ Welcome, 🤖 AI assistant! Please follow these guidelines when contributing to 
 - Services configuration must use PHP format (`config/services.php`)
 - Translations must be in PHP format (`translations/*.php`)
 - Handle exceptions explicitly and avoid silent catch blocks
+- In tests, use simple descriptive names like 'Action 1', 'Action 2', 'Group 1', etc. instead of realistic examples
 
 ## Twig Templates
 

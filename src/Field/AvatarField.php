@@ -15,7 +15,13 @@ final class AvatarField implements FieldInterface
     use FieldTrait;
 
     public const OPTION_IS_GRAVATAR_EMAIL = 'isGravatarEmail';
+    public const OPTION_GRAVATAR_DEFAULT_IMAGE = 'gravatarDefaultImage';
     public const OPTION_HEIGHT = 'height';
+
+    // see https://docs.gravatar.com/sdk/images/#default-image
+    private const ALLOWED_GRAVATAR_DEFAULT_IMAGES = [
+        'initials', 'color', '404', 'mp', 'identicon', 'monsterid', 'wavatar', 'retro', 'robohash', 'blank',
+    ];
 
     public static function new(string $propertyName, TranslatableInterface|string|bool|null $label = null): self
     {
@@ -31,10 +37,7 @@ final class AvatarField implements FieldInterface
             ->setCustomOption(self::OPTION_HEIGHT, null);
     }
 
-    /**
-     * @param int|string $heightInPixels
-     */
-    public function setHeight($heightInPixels): self
+    public function setHeight(int|string $heightInPixels): self
     {
         $semanticHeights = [Size::SM => 18, Size::MD => 24, Size::LG => 48, Size::XL => 96];
 
@@ -58,6 +61,22 @@ final class AvatarField implements FieldInterface
     public function setIsGravatarEmail(bool $isGravatar = true): self
     {
         $this->setCustomOption(self::OPTION_IS_GRAVATAR_EMAIL, $isGravatar);
+
+        return $this;
+    }
+
+    public function setGravatarDefaultImage(string $gravatarDefaultImage): self
+    {
+        $gravatarDefaultImage = trim($gravatarDefaultImage);
+
+        if (
+            !\in_array($gravatarDefaultImage, self::ALLOWED_GRAVATAR_DEFAULT_IMAGES, true)
+            && !(str_starts_with($gravatarDefaultImage, 'http://') || str_starts_with($gravatarDefaultImage, 'https://'))
+        ) {
+            throw new \InvalidArgumentException(sprintf('The argument of the "%s()" method must be an image URL or one of these values: %s ("%s" given).', __METHOD__, implode(', ', self::ALLOWED_GRAVATAR_DEFAULT_IMAGES), $gravatarDefaultImage));
+        }
+
+        $this->setCustomOption(self::OPTION_GRAVATAR_DEFAULT_IMAGE, $gravatarDefaultImage);
 
         return $this;
     }

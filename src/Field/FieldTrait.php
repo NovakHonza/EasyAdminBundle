@@ -69,20 +69,14 @@ trait FieldTrait
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setValue($value): self
+    public function setValue(mixed $value): self
     {
         $this->dto->setValue($value);
 
         return $this;
     }
 
-    /**
-     * @param mixed $value
-     */
-    public function setFormattedValue($value): self
+    public function setFormattedValue(mixed $value): self
     {
         $this->dto->setFormattedValue($value);
 
@@ -117,10 +111,7 @@ trait FieldTrait
         return $this;
     }
 
-    /**
-     * @param mixed $emptyData
-     */
-    public function setEmptyData($emptyData = null): self
+    public function setEmptyData(mixed $emptyData = null): self
     {
         $this->dto->setFormTypeOption('empty_data', $emptyData);
 

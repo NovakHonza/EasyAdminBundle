@@ -4,24 +4,21 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Dto;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
+ *
+ * @template TEntity of object = object
  */
 class BatchActionDto
 {
-    private string $name;
-    /** @var array<mixed> */
-    private array $entityIds;
-    private string $entityFqcn;
-    private string $csrfToken;
-
     /**
-     * @param array<mixed> $entityIds
+     * @param array<mixed>          $entityIds
+     * @param class-string<TEntity> $entityFqcn
      */
-    public function __construct(string $name, array $entityIds, string $entityFqcn, string $csrfToken)
-    {
-        $this->name = $name;
-        $this->entityIds = $entityIds;
-        $this->entityFqcn = $entityFqcn;
-        $this->csrfToken = $csrfToken;
+    public function __construct(
+        private readonly string $name,
+        private readonly array $entityIds,
+        private readonly string $entityFqcn,
+        private readonly string $csrfToken,
+    ) {
     }
 
     public function getName(): string
@@ -37,6 +34,9 @@ class BatchActionDto
         return $this->entityIds;
     }
 
+    /**
+     * @return class-string<TEntity>
+     */
     public function getEntityFqcn(): string
     {
         return $this->entityFqcn;

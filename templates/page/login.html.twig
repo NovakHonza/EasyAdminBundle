@@ -22,7 +22,7 @@
     {% set _remember_me_label = remember_me_label is defined ? remember_me_label|trans : 'login_page.remember_me'|trans({}, 'EasyAdminBundle') %}
     {% set _sign_in_label = sign_in_label is defined ? sign_in_label|trans : 'login_page.sign_in'|trans({}, 'EasyAdminBundle') %}
 
-    {% include '@EasyAdmin/flash_messages.html.twig' %}
+    {{ include('@EasyAdmin/flash_messages.html.twig') }}
 
     <div class="login-wrapper">
         <header class="main-header">
@@ -89,7 +89,7 @@
                     </div>
                 {% endif %}
 
-                <button type="submit" class="btn btn-primary btn-lg btn-block">{{ _sign_in_label }}</button>
+                <twig:ea:Button type="submit" variant="primary" size="lg" isBlock htmlAttributes="{class: 'btn-block'}">{{ _sign_in_label }}</twig:ea:Button>
             </form>
 
             <script src="{{ asset('login.js', constant('EasyCorp\\Bundle\\EasyAdminBundle\\Asset\\AssetPackage::PACKAGE_NAME')) }}"></script>

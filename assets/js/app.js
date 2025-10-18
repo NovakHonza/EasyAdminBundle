@@ -182,17 +182,10 @@ class App {
         };
 
         const searchQueryTerms = tokenizeString(searchElement.value);
-        const searchQueryTermsHighlightRegexp = new RegExp(
-            searchQueryTerms
-                // escapes all characters that are special inside a RegExp
-                .map((term) => term.replace(/[|\\{}()[\]^$+*?.-]/g, '\\$&'))
-                .join('|'),
-            'i'
-        );
 
         const elementsToHighlight = document.querySelectorAll('table tbody td.searchable');
         const highlighter = new Mark(elementsToHighlight);
-        highlighter.markRegExp(searchQueryTermsHighlightRegexp);
+        highlighter.mark(searchQueryTerms, { separateWordSearch: false });
     }
 
     #createFilters() {
@@ -389,7 +382,7 @@ class App {
     }
 
     #createModalWindowsForDeleteActions() {
-        document.querySelectorAll('.action-delete').forEach((actionElement) => {
+        document.querySelectorAll('[data-action-name="delete"]').forEach((actionElement) => {
             actionElement.addEventListener('click', (event) => {
                 event.preventDefault();
 

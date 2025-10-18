@@ -32,24 +32,13 @@ use function Symfony\Component\Translation\t;
  */
 final class AssociationConfigurator implements FieldConfiguratorInterface
 {
-    private EntityFactory $entityFactory;
-    private AdminUrlGeneratorInterface $adminUrlGenerator;
-    private RequestStack $requestStack;
-    private ControllerFactory $controllerFactory;
-    private CacheItemPoolInterface $cache;
-
     public function __construct(
-        EntityFactory $entityFactory,
-        AdminUrlGeneratorInterface $adminUrlGenerator,
-        RequestStack $requestStack,
-        ControllerFactory $controllerFactory,
-        CacheItemPoolInterface $cache,
+        private readonly EntityFactory $entityFactory,
+        private readonly AdminUrlGeneratorInterface $adminUrlGenerator,
+        private readonly RequestStack $requestStack,
+        private readonly ControllerFactory $controllerFactory,
+        private readonly CacheItemPoolInterface $cache,
     ) {
-        $this->entityFactory = $entityFactory;
-        $this->adminUrlGenerator = $adminUrlGenerator;
-        $this->requestStack = $requestStack;
-        $this->controllerFactory = $controllerFactory;
-        $this->cache = $cache;
     }
 
     public function supports(FieldDto $field, EntityDto $entityDto): bool
@@ -112,6 +101,7 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
         $propertyNameParts = explode('.', $propertyName);
         if (\count($propertyNameParts) > 1) {
             // prepare starting class for association
+            /** @var class-string $targetEntityFqcn */
             $targetEntityFqcn = $entityDto->getPropertyMetadata($propertyNameParts[0])->get('targetEntity');
             array_shift($propertyNameParts);
             $metadata = $this->entityFactory->getEntityMetadata($targetEntityFqcn);
@@ -315,14 +305,16 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
         if (null === $associatedEntity) {
             $targetCrudControllerAction = Action::NEW;
             $targetCrudControllerPageName = $field->getCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_NEW_PAGE_NAME) ?? Crud::PAGE_NEW;
+            $crudPageName = Crud::PAGE_NEW;
         } else {
             $targetCrudControllerAction = Action::EDIT;
             $targetCrudControllerPageName = $field->getCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_EDIT_PAGE_NAME) ?? Crud::PAGE_EDIT;
+            $crudPageName = Crud::PAGE_EDIT;
         }
 
         $field->setFormTypeOption(
             'entityDto',
-            $this->createEntityDto($targetEntityFqcn, $targetCrudControllerFqcn, $targetCrudControllerAction, $targetCrudControllerPageName),
+            $this->createEntityDto($targetEntityFqcn, $targetCrudControllerFqcn, $targetCrudControllerAction, $targetCrudControllerPageName, $crudPageName),
         );
     }
 
@@ -330,7 +322,7 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
      * @param class-string $entityFqcn
      * @param class-string $crudControllerFqcn
      */
-    private function createEntityDto(string $entityFqcn, string $crudControllerFqcn, string $crudControllerAction, string $crudControllerPageName): EntityDto
+    private function createEntityDto(string $entityFqcn, string $crudControllerFqcn, string $crudControllerAction, string $crudControllerPageName, string $crudPageName): EntityDto
     {
         $entityDto = $this->entityFactory->create($entityFqcn);
 
@@ -342,7 +334,7 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
 
         $fields = $crudController->configureFields($crudControllerPageName);
 
-        $this->entityFactory->processFields($entityDto, FieldCollection::new($fields));
+        $this->entityFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
 
         return $entityDto;
     }

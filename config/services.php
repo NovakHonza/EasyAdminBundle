@@ -185,7 +185,9 @@ return static function (ContainerConfigurator $container) {
             ->share(false)
             ->arg(0, service(AdminContextProvider::class))
             ->arg(1, service('router'))
-            ->arg(2, service(AdminRouteGenerator::class))
+            ->arg(2, service(DashboardControllerRegistry::class))
+            ->arg(3, service(AdminRouteGenerator::class))
+            ->arg(4, service('cache.easyadmin'))
 
         ->set('service_locator_'.AdminUrlGenerator::class, ServiceLocator::class)
             ->args([[AdminUrlGenerator::class => service(AdminUrlGenerator::class)]])

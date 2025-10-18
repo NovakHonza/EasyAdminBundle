@@ -300,7 +300,13 @@ class AdminUrlGeneratorTest extends WebTestCase
 
         $adminRouteGenerator = new AdminRouteGenerator($dashboardControllers, [], $cacheMock, 'en');
 
-        return new AdminUrlGenerator($adminContextProviderMock, $routerMock, $adminRouteGenerator);
+        $cacheItem = new CacheItem();
+        $cacheItem->set([]);
+        $urlGeneratorCacheMock = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
+        $urlGeneratorCacheMock->method('getItem')->willReturn($cacheItem);
+        $urlGeneratorCacheMock->method('save')->willReturn(true);
+
+        return new AdminUrlGenerator($adminContextProviderMock, $routerMock, $adminRouteGenerator, $urlGeneratorCacheMock);
     }
 }
 

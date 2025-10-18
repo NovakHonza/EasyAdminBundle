@@ -4,6 +4,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Menu;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MenuItemDto;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
@@ -51,7 +52,7 @@ class MenuItemMatcher implements MenuItemMatcherInterface
         // 1) check all menu items for an exact match with the current URL
         // 2) if no match, check again with the current URL action changed to 'index'
         // 3) if still no match, check again with the current URL action changed to 'index' and no query parameters
-        $currentUrlWithoutHost = $request->getPathInfo();
+        $currentUrlWithoutHost = $request->getBasePath().$request->getPathInfo();
         $currentUrlQueryParams = $request->query->all();
         unset($currentUrlQueryParams[EA::SORT], $currentUrlQueryParams[EA::PAGE], $currentUrlQueryParams[EA::QUERY], $currentUrlQueryParams[EA::FILTERS]);
         // sort them because menu items always have their query parameters sorted
@@ -92,7 +93,10 @@ class MenuItemMatcher implements MenuItemMatcherInterface
         // to match the same URL with the 'index' action. This ensures e.g. that the
         // /admin/post menu item is highlighted when visiting related URLs such as
         // /admin/post/new, /admin/post/37/edit, etc.
-        if (null === $crudControllerFqcn = $request->attributes->get(EA::CRUD_CONTROLLER_FQCN)) {
+        // But only try to generate the index CRUD URL if we know the controller is a EasyAdmin CRUD controller
+        // (e.g. ignore this in custom admin routes created with #[AdminRoute] and unrelated to CRUD)
+        $crudControllerFqcn = $request->attributes->get(EA::CRUD_CONTROLLER_FQCN);
+        if (null === $crudControllerFqcn || !is_subclass_of($crudControllerFqcn, CrudControllerInterface::class)) {
             return $menuItems;
         }
 

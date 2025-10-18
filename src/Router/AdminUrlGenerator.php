@@ -8,6 +8,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInte
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
 /**
@@ -23,6 +24,7 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
         private readonly AdminContextProviderInterface $adminContextProvider,
         private readonly UrlGeneratorInterface $urlGenerator,
         private readonly AdminRouteGeneratorInterface $adminRouteGenerator,
+        private readonly CacheItemPoolInterface $cache,
     ) {
     }
 
@@ -190,7 +192,12 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
             return $this->urlGenerator->generate($this->dashboardRoute, [], $urlType);
         }
 
-        if (null !== $this->get(EA::ROUTE_NAME)) {
+        if (null !== $routeName = $this->get(EA::ROUTE_NAME)) {
+            $adminRoutes = $this->cache->getItem(AdminRouteGenerator::CACHE_KEY_ROUTE_TO_FQCN)->get();
+            if (null !== $adminRoutes && \array_key_exists($routeName, $adminRoutes)) {
+                return $this->urlGenerator->generate($routeName, $routeParameters[EA::ROUTE_PARAMS] ?? [], $urlType);
+            }
+
             return $this->urlGenerator->generate($this->dashboardRoute, $canonicalRouteParameters, $urlType);
         }
 

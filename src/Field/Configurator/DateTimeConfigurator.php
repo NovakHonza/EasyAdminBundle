@@ -17,11 +17,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TimeField;
  */
 final class DateTimeConfigurator implements FieldConfiguratorInterface
 {
-    private IntlFormatterInterface $intlFormatter;
-
-    public function __construct(IntlFormatterInterface $intlFormatter)
+    public function __construct(private readonly IntlFormatterInterface $intlFormatter)
     {
-        $this->intlFormatter = $intlFormatter;
     }
 
     public function supports(FieldDto $field, EntityDto $entityDto): bool
@@ -97,7 +94,7 @@ final class DateTimeConfigurator implements FieldConfiguratorInterface
         if (!$entityDto->hasProperty($field->getProperty())) {
             return;
         }
-        $doctrineDataType = $entityDto->getPropertyMetadata($field->getProperty())->get('type');
+        $doctrineDataType = $entityDto->getPropertyDataType($field->getProperty());
         $isImmutableDateTime = \in_array($doctrineDataType, [Types::DATETIMETZ_IMMUTABLE, Types::DATETIME_IMMUTABLE, Types::DATE_IMMUTABLE, Types::TIME_IMMUTABLE], true);
         if ($isImmutableDateTime) {
             $field->setFormTypeOptionIfNotSet('input', 'datetime_immutable');

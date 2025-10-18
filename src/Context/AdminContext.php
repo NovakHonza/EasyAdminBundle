@@ -28,33 +28,19 @@ use Symfony\Component\Security\Core\User\UserInterface;
  */
 final class AdminContext implements AdminContextInterface
 {
-    private Request $request;
-    private ?UserInterface $user;
-    private I18nDto $i18nDto;
-    private ?EntityDto $entityDto;
-    private DashboardDto $dashboardDto;
-    private DashboardControllerInterface $dashboardControllerInstance;
-    private AssetsDto $assetDto;
-    private ?CrudDto $crudDto;
-    private ?SearchDto $searchDto;
-    private MenuFactoryInterface $menuFactory;
-    private TemplateRegistry $templateRegistry;
-    private ?MainMenuDto $mainMenuDto = null;
-    private ?UserMenuDto $userMenuDto = null;
-
-    public function __construct(Request $request, ?UserInterface $user, I18nDto $i18nDto, DashboardDto $dashboardDto, DashboardControllerInterface $dashboardController, AssetsDto $assetDto, ?CrudDto $crudDto, ?EntityDto $entityDto, ?SearchDto $searchDto, MenuFactoryInterface $menuFactory, TemplateRegistry $templateRegistry)
-    {
-        $this->request = $request;
-        $this->user = $user;
-        $this->i18nDto = $i18nDto;
-        $this->dashboardDto = $dashboardDto;
-        $this->dashboardControllerInstance = $dashboardController;
-        $this->crudDto = $crudDto;
-        $this->assetDto = $assetDto;
-        $this->entityDto = $entityDto;
-        $this->searchDto = $searchDto;
-        $this->menuFactory = $menuFactory;
-        $this->templateRegistry = $templateRegistry;
+    public function __construct(
+        private readonly Request $request,
+        private readonly ?UserInterface $user,
+        private readonly I18nDto $i18nDto,
+        private readonly DashboardDto $dashboardDto,
+        private readonly DashboardControllerInterface $dashboardControllerInstance,
+        private readonly ?CrudDto $crudDto,
+        private readonly AssetsDto $assetDto,
+        private readonly ?EntityDto $entityDto,
+        private readonly ?SearchDto $searchDto,
+        private readonly MenuFactoryInterface $menuFactory,
+        private readonly TemplateRegistry $templateRegistry,
+    ) {
     }
 
     public function getRequest(): Request

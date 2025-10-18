@@ -14,16 +14,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Event\EntityLifecycleEventInterfac
 abstract class AbstractLifecycleEvent implements EntityLifecycleEventInterface
 {
     /**
-     * @var TEntity
-     */
-    protected $entityInstance;
-
-    /**
      * @param TEntity $entityInstance
      */
-    public function __construct(?object $entityInstance)
+    public function __construct(protected ?object $entityInstance)
     {
-        $this->entityInstance = $entityInstance;
     }
 
     public function getEntityInstance(): ?object

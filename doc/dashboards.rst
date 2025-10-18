@@ -3,7 +3,7 @@ Dashboards
 
 **Dashboards** are the entry point of backends and they link to one or more
 :doc:`resources </crud>`. Dashboards also display a main menu to navigate the
-resources and the information of the logged in user.
+resources and information about the logged-in user.
 
 Imagine that you have a simple application with three Doctrine entities: users,
 blog posts and categories. Your own employees can create and edit any of them
@@ -121,7 +121,7 @@ method of the controller.
 The name of the dashboard route should be concise because it's used as the prefix
 of all the routes associated to this dashboard (e.g. if this route name is ``my_private_backend``,
 the generated routes will be like ``my_private_backend_product_index``). The path
-of this route will also be used by all the dasboard routes (e.g. if the path is
+of this route will also be used by all the dashboard routes (e.g. if the path is
 ``/_secret/backend``, the generated routes paths will be like ``/_secret/backend/category/324``).
 
 That's it. Later, when you start adding :doc:`CRUD controllers </crud>`, the route

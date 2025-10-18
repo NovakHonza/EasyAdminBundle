@@ -9,7 +9,7 @@ jobs:
     phpstan:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Setup PHP, with composer and extensions
               uses: shivammathur/setup-php@v2
@@ -78,7 +78,7 @@ jobs:
         runs-on: ${{ matrix.os }}
         continue-on-error: ${{ matrix.stability == 'dev' }}
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Setup PHP, with composer and extensions
               uses: shivammathur/setup-php@v2
@@ -124,7 +124,7 @@ jobs:
     php-linter:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             # see https://github.com/OskarStark/php-cs-fixer-ga
             - name: PHP-CS-Fixer
@@ -135,7 +135,7 @@ jobs:
     doc-linter:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: DOCtor-RST
               uses: docker://oskarstark/doctor-rst
@@ -147,7 +147,7 @@ jobs:
     css-linter:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
 
             - name: Setup PHP, with composer and extensions
               uses: shivammathur/setup-php@v2
@@ -163,12 +163,31 @@ jobs:
                 run: |
                     php ./src/Resources/bin/logical-css-properties-linter.php
 
+    twig-linter:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Setup PHP, with composer and extensions
+              uses: shivammathur/setup-php@v2
+              with:
+                  php-version: 8.2
+                  coverage: none
+
+            - name: Install dependencies
+              run: |
+                  composer install
+
+            -   name: Lint Twig template syntax
+                run: |
+                    vendor/bin/twig-cs-fixer lint templates/ --report=github
+
     js-linter:
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
+            - uses: actions/checkout@v5
             - run: npm i -g corepack && corepack enable
-            - uses: actions/setup-node@v4
+            - uses: actions/setup-node@v5
               with:
                   cache: 'yarn'
             - run: yarn --immutable

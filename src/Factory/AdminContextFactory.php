@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Factory\MenuFactoryInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\ActionConfigDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\AssetsDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
@@ -33,19 +34,13 @@ use Symfony\Contracts\Translation\TranslatableInterface;
  */
 final class AdminContextFactory
 {
-    private ?TokenStorageInterface $tokenStorage;
-    private MenuFactoryInterface $menuFactory;
-    private EntityFactory $entityFactory;
-    private AdminRouteGenerator $adminRouteGenerator;
-    private CacheItemPoolInterface $cache;
-
-    public function __construct(?TokenStorageInterface $tokenStorage, MenuFactoryInterface $menuFactory, EntityFactory $entityFactory, AdminRouteGenerator $adminRouteGenerator, CacheItemPoolInterface $cache)
-    {
-        $this->tokenStorage = $tokenStorage;
-        $this->menuFactory = $menuFactory;
-        $this->entityFactory = $entityFactory;
-        $this->adminRouteGenerator = $adminRouteGenerator;
-        $this->cache = $cache;
+    public function __construct(
+        private readonly ?TokenStorageInterface $tokenStorage,
+        private readonly MenuFactoryInterface $menuFactory,
+        private readonly EntityFactory $entityFactory,
+        private readonly AdminRouteGeneratorInterface $adminRouteGenerator,
+        private readonly CacheItemPoolInterface $cache,
+    ) {
     }
 
     public function create(Request $request, DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ?string $actionName = null): AdminContext
@@ -66,7 +61,7 @@ final class AdminContextFactory
         $templateRegistry = $this->getTemplateRegistry($dashboardController, $crudDto);
         $user = $this->getUser($this->tokenStorage);
 
-        return new AdminContext($request, $user, $i18nDto, $dashboardDto, $dashboardController, $assetDto, $crudDto, $entityDto, $searchDto, $this->menuFactory, $templateRegistry);
+        return new AdminContext($request, $user, $i18nDto, $dashboardDto, $dashboardController, $crudDto, $assetDto, $entityDto, $searchDto, $this->menuFactory, $templateRegistry);
     }
 
     private function getDashboardDto(Request $request, DashboardControllerInterface $dashboardControllerInstance): DashboardDto
@@ -204,12 +199,11 @@ final class AdminContextFactory
             return null;
         }
 
-        $queryParams = $request->query->all();
         $searchableProperties = $crudDto->getSearchFields();
-        $query = $queryParams[EA::QUERY] ?? null;
+        $query = $request->query->has(EA::QUERY) ? (string) $request->query->get(EA::QUERY) : null;
         $defaultSort = $crudDto->getDefaultSort();
-        $customSort = $queryParams[EA::SORT] ?? [];
-        $appliedFilters = $queryParams[EA::FILTERS] ?? [];
+        $customSort = $request->query->all(EA::SORT);
+        $appliedFilters = $request->query->all(EA::FILTERS);
         $searchMode = $crudDto->getSearchMode();
 
         return new SearchDto($request, $searchableProperties, $query, $defaultSort, $customSort, $appliedFilters, $searchMode);

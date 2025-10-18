@@ -11,6 +11,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Context\AdminContextInterface;
  */
 interface AdminContextProviderInterface
 {
+    /**
+     * @deprecated since 4.27 and it will be removed in EasyAdmin 5.0 without a replacement
+     */
     public function hasContext(): bool;
 
     public function getContext(): ?AdminContextInterface;

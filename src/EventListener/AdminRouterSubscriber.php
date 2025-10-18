@@ -5,7 +5,6 @@ namespace EasyCorp\Bundle\EasyAdminBundle\EventListener;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Cache;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\AdminContextFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\ControllerFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminRouteGenerator;
@@ -33,23 +32,15 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
  */
 class AdminRouterSubscriber implements EventSubscriberInterface
 {
-    private AdminContextFactory $adminContextFactory;
-    private ControllerFactory $controllerFactory;
-    private ControllerResolverInterface $controllerResolver;
-    private UrlGeneratorInterface $urlGenerator;
-    private RequestMatcherInterface $requestMatcher;
-    private CacheItemPoolInterface $cache;
-    private AdminRouteGeneratorInterface $adminRouteGenerator;
-
-    public function __construct(AdminContextFactory $adminContextFactory, ControllerFactory $controllerFactory, ControllerResolverInterface $controllerResolver, UrlGeneratorInterface $urlGenerator, RequestMatcherInterface $requestMatcher, CacheItemPoolInterface $cache, AdminRouteGenerator $adminRouteGenerator)
-    {
-        $this->adminContextFactory = $adminContextFactory;
-        $this->controllerFactory = $controllerFactory;
-        $this->controllerResolver = $controllerResolver;
-        $this->urlGenerator = $urlGenerator;
-        $this->requestMatcher = $requestMatcher;
-        $this->cache = $cache;
-        $this->adminRouteGenerator = $adminRouteGenerator;
+    public function __construct(
+        private readonly AdminContextFactory $adminContextFactory,
+        private readonly ControllerFactory $controllerFactory,
+        private readonly ControllerResolverInterface $controllerResolver,
+        private readonly UrlGeneratorInterface $urlGenerator,
+        private readonly RequestMatcherInterface $requestMatcher,
+        private readonly CacheItemPoolInterface $cache,
+        private readonly AdminRouteGenerator $adminRouteGenerator,
+    ) {
     }
 
     public static function getSubscribedEvents(): array
@@ -114,7 +105,7 @@ class AdminRouterSubscriber implements EventSubscriberInterface
         // if the request is related to a custom action, change the controller to be executed
         if (null !== $request->query->get(EA::ROUTE_NAME)) {
             $symfonyControllerAsString = $this->getSymfonyControllerFqcn($request);
-            $symfonyControllerCallable = $this->getSymfonyControllerInstance($symfonyControllerAsString, $request->query->all()[EA::ROUTE_PARAMS] ?? []);
+            $symfonyControllerCallable = $this->getSymfonyControllerInstance($symfonyControllerAsString, $request->query->all(EA::ROUTE_PARAMS));
             if (false !== $symfonyControllerCallable) {
                 // this makes Symfony believe that another controller is being executed
                 // (e.g. this is needed for the autowiring of controller action arguments)
@@ -123,7 +114,7 @@ class AdminRouterSubscriber implements EventSubscriberInterface
                 $event->getRequest()->attributes->set('_controller', $symfonyControllerAsString);
                 // route params must be added as route attribute; otherwise, param converters don't work
                 $event->getRequest()->attributes->replace(array_merge(
-                    $request->query->all()[EA::ROUTE_PARAMS] ?? [],
+                    $request->query->all(EA::ROUTE_PARAMS),
                     $event->getRequest()->attributes->all()
                 ));
 
@@ -141,7 +132,7 @@ class AdminRouterSubscriber implements EventSubscriberInterface
     private function getSymfonyControllerFqcn(Request $request): ?string
     {
         $routeName = $request->query->get(EA::ROUTE_NAME);
-        $routeParams = $request->query->all()[EA::ROUTE_PARAMS] ?? [];
+        $routeParams = $request->query->all(EA::ROUTE_PARAMS);
         $url = $this->urlGenerator->generate($routeName, $routeParams, UrlGeneratorInterface::ABSOLUTE_PATH);
 
         $newRequest = $request->duplicate();

@@ -23,30 +23,40 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
  */
 final class EntityFactory
 {
-    private FieldFactory $fieldFactory;
-    private ActionFactory $actionFactory;
-    private AuthorizationCheckerInterface $authorizationChecker;
-    private ManagerRegistry $doctrine;
-    private EventDispatcherInterface $eventDispatcher;
-
-    public function __construct(FieldFactory $fieldFactory, ActionFactory $actionFactory, AuthorizationCheckerInterface $authorizationChecker, ManagerRegistry $doctrine, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->fieldFactory = $fieldFactory;
-        $this->actionFactory = $actionFactory;
-        $this->authorizationChecker = $authorizationChecker;
-        $this->doctrine = $doctrine;
-        $this->eventDispatcher = $eventDispatcher;
+    public function __construct(
+        private readonly FieldFactory $fieldFactory,
+        private readonly ActionFactory $actionFactory,
+        private readonly AuthorizationCheckerInterface $authorizationChecker,
+        private readonly ManagerRegistry $doctrine,
+        private readonly EventDispatcherInterface $eventDispatcher,
+    ) {
     }
 
-    public function processFields(EntityDto $entityDto, FieldCollection $fields): void
+    public function processFields(EntityDto $entityDto, FieldCollection $fields, ?string $pageName = null): void
     {
-        $this->fieldFactory->processFields($entityDto, $fields);
+        if (null === $pageName) {
+            trigger_deprecation(
+                'easycorp/easyadmin-bundle',
+                '4.27.0',
+                'Argument "$pageName" is missing. Omitting it will cause an error in 5.0.0.',
+            );
+        }
+
+        $this->fieldFactory->processFields($entityDto, $fields, $pageName);
     }
 
-    public function processFieldsForAll(EntityCollection $entities, FieldCollection $fields): void
+    public function processFieldsForAll(EntityCollection $entities, FieldCollection $fields, ?string $pageName = null): void
     {
+        if (null === $pageName) {
+            trigger_deprecation(
+                'easycorp/easyadmin-bundle',
+                '4.27.0',
+                'Argument "$pageName" is missing. Omitting it will cause an error in 5.0.0.',
+            );
+        }
+
         foreach ($entities as $entity) {
-            $this->processFields($entity, clone $fields);
+            $this->processFields($entity, clone $fields, $pageName);
             $entities->set($entity);
         }
     }
@@ -76,8 +86,17 @@ final class EntityFactory
     /**
      * @param object $entityInstance
      */
-    public function createForEntityInstance($entityInstance): EntityDto
+    public function createForEntityInstance(/* object */ $entityInstance): EntityDto
     {
+        if (!\is_object($entityInstance)) {
+            trigger_deprecation(
+                'easycorp/easyadmin-bundle',
+                '4.27.0',
+                'Not passing argument "$entityInstance" for method "%s" of type "object" is deprecated.',
+                __METHOD__,
+            );
+        }
+
         return $this->doCreate(null, null, null, $entityInstance);
     }
 
@@ -102,12 +121,16 @@ final class EntityFactory
     }
 
     /**
-     * @param class-string $entityFqcn
+     * @template TEntity of object
+     *
+     * @param class-string<TEntity> $entityFqcn
+     *
+     * @return ClassMetadata<TEntity>
      */
     public function getEntityMetadata(string $entityFqcn): ClassMetadata
     {
         $entityManager = $this->getEntityManager($entityFqcn);
-        /** @var ClassMetadata $entityMetadata */
+        /** @var ClassMetadata<TEntity> $entityMetadata */
         $entityMetadata = $entityManager->getClassMetadata($entityFqcn);
 
         if (1 !== \count($entityMetadata->getIdentifierFieldNames())) {
@@ -188,6 +211,9 @@ final class EntityFactory
             return $class;
         }
 
-        return substr($class, $pos + Proxy::MARKER_LENGTH + 2);
+        /** @var class-string $realClass */
+        $realClass = substr($class, $pos + Proxy::MARKER_LENGTH + 2);
+
+        return $realClass;
     }
 }
