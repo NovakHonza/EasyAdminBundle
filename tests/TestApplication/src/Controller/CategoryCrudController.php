@@ -2,7 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller;
 
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminAction;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
@@ -66,7 +66,7 @@ class CategoryCrudController extends AbstractCrudController
             ->add('active');
     }
 
-    #[AdminAction(routePath: '/custom', routeName: 'custom')]
+    #[AdminRoute('/custom', 'custom')]
     public function customAction(AdminContext $context): Response
     {
         if (!$this->isGranted(Permission::EA_EXECUTE_ACTION, ['action' => AppAction::CUSTOM_ACTION, 'entity' => $context->getEntity()])) {

@@ -2,7 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\PrettyUrlsApp\Controller;
 
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminAction;
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\PrettyUrlsApp\Entity\Category;
@@ -22,7 +22,7 @@ class CategoryCrudController extends AbstractCrudController
         ];
     }
 
-    #[AdminAction(routeName: 'custom_action', routePath: 'custom/action')]
+    #[AdminRoute('/custom/action', 'custom_action')]
     public function customAction(): Response
     {
         return $this->render('category/custom_action.html.twig');
