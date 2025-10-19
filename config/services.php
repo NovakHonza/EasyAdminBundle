@@ -229,11 +229,9 @@ return static function (ContainerConfigurator $container) {
             ->arg(4, service('event_dispatcher'))
 
         ->set(EntityFactory::class)
-            ->arg(0, service(FieldFactory::class))
-            ->arg(1, service(ActionFactory::class))
-            ->arg(2, service(AuthorizationChecker::class))
-            ->arg(3, service('doctrine'))
-            ->arg(4, service('event_dispatcher'))
+            ->arg(0, service(AuthorizationChecker::class))
+            ->arg(1, service('doctrine'))
+            ->arg(2, service('event_dispatcher'))
 
         ->set(EntityPaginator::class)
             ->arg(0, service(AdminUrlGenerator::class))
@@ -315,7 +313,8 @@ return static function (ContainerConfigurator $container) {
             ->arg(1, new Reference(AdminUrlGenerator::class))
             ->arg(2, service('request_stack'))
             ->arg(3, service(ControllerFactory::class))
-            ->arg(4, service('cache.easyadmin'))
+            ->arg(4, new Reference(FieldFactory::class))
+            ->arg(5, service('cache.easyadmin'))
 
         ->set(AvatarConfigurator::class)
 
@@ -375,7 +374,8 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, service('request_stack'))
             ->arg(1, service(EntityFactory::class))
             ->arg(2, service(ControllerFactory::class))
-            ->arg(3, service('cache.easyadmin'))
+            ->arg(3, new Reference(FieldFactory::class))
+            ->arg(4, service('cache.easyadmin'))
 
         ->set(SlugConfigurator::class)
 

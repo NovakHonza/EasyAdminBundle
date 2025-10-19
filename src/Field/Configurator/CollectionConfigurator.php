@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\ControllerFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudFormType;
 use Psr\Cache\CacheItemPoolInterface;
@@ -34,6 +35,7 @@ final class CollectionConfigurator implements FieldConfiguratorInterface
         private readonly RequestStack $requestStack,
         private readonly EntityFactory $entityFactory,
         private readonly ControllerFactory $controllerFactory,
+        private readonly FieldFactory $fieldFactory,
         private readonly CacheItemPoolInterface $cache,
     ) {
     }
@@ -172,7 +174,11 @@ final class CollectionConfigurator implements FieldConfiguratorInterface
 
         $fields = $crudController->configureFields($crudControllerPageName);
 
-        $this->entityFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
+        if (null === $this->fieldFactory) {
+            $this->entityFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
+        } else {
+            $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
+        }
 
         return $entityDto;
     }
