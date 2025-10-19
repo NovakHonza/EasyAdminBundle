@@ -35,9 +35,6 @@ final class EntityFactory
         return $this->doCreate($entityFqcn, $entityId, $entityPermission);
     }
 
-    /**
-     * @param object $entityInstance
-     */
     public function createForEntityInstance(object $entityInstance): EntityDto
     {
         return $this->doCreate(null, null, null, $entityInstance);
