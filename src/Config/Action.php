@@ -121,19 +121,6 @@ final class Action
         return $this;
     }
 
-    public function displayAsLink(): self
-    {
-        @trigger_deprecation(
-            'easycorp/easyadmin-bundle',
-            '4.26.0',
-            'The "%s()" method is deprecated and will be removed in 5.0.0. Use "%s()" instead.',
-            __METHOD__,
-            'renderAsLink()'
-        );
-
-        return $this->renderAsLink();
-    }
-
     /**
      * This makes the button element to be `<a ...>` instead of `<button ...>` when rendering the action.
      * Visually, the action will look exactly the same as a button.
@@ -145,19 +132,6 @@ final class Action
         }
 
         return $this;
-    }
-
-    public function displayAsButton(): self
-    {
-        @trigger_deprecation(
-            'easycorp/easyadmin-bundle',
-            '4.26.0',
-            'The "%s()" method is deprecated and will be removed in 5.0.0. Use "%s()" instead.',
-            __METHOD__,
-            'renderAsButton()'
-        );
-
-        return $this->renderAsButton();
     }
 
     /**
@@ -174,19 +148,6 @@ final class Action
         $this->dto->setButtonType($buttonType);
 
         return $this;
-    }
-
-    public function displayAsForm(): self
-    {
-        @trigger_deprecation(
-            'easycorp/easyadmin-bundle',
-            '4.26.0',
-            'The "%s()" method is deprecated and will be removed in 5.0.0. Use "%s()" instead.',
-            __METHOD__,
-            'renderAsForm()'
-        );
-
-        return $this->renderAsForm();
     }
 
     /**

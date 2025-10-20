@@ -63,36 +63,12 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
      * Transforms ['a' => 'foo', 'b' => ['c' => ['d' => 7]]] into ['a' => 'foo', 'b[c][d]' => 7]
      * It's useful to submit nested arrays (e.g. query string parameters) as form fields.
      *
-     * @param mixed[]     $array
-     * @param string|null $parentKey
+     * @param array<string|int, mixed> $array
      *
-     * @return mixed[]
+     * @return array<string|int, mixed>
      */
-    public function flattenArray(/* array */ $array, /* ?string */ $parentKey = null): array
+    public function flattenArray(array $array, ?string $parentKey = null): array
     {
-        if (!\is_array($array)) {
-            trigger_deprecation(
-                'easycorp/easyadmin-bundle',
-                '4.27.0',
-                'Argument "%s" for "%s" must be one of these types: %s. Passing type "%s" will cause an error in 5.0.0.',
-                '$array',
-                __METHOD__,
-                '"array"',
-                \gettype($array)
-            );
-        }
-        if (!\is_string($parentKey) && null !== $parentKey) {
-            trigger_deprecation(
-                'easycorp/easyadmin-bundle',
-                '4.27.0',
-                'Argument "%s" for "%s" must be one of these types: %s. Passing type "%s" will cause an error in 5.0.0.',
-                '$parentKey',
-                __METHOD__,
-                '"string" or "null"',
-                \gettype($parentKey)
-            );
-        }
-
         $flattenedArray = [];
 
         foreach ($array as $flattenedKey => $value) {
@@ -124,7 +100,7 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
         return sprintf('%d%s', $scaledValue, $size[$factor]);
     }
 
-    public function representAsString($value, string|callable|null $toStringMethod = null): string
+    public function representAsString(mixed $value, string|callable|null $toStringMethod = null): string
     {
         if (null !== $toStringMethod) {
             if (\is_callable($toStringMethod)) {
