@@ -19,12 +19,12 @@ use Twig\Error\RuntimeError;
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  */
-final class ExceptionListener
+final readonly class ExceptionListener
 {
     public function __construct(
-        private readonly bool $kernelDebug,
-        private readonly AdminContextProviderInterface $adminContextProvider,
-        private readonly Environment $twig,
+        private bool $kernelDebug,
+        private AdminContextProviderInterface $adminContextProvider,
+        private Environment $twig,
     ) {
     }
 

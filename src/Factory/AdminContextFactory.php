@@ -31,14 +31,14 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class AdminContextFactory
+final readonly class AdminContextFactory
 {
     public function __construct(
-        private readonly ?TokenStorageInterface $tokenStorage,
-        private readonly MenuFactoryInterface $menuFactory,
-        private readonly EntityFactory $entityFactory,
-        private readonly AdminRouteGeneratorInterface $adminRouteGenerator,
-        private readonly CacheItemPoolInterface $cache,
+        private ?TokenStorageInterface $tokenStorage,
+        private MenuFactoryInterface $menuFactory,
+        private EntityFactory $entityFactory,
+        private AdminRouteGeneratorInterface $adminRouteGenerator,
+        private CacheItemPoolInterface $cache,
     ) {
     }
 

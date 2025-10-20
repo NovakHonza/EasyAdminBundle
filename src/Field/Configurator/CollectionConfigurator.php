@@ -29,14 +29,14 @@ use function Symfony\Component\String\u;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class CollectionConfigurator implements FieldConfiguratorInterface
+final readonly class CollectionConfigurator implements FieldConfiguratorInterface
 {
     public function __construct(
-        private readonly RequestStack $requestStack,
-        private readonly EntityFactory $entityFactory,
-        private readonly ControllerFactory $controllerFactory,
-        private readonly FieldFactory $fieldFactory,
-        private readonly CacheItemPoolInterface $cache,
+        private RequestStack $requestStack,
+        private EntityFactory $entityFactory,
+        private ControllerFactory $controllerFactory,
+        private FieldFactory $fieldFactory,
+        private CacheItemPoolInterface $cache,
     ) {
     }
 

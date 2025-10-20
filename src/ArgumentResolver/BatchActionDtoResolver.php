@@ -12,11 +12,10 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /*
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class BatchActionDtoResolver implements ValueResolverInterface
+final readonly class BatchActionDtoResolver implements ValueResolverInterface
 {
-    public function __construct(
-        private readonly AdminContextProviderInterface $adminContextProvider,
-    ) {
+    public function __construct(private AdminContextProviderInterface $adminContextProvider)
+    {
     }
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable

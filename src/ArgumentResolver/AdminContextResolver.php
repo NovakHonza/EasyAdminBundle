@@ -11,9 +11,9 @@ use Symfony\Component\HttpKernel\ControllerMetadata\ArgumentMetadata;
 /*
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class AdminContextResolver implements ValueResolverInterface
+final readonly class AdminContextResolver implements ValueResolverInterface
 {
-    public function __construct(private readonly AdminContextProviderInterface $adminContextProvider)
+    public function __construct(private AdminContextProviderInterface $adminContextProvider)
     {
     }
 

@@ -27,13 +27,13 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class ActionFactory
+final readonly class ActionFactory
 {
     public function __construct(
-        private readonly AdminContextProviderInterface $adminContextProvider,
-        private readonly AuthorizationCheckerInterface $authChecker,
-        private readonly AdminUrlGeneratorInterface $adminUrlGenerator,
-        private readonly ?CsrfTokenManagerInterface $csrfTokenManager = null,
+        private AdminContextProviderInterface $adminContextProvider,
+        private AuthorizationCheckerInterface $authChecker,
+        private AdminUrlGeneratorInterface $adminUrlGenerator,
+        private ?CsrfTokenManagerInterface $csrfTokenManager = null,
     ) {
     }
 

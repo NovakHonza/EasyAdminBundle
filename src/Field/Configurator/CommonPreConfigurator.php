@@ -22,9 +22,9 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class CommonPreConfigurator implements FieldConfiguratorInterface
+final readonly class CommonPreConfigurator implements FieldConfiguratorInterface
 {
-    public function __construct(private readonly PropertyAccessorInterface $propertyAccessor, private readonly EntityFactory $entityFactory)
+    public function __construct(private PropertyAccessorInterface $propertyAccessor, private EntityFactory $entityFactory)
     {
     }
 
