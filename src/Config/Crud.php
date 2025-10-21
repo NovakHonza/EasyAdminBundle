@@ -52,8 +52,6 @@ class Crud
 
     /**
      * @param TranslatableInterface|string|callable $label The callable signature is: fn ($entityInstance, $pageName): string
-     *
-     * @phpstan-param mixed $label
      */
     public function setEntityLabelInSingular(TranslatableInterface|string|callable $label): self
     {
@@ -64,8 +62,6 @@ class Crud
 
     /**
      * @param TranslatableInterface|string|callable $label The callable signature is: fn ($entityInstance, $pageName): string
-     *
-     * @phpstan-param mixed $label
      */
     public function setEntityLabelInPlural(TranslatableInterface|string|callable $label): self
     {
@@ -76,8 +72,6 @@ class Crud
 
     /**
      * @param TranslatableInterface|string|callable $title The callable signature is: fn ($entityInstance): string
-     *
-     * @phpstan-param mixed $title
      */
     public function setPageTitle(string $pageName, TranslatableInterface|string|callable $title): self
     {

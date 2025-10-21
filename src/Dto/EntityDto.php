@@ -20,7 +20,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 final class EntityDto
 {
     private bool $isAccessible = true;
-    private ?string $primaryKeyName;
+    private string $primaryKeyName;
     private mixed $primaryKeyValue = null;
     private ?FieldCollection $fields = null;
     private ?ActionCollection $actions = null;
@@ -78,7 +78,7 @@ final class EntityDto
         return $this->entityInstance;
     }
 
-    public function getPrimaryKeyName(): ?string
+    public function getPrimaryKeyName(): string
     {
         return $this->primaryKeyName;
     }
@@ -200,14 +200,6 @@ final class EntityDto
         throw new \InvalidArgumentException(sprintf('The "%s" field does not exist in the "%s" entity.', $propertyName, $this->getFqcn()));
     }
 
-    /**
-     * @deprecated since 4.27 and to be removed in 5.0, use $entityDto->getClassMetadata()->getFieldMapping($propertyName)->type and $entityDto->getClassMetadata()->getAssociationMapping($propertyName)->type() instead
-     */
-    public function getPropertyDataType(string $propertyName): string|int
-    {
-        return $this->getPropertyMetadata($propertyName)->get('type');
-    }
-
     public function hasProperty(string $propertyName): bool
     {
         return isset($this->metadata->fieldMappings[$propertyName])
@@ -218,22 +210,6 @@ final class EntityDto
     {
         return $this->metadata->hasAssociation($propertyName)
             || (str_contains($propertyName, '.') && !$this->isEmbeddedClassProperty($propertyName));
-    }
-
-    /**
-     * @deprecated since 4.27 and to be removed in 5.0, use $entityDto->getClassMetadata()->isSingleValuedAssociation($propertyName)
-     */
-    public function isToOneAssociation(string $propertyName): bool
-    {
-        return $this->getClassMetadata()->isSingleValuedAssociation($propertyName);
-    }
-
-    /**
-     * @deprecated since 4.27 and to be removed in 5.0, use $entityDto->getClassMetadata()->isCollectionValuedAssociation($propertyName)
-     */
-    public function isToManyAssociation(string $propertyName): bool
-    {
-        return $this->getClassMetadata()->isCollectionValuedAssociation($propertyName);
     }
 
     public function isEmbeddedClassProperty(string $propertyName): bool

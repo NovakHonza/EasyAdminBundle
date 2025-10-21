@@ -174,11 +174,7 @@ final class CollectionConfigurator implements FieldConfiguratorInterface
 
         $fields = $crudController->configureFields($crudControllerPageName);
 
-        if (null === $this->fieldFactory) {
-            $this->entityFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
-        } else {
-            $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
-        }
+        $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
 
         return $entityDto;
     }
