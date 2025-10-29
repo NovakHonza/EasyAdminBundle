@@ -16,11 +16,11 @@ abstract class AbstractLifecycleEvent implements EntityLifecycleEventInterface
     /**
      * @param TEntity $entityInstance
      */
-    public function __construct(protected ?object $entityInstance)
+    public function __construct(protected object $entityInstance)
     {
     }
 
-    public function getEntityInstance(): ?object
+    public function getEntityInstance(): object
     {
         return $this->entityInstance;
     }

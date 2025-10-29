@@ -912,6 +912,9 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
     // It stores two maps between CRUD controllers and their associated entity FQCN:
     //   controller_to_entity: $cache['crud_controller_fqcn'] => 'entity_fqcn'
     //   entity_to_controller: $cache['entity_fqcn'] => ['crud_controller_fqcn1', 'crud_controller_fqcn2', ...]
+    /**
+     * @param iterable<CrudControllerInterface> $crudControllers
+     */
     private function saveCrudControllersAndEntityFqcnMapInCache(iterable $crudControllers): void
     {
         $crudToEntityMap = [];

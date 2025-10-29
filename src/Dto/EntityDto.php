@@ -91,7 +91,7 @@ final class EntityDto
             ->getPropertyAccessor();
 
         try {
-            $primaryKeyValue = $propertyAccessor->getValue($this->instance, $this->metadata->getSingleIdentifierFieldName());
+            $primaryKeyValue = $propertyAccessor->getValue($this->entityInstance, $this->metadata->getSingleIdentifierFieldName());
         } catch (UninitializedPropertyException $exception) {
             $primaryKeyValue = null;
         }
