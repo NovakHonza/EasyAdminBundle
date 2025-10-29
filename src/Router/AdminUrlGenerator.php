@@ -18,6 +18,7 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
 {
     private bool $isInitialized = false;
     private ?string $dashboardRoute = null;
+    /** @var array<string, mixed> */
     private array $routeParameters = [];
 
     public function __construct(
@@ -195,7 +196,7 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
         if (null !== $routeName = $this->get(EA::ROUTE_NAME)) {
             $adminRoutes = $this->cache->getItem(AdminRouteGenerator::CACHE_KEY_ROUTE_TO_FQCN)->get();
             if (null !== $adminRoutes && \array_key_exists($routeName, $adminRoutes)) {
-                return $this->urlGenerator->generate($routeName, $routeParameters[EA::ROUTE_PARAMS] ?? [], $urlType);
+                return $this->urlGenerator->generate($routeName, $canonicalRouteParameters[EA::ROUTE_PARAMS] ?? [], $urlType);
             }
 
             return $this->urlGenerator->generate($this->dashboardRoute, $canonicalRouteParameters, $urlType);
@@ -254,12 +255,18 @@ final class AdminUrlGenerator implements AdminUrlGeneratorInterface
         $adminContext = $this->adminContextProvider->getContext();
 
         $this->dashboardRoute = $adminContext?->getDashboardRouteName();
-        $this->routeParameters = array_merge(array_filter([
-            EA::DASHBOARD_CONTROLLER_FQCN => $adminContext?->getRequest()->attributes->get(EA::DASHBOARD_CONTROLLER_FQCN),
-            EA::CRUD_CONTROLLER_FQCN => $adminContext?->getRequest()->attributes->get(EA::CRUD_CONTROLLER_FQCN),
-            EA::CRUD_ACTION => $adminContext?->getRequest()->attributes->get(EA::CRUD_ACTION),
-            EA::ENTITY_ID => $adminContext?->getRequest()->attributes->get(EA::ENTITY_ID),
-        ]), $adminContext?->getRequest()->query->all() ?? []);
+
+        $defaultParameters = array_filter(
+            [
+                EA::DASHBOARD_CONTROLLER_FQCN => $adminContext?->getRequest()->attributes->get(EA::DASHBOARD_CONTROLLER_FQCN),
+                EA::CRUD_CONTROLLER_FQCN => $adminContext?->getRequest()->attributes->get(EA::CRUD_CONTROLLER_FQCN),
+                EA::CRUD_ACTION => $adminContext?->getRequest()->attributes->get(EA::CRUD_ACTION),
+                EA::ENTITY_ID => $adminContext?->getRequest()->attributes->get(EA::ENTITY_ID),
+            ],
+            static fn (mixed $value): bool => null !== $value
+        );
+
+        $this->routeParameters = array_merge($defaultParameters, $adminContext?->getRequest()->query->all() ?? []);
 
         $this->isInitialized = true;
     }
