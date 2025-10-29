@@ -8,9 +8,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterInterface;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class FilterConfigDto
+final readonly class FilterConfigDto
 {
-    private readonly KeyValueStore $filters;
+    private KeyValueStore $filters;
 
     public function __construct()
     {

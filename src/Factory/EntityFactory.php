@@ -18,7 +18,7 @@ use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class EntityFactory
+final readonly class EntityFactory
 {
     public function __construct(
         private AuthorizationCheckerInterface $authorizationChecker,

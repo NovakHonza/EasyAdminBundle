@@ -25,15 +25,15 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class MenuFactory implements MenuFactoryInterface
+final readonly class MenuFactory implements MenuFactoryInterface
 {
     public function __construct(
-        private readonly AdminContextProviderInterface $adminContextProvider,
-        private readonly AuthorizationCheckerInterface $authChecker,
-        private readonly LogoutUrlGenerator $logoutUrlGenerator,
-        private readonly AdminUrlGeneratorInterface $adminUrlGenerator,
-        private readonly MenuItemMatcherInterface $menuItemMatcher,
-        private readonly CacheItemPoolInterface $cache,
+        private AdminContextProviderInterface $adminContextProvider,
+        private AuthorizationCheckerInterface $authChecker,
+        private LogoutUrlGenerator $logoutUrlGenerator,
+        private AdminUrlGeneratorInterface $adminUrlGenerator,
+        private MenuItemMatcherInterface $menuItemMatcher,
+        private CacheItemPoolInterface $cache,
     ) {
     }
 

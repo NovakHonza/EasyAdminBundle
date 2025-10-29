@@ -7,9 +7,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Context\AdminContextInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-final class AdminContextProvider implements AdminContextProviderInterface
+final readonly class AdminContextProvider implements AdminContextProviderInterface
 {
-    public function __construct(private readonly RequestStack $requestStack)
+    public function __construct(private RequestStack $requestStack)
     {
     }
 

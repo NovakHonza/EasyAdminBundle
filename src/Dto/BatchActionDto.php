@@ -7,17 +7,17 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Dto;
  *
  * @template TEntity of object = object
  */
-class BatchActionDto
+readonly class BatchActionDto
 {
     /**
      * @param array<mixed>          $entityIds
      * @param class-string<TEntity> $entityFqcn
      */
     public function __construct(
-        private readonly string $name,
-        private readonly array $entityIds,
-        private readonly string $entityFqcn,
-        private readonly string $csrfToken,
+        private string $name,
+        private array $entityIds,
+        private string $entityFqcn,
+        private string $csrfToken,
     ) {
     }
 

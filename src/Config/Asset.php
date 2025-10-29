@@ -8,9 +8,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\AssetDto;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class Asset
+final readonly class Asset
 {
-    private function __construct(private readonly AssetDto $dto)
+    private function __construct(private AssetDto $dto)
     {
     }
 

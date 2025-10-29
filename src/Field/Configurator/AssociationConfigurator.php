@@ -31,15 +31,15 @@ use function Symfony\Component\Translation\t;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class AssociationConfigurator implements FieldConfiguratorInterface
+final readonly class AssociationConfigurator implements FieldConfiguratorInterface
 {
     public function __construct(
-        private readonly EntityFactory $entityFactory,
-        private readonly AdminUrlGeneratorInterface $adminUrlGenerator,
-        private readonly RequestStack $requestStack,
-        private readonly ControllerFactory $controllerFactory,
-        private readonly FieldFactory $fieldFactory,
-        private readonly CacheItemPoolInterface $cache,
+        private EntityFactory $entityFactory,
+        private AdminUrlGeneratorInterface $adminUrlGenerator,
+        private RequestStack $requestStack,
+        private ControllerFactory $controllerFactory,
+        private FieldFactory $fieldFactory,
+        private CacheItemPoolInterface $cache,
     ) {
     }
 

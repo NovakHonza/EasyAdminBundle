@@ -13,7 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-class MenuItemMatcher implements MenuItemMatcherInterface
+readonly class MenuItemMatcher implements MenuItemMatcherInterface
 {
     public function __construct(
         private AdminUrlGeneratorInterface $adminUrlGenerator,

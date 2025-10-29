@@ -30,16 +30,16 @@ use Symfony\Component\Routing\Matcher\RequestMatcherInterface;
  * @author Maxime Steinhausser <maxime.steinhausser@gmail.com>
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
-class AdminRouterSubscriber implements EventSubscriberInterface
+readonly class AdminRouterSubscriber implements EventSubscriberInterface
 {
     public function __construct(
-        private readonly AdminContextFactory $adminContextFactory,
-        private readonly ControllerFactory $controllerFactory,
-        private readonly ControllerResolverInterface $controllerResolver,
-        private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly RequestMatcherInterface $requestMatcher,
-        private readonly CacheItemPoolInterface $cache,
-        private readonly AdminRouteGenerator $adminRouteGenerator,
+        private AdminContextFactory $adminContextFactory,
+        private ControllerFactory $controllerFactory,
+        private ControllerResolverInterface $controllerResolver,
+        private UrlGeneratorInterface $urlGenerator,
+        private RequestMatcherInterface $requestMatcher,
+        private CacheItemPoolInterface $cache,
+        private AdminRouteGenerator $adminRouteGenerator,
     ) {
     }
 
