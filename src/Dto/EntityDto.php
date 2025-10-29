@@ -20,7 +20,6 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 final class EntityDto
 {
     private bool $isAccessible = true;
-    private string $primaryKeyName;
     private mixed $primaryKeyValue = null;
     private ?FieldCollection $fields = null;
     private ?ActionCollection $actions = null;
@@ -36,7 +35,6 @@ final class EntityDto
         private readonly string|Expression|null $permission = null,
         private ?object $entityInstance = null,
     ) {
-        $this->primaryKeyName = $this->metadata->getIdentifierFieldNames()[0];
     }
 
     public function __toString(): string
@@ -78,11 +76,6 @@ final class EntityDto
         return $this->entityInstance;
     }
 
-    public function getPrimaryKeyName(): string
-    {
-        return $this->primaryKeyName;
-    }
-
     public function getPrimaryKeyValue(): mixed
     {
         if (null === $this->entityInstance) {
@@ -98,7 +91,7 @@ final class EntityDto
             ->getPropertyAccessor();
 
         try {
-            $primaryKeyValue = $propertyAccessor->getValue($this->entityInstance, $this->primaryKeyName);
+            $primaryKeyValue = $propertyAccessor->getValue($this->instance, $this->metadata->getSingleIdentifierFieldName());
         } catch (UninitializedPropertyException $exception) {
             $primaryKeyValue = null;
         }
@@ -153,17 +146,6 @@ final class EntityDto
         return $this->metadata;
     }
 
-    /**
-     * Returns the names of all properties defined in the entity, no matter
-     * if they are used or not in the application.
-     *
-     * @return array<string>
-     */
-    public function getAllPropertyNames(): array
-    {
-        return $this->metadata->getFieldNames();
-    }
-
     public function getPropertyMetadata(string $propertyName): KeyValueStore
     {
         if (isset($this->metadata->fieldMappings[$propertyName])) {
@@ -208,15 +190,17 @@ final class EntityDto
 
     public function isAssociation(string $propertyName): bool
     {
-        return $this->metadata->hasAssociation($propertyName)
-            || (str_contains($propertyName, '.') && !$this->isEmbeddedClassProperty($propertyName));
-    }
+        if ($this->metadata->hasAssociation($propertyName)) {
+            return true;
+        }
 
-    public function isEmbeddedClassProperty(string $propertyName): bool
-    {
+        if (!str_contains($propertyName, '.')) {
+            return false;
+        }
+
         $propertyNameParts = explode('.', $propertyName, 2);
 
-        return isset($this->metadata->embeddedClasses[$propertyNameParts[0]]);
+        return !isset($this->metadata->embeddedClasses[$propertyNameParts[0]]);
     }
 
     /**

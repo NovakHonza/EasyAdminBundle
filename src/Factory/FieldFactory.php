@@ -147,7 +147,7 @@ final class FieldFactory
                 continue;
             }
 
-            if ($fieldDto->getProperty() === $entityDto->getPrimaryKeyName()) {
+            if ($fieldDto->getProperty() === $entityDto->getClassMetadata()->getSingleIdentifierFieldName()) {
                 $guessedFieldFqcn = IdField::class;
             } elseif ($entityDto->getClassMetadata()->hasAssociation($fieldDto->getProperty())) {
                 /** @var AssociationMapping|array $associationMapping */
