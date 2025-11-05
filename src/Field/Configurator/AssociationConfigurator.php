@@ -51,7 +51,7 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
     public function configure(FieldDto $field, EntityDto $entityDto, AdminContext $context): void
     {
         $propertyName = $field->getProperty();
-        if (!$entityDto->isAssociation($propertyName)) {
+        if (!$entityDto->getClassMetadata()->hasAssociation($propertyName)) {
             throw new \RuntimeException(sprintf('The "%s" field is not a Doctrine association, so it cannot be used as an association field.', $propertyName));
         }
 

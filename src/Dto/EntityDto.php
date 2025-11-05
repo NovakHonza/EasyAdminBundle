@@ -2,12 +2,9 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Dto;
 
-use Doctrine\ORM\Mapping\AssociationMapping;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Mapping\FieldMapping;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\ActionCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
-use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -144,63 +141,6 @@ final class EntityDto
     public function getClassMetadata(): ClassMetadata
     {
         return $this->metadata;
-    }
-
-    public function getPropertyMetadata(string $propertyName): KeyValueStore
-    {
-        if (isset($this->metadata->fieldMappings[$propertyName])) {
-            /** @var FieldMapping|array $fieldMapping */
-            /** @phpstan-ignore-next-line */
-            $fieldMapping = $this->metadata->fieldMappings[$propertyName];
-
-            // Doctrine ORM 2.x returns an array and Doctrine ORM 3.x returns a FieldMapping object
-            if ($fieldMapping instanceof FieldMapping) {
-                $fieldMapping = (array) $fieldMapping;
-            }
-
-            return KeyValueStore::new($fieldMapping);
-        }
-
-        if ($this->metadata->hasAssociation($propertyName)) {
-            /** @var AssociationMapping|array $associationMapping */
-            /** @phpstan-ignore-next-line */
-            $associationMapping = $this->metadata->associationMappings[$propertyName];
-
-            // Doctrine ORM 2.x returns an array and Doctrine ORM 3.x returns an AssociationMapping object
-            if ($associationMapping instanceof AssociationMapping) {
-                // Doctrine ORM 3.x doesn't include the 'type' key that tells the type of association
-                // recreate that key to keep the code compatible with both versions
-                $associationType = $associationMapping->type();
-
-                $associationMapping = (array) $associationMapping;
-                $associationMapping['type'] = $associationType;
-            }
-
-            return KeyValueStore::new($associationMapping);
-        }
-
-        throw new \InvalidArgumentException(sprintf('The "%s" field does not exist in the "%s" entity.', $propertyName, $this->getFqcn()));
-    }
-
-    public function hasProperty(string $propertyName): bool
-    {
-        return isset($this->metadata->fieldMappings[$propertyName])
-            || $this->metadata->hasAssociation($propertyName);
-    }
-
-    public function isAssociation(string $propertyName): bool
-    {
-        if ($this->metadata->hasAssociation($propertyName)) {
-            return true;
-        }
-
-        if (!str_contains($propertyName, '.')) {
-            return false;
-        }
-
-        $propertyNameParts = explode('.', $propertyName, 2);
-
-        return !isset($this->metadata->embeddedClasses[$propertyNameParts[0]]);
     }
 
     /**

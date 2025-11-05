@@ -74,9 +74,9 @@ class ActionGroupsCrudController extends AbstractCrudController
 
         // mixed action types (link, button, form)
         $group4 = ActionGroup::new('group4', 'Action Group 4')
-            ->addAction(Action::new('link_action', 'Action 1')->linkToCrudAction('aCrudAction'))
-            ->addAction(Action::new('button_action', 'Action 2')->linkToCrudAction('aCrudAction')->addCssClass('btn-primary'))
-            ->addAction(Action::new('form_action', 'Action 3')->linkToCrudAction('aCrudAction')->renderAsForm());
+            ->addAction(Action::new('link_action', 'Action 1')->linkToCrudAction('edit'))
+            ->addAction(Action::new('button_action', 'Action 2')->linkToCrudAction('detail')->addCssClass('btn-primary'))
+            ->addAction(Action::new('form_action', 'Action 3')->linkToCrudAction('delete')->renderAsForm());
         $group4Global = ActionGroup::new('group4global ', 'Global Action Group 4')
             ->createAsGlobalActionGroup()
             ->addAction(Action::new('link_action', 'Action 1')->linkToCrudAction('aGlobalAction'))

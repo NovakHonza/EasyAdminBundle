@@ -15,6 +15,6 @@ final readonly class AdminContextProvider implements AdminContextProviderInterfa
 
     public function getContext(): ?AdminContextInterface
     {
-        return $this->requestStack->getCurrentRequest()?->get(EA::CONTEXT_REQUEST_ATTRIBUTE);
+        return $this->requestStack->getCurrentRequest()?->attributes->get(EA::CONTEXT_REQUEST_ATTRIBUTE);
     }
 }
