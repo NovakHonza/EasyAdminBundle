@@ -3,7 +3,6 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Router;
 
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminAction;
-use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminCrud;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Cache;
@@ -108,6 +107,9 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
         return $collection;
     }
 
+    /**
+     * @deprecated Since easycorp/easyadmin-bundle 5.0.0 and will be removed in EasyAdmin 5.1.0.
+     */
     public function usesPrettyUrls(): bool
     {
         @trigger_deprecation('easycorp/easyadmin-bundle', '5.0.0', 'The "%s()" method is deprecated and will be removed in EasyAdmin 5.1.0. This method always returns true.', __METHOD__);
@@ -579,38 +581,6 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
 
                 $crudControllerConfig['routeName'] = trim($adminRouteInstance->name, '_');
             }
-        } else {
-            // fallback to deprecated #[AdminCrud] attribute for backward compatibility
-            $attributes = $reflectionClass->getAttributes(AdminCrud::class);
-            $attribute = $attributes[0] ?? null;
-
-            if (null !== $attribute) {
-                trigger_deprecation(
-                    'easycorp/easyadmin-bundle',
-                    '4.25.0',
-                    'The #[AdminCrud] attribute used in "%s" is deprecated. Use #[AdminRoute] instead.',
-                    $crudControllerFqcn,
-                );
-
-                /** @var AdminCrud $attributeInstance */
-                $attributeInstance = $attribute->newInstance();
-
-                if (\count(array_diff(array_keys($attribute->getArguments()), ['routePath', 'routeName', 0, 1])) > 0) {
-                    throw new \RuntimeException(sprintf('In the #[AdminCrud] attribute of the "%s" CRUD controller, the route configuration defines some unsupported keys. You can only define these keys: "routePath" and "routeName".', $crudControllerFqcn));
-                }
-
-                if (null !== $attributeInstance->routePath) {
-                    $crudControllerConfig['routePath'] = trim($attributeInstance->routePath, '/');
-                }
-
-                if (null !== $attributeInstance->routeName) {
-                    if (1 !== preg_match('/^[a-zA-Z0-9_-]+$/', $attributeInstance->routeName)) {
-                        throw new \RuntimeException(sprintf('In the #[AdminCrud] attribute of the "%s" CRUD controller, the route name "%s" is not valid. It can only contain letter, numbers, dashes, and underscores.', $crudControllerFqcn, $attributeInstance->routeName));
-                    }
-
-                    $crudControllerConfig['routeName'] = trim($attributeInstance->routeName, '_');
-                }
-            }
         }
 
         // if the CRUD controller doesn't define any or all of the route configuration,
@@ -639,124 +609,65 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
         foreach ($methods as $method) {
             $action = $method->getName();
 
-            // first, check for #[AdminRoute] attribute (it is repeatable, so there can be more than one)
             $adminRouteAttributes = $method->getAttributes(AdminRoute::class);
-            if ([] !== $adminRouteAttributes) {
-                // process each AdminRoute attribute separately to support multiple routes per action
-                foreach ($adminRouteAttributes as $index => $adminRouteAttribute) {
-                    /** @var AdminRoute $adminRouteInstance */
-                    $adminRouteInstance = $adminRouteAttribute->newInstance();
+            // process each AdminRoute attribute separately to support multiple routes per action
+            foreach ($adminRouteAttributes as $index => $adminRouteAttribute) {
+                /** @var AdminRoute $adminRouteInstance */
+                $adminRouteInstance = $adminRouteAttribute->newInstance();
 
-                    // each route can define more than one route, so we cannot use the action name as the array key
-                    $routeId = $action.'_route_'.++$index;
+                // each route can define more than one route, so we cannot use the action name as the array key
+                $routeId = $action.'_route_'.++$index;
 
-                    if (null !== $adminRouteInstance->path) {
-                        if (\in_array($action, ['edit', 'detail', 'delete'], true) && !str_contains($adminRouteInstance->path, '{entityId}')) {
-                            throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminRoute] attribute applied to the "%s()" action is missing the "{entityId}" placeholder in its route path.', $crudControllerFqcn, $action));
-                        }
+                if (null !== $adminRouteInstance->path) {
+                    if (\in_array($action, ['edit', 'detail', 'delete'], true) && !str_contains($adminRouteInstance->path, '{entityId}')) {
+                        throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminRoute] attribute applied to the "%s()" action is missing the "{entityId}" placeholder in its route path.', $crudControllerFqcn, $action));
+                    }
 
-                        $customActionsConfig[$routeId]['routePath'] = $adminRouteInstance->path;
+                    $customActionsConfig[$routeId]['routePath'] = $adminRouteInstance->path;
+                } else {
+                    $customActionsConfig[$routeId]['routePath'] = null;
+                }
+
+                if (null !== $adminRouteInstance->name) {
+                    if (1 !== preg_match('/^[a-zA-Z0-9_-]+$/', $adminRouteInstance->name)) {
+                        throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminRoute] attribute applied to the "%s()" action defines an invalid route name: "%s". Valid route names can only contain letters, numbers, dashes, and underscores.', $crudControllerFqcn, $action, $adminRouteInstance->name));
+                    }
+
+                    $customActionsConfig[$routeId]['routeName'] = trim($adminRouteInstance->name, '_');
+                } else {
+                    $customActionsConfig[$routeId]['routeName'] = null;
+                }
+
+                // handle methods from routeOptions or use smart defaults
+                $methods = $adminRouteInstance->options['methods'] ?? null;
+                if (null === $methods) {
+                    // smart defaults: built-in actions have fixed methods, custom actions default to GET and POST
+                    if (\in_array($action, ['index', 'detail'], true)) {
+                        $methods = ['GET'];
+                    } elseif (\in_array($action, ['new', 'edit', 'delete', 'batchDelete'], true)) {
+                        $methods = ['GET', 'POST'];
                     } else {
-                        $customActionsConfig[$routeId]['routePath'] = null;
+                        // custom actions default to GET and POST
+                        $methods = ['GET', 'POST'];
                     }
-
-                    if (null !== $adminRouteInstance->name) {
-                        if (1 !== preg_match('/^[a-zA-Z0-9_-]+$/', $adminRouteInstance->name)) {
-                            throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminRoute] attribute applied to the "%s()" action defines an invalid route name: "%s". Valid route names can only contain letters, numbers, dashes, and underscores.', $crudControllerFqcn, $action, $adminRouteInstance->name));
-                        }
-
-                        $customActionsConfig[$routeId]['routeName'] = trim($adminRouteInstance->name, '_');
-                    } else {
-                        $customActionsConfig[$routeId]['routeName'] = null;
-                    }
-
-                    // handle methods from routeOptions or use smart defaults
-                    $methods = $adminRouteInstance->options['methods'] ?? null;
-                    if (null === $methods) {
-                        // smart defaults: built-in actions have fixed methods, custom actions default to GET and POST
-                        if (\in_array($action, ['index', 'detail'], true)) {
-                            $methods = ['GET'];
-                        } elseif (\in_array($action, ['new', 'edit', 'delete', 'batchDelete'], true)) {
-                            $methods = ['GET', 'POST'];
-                        } else {
-                            // custom actions default to GET and POST
-                            $methods = ['GET', 'POST'];
-                        }
-                    }
-
-                    if (\is_string($methods)) {
-                        $methods = [$methods];
-                    }
-
-                    // validate HTTP methods
-                    $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'];
-                    foreach ($methods as $httpMethod) {
-                        if (!\in_array(strtoupper($httpMethod), $allowedMethods, true)) {
-                            throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminRoute] attribute applied to the "%s()" action includes "%s" as part of its HTTP methods. However, the only allowed HTTP methods are: %s', $crudControllerFqcn, $action, $httpMethod, implode(', ', $allowedMethods)));
-                        }
-                    }
-
-                    $customActionsConfig[$routeId]['methods'] = array_map('strtoupper', $methods);
-
-                    // store the actual action name for the route generation
-                    $customActionsConfig[$routeId]['actionName'] = $action;
                 }
 
-                continue; // used to skip checking for deprecated AdminAction
-            }
-
-            // fallback to deprecated #[AdminAction] attribute for backward compatibility
-            $attributes = $method->getAttributes(AdminAction::class);
-            if ([] === $attributes) {
-                continue;
-            }
-
-            trigger_deprecation(
-                'easycorp/easyadmin-bundle',
-                '4.25.0',
-                'The #[AdminAction] attribute used in "%s::%s()" is deprecated. Use #[AdminRoute] instead.',
-                $crudControllerFqcn, $action
-            );
-
-            $attribute = $attributes[0];
-            /** @var AdminAction $attributeInstance */
-            $attributeInstance = $attribute->newInstance();
-
-            if (\count(array_diff(array_keys($attribute->getArguments()), ['routePath', 'routeName', 'methods', 0, 1, 2])) > 0) {
-                throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminAction] attribute applied to the "%s()" action includes some unsupported keys. You can only define these keys: "routePath", "routeName", and "methods".', $crudControllerFqcn, $action));
-            }
-
-            $customActionsConfig[$action]['actionName'] = $action;
-
-            if (null !== $attributeInstance->routePath) {
-                if (\in_array($action, ['edit', 'detail', 'delete'], true) && !str_contains($attributeInstance->routePath, '{entityId}')) {
-                    throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminAction] attribute applied to the "%s()" action is missing the "{entityId}" placeholder in its route path.', $crudControllerFqcn, $action));
+                if (\is_string($methods)) {
+                    $methods = [$methods];
                 }
 
-                $customActionsConfig[$action]['routePath'] = trim($attributeInstance->routePath, '/');
-            }
-
-            if (null !== $attributeInstance->routeName) {
-                if (1 !== preg_match('/^[a-zA-Z0-9_-]+$/', $attributeInstance->routeName)) {
-                    throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminAction] attribute applied to the "%s()" action defines an invalid route name: "%s". Valid route names can only contain letters, numbers, dashes, and underscores.', $crudControllerFqcn, $action, $attributeInstance->routeName));
-                }
-
-                $customActionsConfig[$action]['routeName'] = trim($attributeInstance->routeName, '_');
-            }
-
-            if (\array_key_exists('methods', $attribute->getArguments()) && null !== $attribute->getArguments()['methods'] && \in_array($action, ['index', 'new', 'edit', 'detail', 'delete'], true)) {
-                throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminAction] attribute applied to the "%s()" action cannot define the "methods" argument because these are built-in EasyAdmin actions and have fixed HTTP methods.', $crudControllerFqcn, $action));
-            }
-
-            if (null !== $attributeInstance->methods) {
-                $allowedMethods = ['GET', 'POST', 'PATCH', 'PUT'];
-                foreach ($attributeInstance->methods as $httpMethod) {
+                // validate HTTP methods
+                $allowedMethods = ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'HEAD'];
+                foreach ($methods as $httpMethod) {
                     if (!\in_array(strtoupper($httpMethod), $allowedMethods, true)) {
-                        throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminAction] attribute applied to the "%s()" action includes "%s" as part of its HTTP methods. However, the only allowed HTTP methods are: %s', $crudControllerFqcn, $action, $httpMethod, implode(', ', $allowedMethods)));
+                        throw new \RuntimeException(sprintf('In the "%s" CRUD controller, the #[AdminRoute] attribute applied to the "%s()" action includes "%s" as part of its HTTP methods. However, the only allowed HTTP methods are: %s', $crudControllerFqcn, $action, $httpMethod, implode(', ', $allowedMethods)));
                     }
                 }
 
-                $customActionsConfig[$action]['methods'] = $attributeInstance->methods;
+                $customActionsConfig[$routeId]['methods'] = array_map('strtoupper', $methods);
+
+                // store the actual action name for the route generation
+                $customActionsConfig[$routeId]['actionName'] = $action;
             }
         }
 
