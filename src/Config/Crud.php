@@ -14,7 +14,7 @@ use Symfony\Contracts\Translation\TranslatableInterface;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-class Crud
+final class Crud
 {
     public const PAGE_DETAIL = 'detail';
     public const PAGE_EDIT = 'edit';
