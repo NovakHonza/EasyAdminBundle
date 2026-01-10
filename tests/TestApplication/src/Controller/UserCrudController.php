@@ -4,6 +4,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller;
 
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Filters;
+use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\EmailField;
@@ -40,25 +41,25 @@ class UserCrudController extends AbstractCrudController
     }
 
     #[AdminRoute('/custom/path-for-index', 'custom_route_for_index')]
-    public function index(AdminContext $context)
+    public function index(AdminContext $context): KeyValueStore|Response
     {
         return parent::index($context);
     }
 
     #[AdminRoute('/custom/path-for-detail/{entityId}')]
-    public function detail(AdminContext $context)
+    public function detail(AdminContext $context): KeyValueStore|Response
     {
         return parent::detail($context);
     }
 
     #[AdminRoute(name: 'custom_route_for_new')]
-    public function new(AdminContext $context)
+    public function new(AdminContext $context): KeyValueStore|Response
     {
         return parent::new($context);
     }
 
     // this action doesn't use the #[AdminRoute] attribute on purpose to test default behavior
-    public function edit(AdminContext $context)
+    public function edit(AdminContext $context): KeyValueStore|Response
     {
         return parent::edit($context);
     }

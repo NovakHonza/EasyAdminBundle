@@ -47,20 +47,15 @@ interface CrudControllerInterface
      */
     public function configureFields(string $pageName): iterable;
 
-    /** @return KeyValueStore|Response */
-    public function index(AdminContext $context);
+    public function index(AdminContext $context): KeyValueStore|Response;
 
-    /** @return KeyValueStore|Response */
-    public function detail(AdminContext $context);
+    public function detail(AdminContext $context): KeyValueStore|Response;
 
-    /** @return KeyValueStore|Response */
-    public function edit(AdminContext $context);
+    public function edit(AdminContext $context): KeyValueStore|Response;
 
-    /** @return KeyValueStore|Response */
-    public function new(AdminContext $context);
+    public function new(AdminContext $context): KeyValueStore|Response;
 
-    /** @return KeyValueStore|Response */
-    public function delete(AdminContext $context);
+    public function delete(AdminContext $context): KeyValueStore|Response;
 
     public function autocomplete(AdminContext $context): JsonResponse;
 
@@ -74,26 +69,24 @@ interface CrudControllerInterface
     /**
      * @param class-string<TEntity> $entityFqcn
      *
-     * @return object
-     *
      * @phpstan-return TEntity
      */
-    public function createEntity(string $entityFqcn);
+    public function createEntity(string $entityFqcn): object;
 
     /**
      * @param TEntity $entityInstance
      */
-    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void;
+    public function updateEntity(EntityManagerInterface $entityManager, object $entityInstance): void;
 
     /**
      * @param TEntity $entityInstance
      */
-    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void;
+    public function persistEntity(EntityManagerInterface $entityManager, object $entityInstance): void;
 
     /**
      * @param TEntity $entityInstance
      */
-    public function deleteEntity(EntityManagerInterface $entityManager, $entityInstance): void;
+    public function deleteEntity(EntityManagerInterface $entityManager, object $entityInstance): void;
 
     /**
      * @param EntityDto<TEntity> $entityDto
