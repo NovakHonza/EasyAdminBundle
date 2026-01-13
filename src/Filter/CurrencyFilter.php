@@ -7,13 +7,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Form\Filter\Type\ChoiceFilterType;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * @author Yonel Ceruto <yonelceruto@gmail.com>
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class ChoiceFilter implements FilterInterface
+final class CurrencyFilter implements FilterInterface
 {
     use ChoiceFilterApplyTrait;
     use FilterTrait;
+
+    public const OPTION_CURRENCY_CODES_TO_KEEP = 'currencyCodesToKeep';
+    public const OPTION_CURRENCY_CODES_TO_REMOVE = 'currencyCodesToRemove';
+    public const OPTION_PREFERRED_CHOICES = 'preferredChoices';
 
     /**
      * @param TranslatableInterface|string|false|null $label
@@ -24,27 +27,35 @@ final class ChoiceFilter implements FilterInterface
             ->setFilterFqcn(__CLASS__)
             ->setProperty($propertyName)
             ->setLabel($label)
-            ->setFormType(ChoiceFilterType::class)
-            ->setFormTypeOption('translation_domain', 'EasyAdminBundle');
+            ->setFormType(ChoiceFilterType::class);
     }
 
     /**
-     * @param array<mixed> $choices
+     * @param string[] $currencyCodes
      */
-    public function setChoices(array $choices): self
+    public function includeOnly(array $currencyCodes): self
     {
-        $this->dto->setFormTypeOption('value_type_options.choices', $choices);
+        $this->dto->setCustomOption(self::OPTION_CURRENCY_CODES_TO_KEEP, $currencyCodes);
 
         return $this;
     }
 
     /**
-     * @param array<string|TranslatableInterface> $choiceGenerator
+     * @param string[] $currencyCodes
      */
-    public function setTranslatableChoices(array $choiceGenerator): self
+    public function remove(array $currencyCodes): self
     {
-        $this->dto->setFormTypeOption('value_type_options.choices', array_keys($choiceGenerator));
-        $this->dto->setFormTypeOption('value_type_options.choice_label', fn ($value) => $choiceGenerator[$value]);
+        $this->dto->setCustomOption(self::OPTION_CURRENCY_CODES_TO_REMOVE, $currencyCodes);
+
+        return $this;
+    }
+
+    /**
+     * @param string[] $currencyCodes
+     */
+    public function preferredChoices(array $currencyCodes): self
+    {
+        $this->dto->setCustomOption(self::OPTION_PREFERRED_CHOICES, $currencyCodes);
 
         return $this;
     }
