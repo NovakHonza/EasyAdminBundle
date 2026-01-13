@@ -144,6 +144,7 @@
         <tbody>
         {% block table_body %}
             {% for entity in entities %}
+                {% block table_body_row %}
                 {% if entity.isAccessible %}
                     <tr data-id="{{ entity.primaryKeyValueAsString }}" {% block entity_row_attributes %}{% endblock %}>
                         {% if has_batch_actions %}
@@ -208,6 +209,7 @@
                     </tr>
 
                 {% endif %}
+                {% endblock table_body_row %}
             {% else %}
                 {% block table_body_empty %}
                     {% for i in 1..14 %}
