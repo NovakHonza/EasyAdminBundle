@@ -2,7 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Config;
 
-class Cache
+final class Cache
 {
     public const ROUTE_NAME_TO_ATTRIBUTES = 'easyadmin.routes.route_to_fqcn';
     public const ROUTE_ATTRIBUTES_TO_NAME = 'easyadmin.routes.fqcn_to_route';
