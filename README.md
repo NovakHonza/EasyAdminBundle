@@ -62,5 +62,9 @@ License
 
 This software is published under the [MIT License](LICENSE.md)
 
+-----
+
+![PhpStorm logo](https://resources.jetbrains.com/storage/products/company/brand/logos/PhpStorm_icon.png) EasyAdmin is developed using [PhpStorm](https://www.jetbrains.com/phpstorm/), generously provided by JetBrains through their Open Source License Program.
+
 [1]: https://symfony.com/doc/4.x/bundles/EasyAdminBundle/index.html
 [2]: https://symfonycasts.com/screencast/easyadminbundle
