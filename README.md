@@ -1,5 +1,6 @@
-EasyAdmin
-=========
+<p align="center"><a href="https://github.com/EasyCorp/EasyAdminBundle">
+    <img src="./assets/images/easyadmin-logo.svg" alt="EasyAdmin Logo">
+</a></p>
 
 EasyAdmin is a fast, beautiful and modern admin generator for Symfony applications.
 
