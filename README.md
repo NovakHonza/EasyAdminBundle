@@ -23,11 +23,13 @@
 EasyAdmin creates beautiful backends for Symfony applications. It's free, fast, fully documented, and trusted by tens of thousands of projects.
 
 <p align="center">
-    <picture>
-        <source media="(prefers-color-scheme: dark)" srcset="./doc/images/easyadmin-screenshot-index-dark.webp">
-        <source media="(prefers-color-scheme: light)" srcset="./doc/images/easyadmin-screenshot-index-light.webp">
-        <img src="./doc/images/easyadmin-screenshot-index-light.webp" alt="EasyAdmin Index Page" width="700">
-    </picture>
+    <a href="./doc/images/easyadmin-screenshot-index-light.webp" target="_blank">
+        <picture>
+            <source media="(prefers-color-scheme: dark)" srcset="./doc/images/easyadmin-screenshot-index-dark.webp">
+            <source media="(prefers-color-scheme: light)" srcset="./doc/images/easyadmin-screenshot-index-light.webp">
+            <img src="./doc/images/easyadmin-screenshot-index-light.webp" alt="EasyAdmin Index Page" width="700">
+        </picture>
+    </a>
 </p>
 
 ## Quick Start
