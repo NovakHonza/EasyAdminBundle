@@ -19,7 +19,7 @@ return (new PhpCsFixer\Config())
         '@Symfony:risky' => true,
         '@PHPUnit48Migration:risky' => true,
         'fopen_flags' => false,
-        'protected_to_private' => false,
+        'protected_to_private' => true,
         'native_function_invocation' => ['exclude' => ['sprintf']],
         // Part of future @Symfony ruleset in PHP-CS-Fixer To be removed from the config file once upgrading
         'phpdoc_types_order' => ['null_adjustment' => 'always_last', 'sort_algorithm' => 'none'],
