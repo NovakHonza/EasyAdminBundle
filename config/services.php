@@ -55,11 +55,16 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\Configurator\UrlConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\ChoiceConfigurator as ChoiceFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\CommonConfigurator as CommonFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\ComparisonConfigurator as ComparisonFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\CountryConfigurator as CountryFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\CurrencyConfigurator as CurrencyFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\DateTimeConfigurator as DateTimeFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\EntityConfigurator as EntityFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\LanguageConfigurator as LanguageFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\LocaleConfigurator as LocaleFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\NullConfigurator as NullFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\NumericConfigurator as NumericFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\TextConfigurator as TextFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\TimezoneConfigurator as TimezoneFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Extension\CollectionTypeExtension;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Extension\EaCrudFormTypeExtension;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudFormType;
@@ -306,16 +311,26 @@ return static function (ContainerConfigurator $container) {
 
         ->set(ComparisonFilterConfigurator::class)
 
+        ->set(CountryFilterConfigurator::class)
+
+        ->set(CurrencyFilterConfigurator::class)
+
         ->set(DateTimeFilterConfigurator::class)
 
         ->set(EntityFilterConfigurator::class)
             ->arg(0, new Reference(AdminUrlGenerator::class))
+
+        ->set(LanguageFilterConfigurator::class)
+
+        ->set(LocaleFilterConfigurator::class)
 
         ->set(NullFilterConfigurator::class)
 
         ->set(NumericFilterConfigurator::class)
 
         ->set(TextFilterConfigurator::class)
+
+        ->set(TimezoneFilterConfigurator::class)
 
         ->set(ActionFactory::class)
             ->arg(0, new Reference(AdminContextProvider::class))
