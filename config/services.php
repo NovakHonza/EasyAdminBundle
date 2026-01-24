@@ -241,7 +241,6 @@ return static function (ContainerConfigurator $container) {
             ->arg(2, service('security.logout_url_generator'))
             ->arg(3, service(AdminUrlGenerator::class))
             ->arg(4, service(MenuItemMatcherInterface::class))
-            ->arg(5, service('router'))
 
         ->set(MenuItemMatcher::class)
             ->arg(0, service(AdminUrlGenerator::class))
