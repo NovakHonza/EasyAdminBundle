@@ -80,7 +80,7 @@ class CustomerSortTest extends AbstractCrudTestCase
             /**
              * @param list<Customer> $array
              */
-            function (array &$array) {
+            static function (array &$array) {
                 usort($array, static function (Customer $a, Customer $b) {
                     $aBills = $a->getBills()->count();
                     $bBills = $b->getBills()->count();
@@ -100,7 +100,7 @@ class CustomerSortTest extends AbstractCrudTestCase
             /**
              * @param list<Customer> $array
              */
-            function (array &$array) {
+            static function (array &$array) {
                 usort($array, static function (Customer $a, Customer $b) {
                     $aBills = $a->getBills()->count();
                     $bBills = $b->getBills()->count();

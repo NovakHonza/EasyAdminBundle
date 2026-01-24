@@ -45,7 +45,7 @@ class FormFactoryTest extends TestCase
         $this->symfonyFormFactory
             ->expects($this->once())
             ->method('createNamedBuilder')
-            ->willReturnCallback(function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
+            ->willReturnCallback(static function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
                 $capturedOptions = $options;
 
                 return $formBuilder;
@@ -72,7 +72,7 @@ class FormFactoryTest extends TestCase
         $this->symfonyFormFactory
             ->expects($this->once())
             ->method('createNamedBuilder')
-            ->willReturnCallback(function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
+            ->willReturnCallback(static function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
                 $capturedOptions = $options;
 
                 return $formBuilder;
@@ -96,7 +96,7 @@ class FormFactoryTest extends TestCase
         $this->symfonyFormFactory
             ->expects($this->once())
             ->method('createNamedBuilder')
-            ->willReturnCallback(function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
+            ->willReturnCallback(static function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
                 $capturedOptions = $options;
 
                 return $formBuilder;
@@ -138,7 +138,7 @@ class FormFactoryTest extends TestCase
         $this->symfonyFormFactory
             ->expects($this->once())
             ->method('createNamedBuilder')
-            ->willReturnCallback(function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
+            ->willReturnCallback(static function ($name, $type, $data, $options) use (&$capturedOptions, $formBuilder) {
                 $capturedOptions = $options;
 
                 return $formBuilder;
@@ -188,7 +188,7 @@ class FormFactoryTest extends TestCase
         $this->symfonyFormFactory
             ->expects($this->once())
             ->method('createNamed')
-            ->willReturnCallback(function ($name, $type, $data, $options) use (&$capturedOptions, $form) {
+            ->willReturnCallback(static function ($name, $type, $data, $options) use (&$capturedOptions, $form) {
                 $capturedOptions = $options;
 
                 return $form;

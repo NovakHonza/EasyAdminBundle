@@ -174,15 +174,15 @@ class CategoryCrudControllerTest extends AbstractCrudTestCase
     {
         yield [
             '', // Manipulate the CSRF token to an empty value
-            fn (int $initialCategoriesCount): int => $initialCategoriesCount,
+            static fn (int $initialCategoriesCount): int => $initialCategoriesCount,
         ];
         yield [
             '123abc', // Manipulate the CSRF token to this invalid value
-            fn (int $initialCategoriesCount): int => $initialCategoriesCount,
+            static fn (int $initialCategoriesCount): int => $initialCategoriesCount,
         ];
         yield [
             null, // Do not manipulate the CSRF token
-            fn (int $initialCategoriesCount): int => $initialCategoriesCount - 1,
+            static fn (int $initialCategoriesCount): int => $initialCategoriesCount - 1,
         ];
     }
 

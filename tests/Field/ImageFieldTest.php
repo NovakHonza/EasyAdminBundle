@@ -102,7 +102,7 @@ class ImageFieldTest extends AbstractFieldTest
 
     public function testSetUploadedFileNamePatternWithClosure(): void
     {
-        $pattern = fn ($file) => 'custom_'.$file->getFilename();
+        $pattern = static fn ($file) => 'custom_'.$file->getFilename();
         $field = ImageField::new('image');
         $field->setUploadedFileNamePattern($pattern);
         $fieldDto = $this->configure($field);

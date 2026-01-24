@@ -64,7 +64,7 @@ class MenuFactoryTest extends TestCase
         $this->setupAdminContext();
         $this->authChecker
             ->method('isGranted')
-            ->willReturnCallback(function (string $permission, MenuItemDto $item) {
+            ->willReturnCallback(static function (string $permission, MenuItemDto $item) {
                 $label = $item->getLabel();
                 $labelStr = $label instanceof TranslatableInterface ? $label->getMessage() : $label;
 
@@ -91,7 +91,7 @@ class MenuFactoryTest extends TestCase
         $this->setupAdminContext();
         $this->authChecker
             ->method('isGranted')
-            ->willReturnCallback(function (string $permission, MenuItemDto $item) {
+            ->willReturnCallback(static function (string $permission, MenuItemDto $item) {
                 $label = $item->getLabel();
                 $labelStr = $label instanceof TranslatableInterface ? $label->getMessage() : $label;
 

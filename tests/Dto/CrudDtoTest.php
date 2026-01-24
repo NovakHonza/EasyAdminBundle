@@ -82,11 +82,11 @@ class CrudDtoTest extends TestCase
         yield ['Foo Bar', 'Foo Bar'];
         // see https://github.com/EasyCorp/EasyAdminBundle/issues/4176
         yield ['link', 'link'];
-        yield [function () { return null; }, null];
-        yield [function () { return ''; }, ''];
-        yield [function () { return 'foo'; }, 'foo'];
-        yield [function () { return 'Foo Bar'; }, 'Foo Bar'];
-        yield [function () { return 'link'; }, 'link'];
-        yield [function ($entityInstance) { return 'Entity #'.$entityInstance->getPrimaryKeyValue(); }, 'Entity #42'];
+        yield [static function () { return null; }, null];
+        yield [static function () { return ''; }, ''];
+        yield [static function () { return 'foo'; }, 'foo'];
+        yield [static function () { return 'Foo Bar'; }, 'Foo Bar'];
+        yield [static function () { return 'link'; }, 'link'];
+        yield [static function ($entityInstance) { return 'Entity #'.$entityInstance->getPrimaryKeyValue(); }, 'Entity #42'];
     }
 }

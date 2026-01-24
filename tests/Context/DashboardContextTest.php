@@ -20,7 +20,7 @@ class DashboardContextTest extends TestCase
         $dto->setRouteName('admin');
 
         $context = new DashboardContext($dto, 'App\\Controller\\DashboardController', new AssetsDto(), false);
-        $context->setMainMenuBuilder(function () use (&$builderCalled, $expectedMenu) {
+        $context->setMainMenuBuilder(static function () use (&$builderCalled, $expectedMenu) {
             $builderCalled = true;
 
             return $expectedMenu;
@@ -42,7 +42,7 @@ class DashboardContextTest extends TestCase
         $dto->setRouteName('admin');
 
         $context = new DashboardContext($dto, 'App\\Controller\\DashboardController', new AssetsDto(), false);
-        $context->setMainMenuBuilder(function () use (&$callCount) {
+        $context->setMainMenuBuilder(static function () use (&$callCount) {
             ++$callCount;
 
             return new MainMenuDto([]);

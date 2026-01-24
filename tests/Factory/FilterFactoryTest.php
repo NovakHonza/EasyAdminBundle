@@ -229,7 +229,7 @@ class FilterFactoryTest extends TestCase
         }
         $metadata->fieldMappings = $fieldMappings;
 
-        $metadata->method('getFieldMapping')->willReturnCallback(function ($fieldName) use ($fieldMappings) {
+        $metadata->method('getFieldMapping')->willReturnCallback(static function ($fieldName) use ($fieldMappings) {
             return $fieldMappings[$fieldName] ?? throw new \InvalidArgumentException("Unknown field: $fieldName");
         });
 
@@ -240,7 +240,7 @@ class FilterFactoryTest extends TestCase
     {
         $metadata = $this->createMock(ClassMetadata::class);
         $metadata->method('getSingleIdentifierFieldName')->willReturn('id');
-        $metadata->method('hasAssociation')->willReturnCallback(function ($name) use ($associationName) {
+        $metadata->method('hasAssociation')->willReturnCallback(static function ($name) use ($associationName) {
             return $name === $associationName;
         });
         $metadata->method('getAssociationTargetClass')->with($associationName)->willReturn($targetClass);

@@ -57,7 +57,7 @@ class CrudAutocompleteSubscriber implements EventSubscriberInterface
                 }
 
                 $data['autocomplete'] = array_map(
-                    function ($v) use ($options) {
+                    static function ($v) use ($options) {
                         if (class_exists(Ulid::class) && Ulid::isValid($v)) {
                             return Ulid::fromBase32($v)->toRfc4122();
                         } elseif (class_exists(Uuid::class) && Uuid::isValid($v)) {

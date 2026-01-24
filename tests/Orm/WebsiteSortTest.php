@@ -80,7 +80,7 @@ class WebsiteSortTest extends AbstractCrudTestCase
             /**
              * @param list<Website> $array
              */
-            function (array &$array) {
+            static function (array &$array) {
                 usort($array, static function (Website $a, Website $b) {
                     $aPages = $a->getPages()->count();
                     $bPages = $b->getPages()->count();
@@ -100,7 +100,7 @@ class WebsiteSortTest extends AbstractCrudTestCase
             /**
              * @param list<Website> $array
              */
-            function (array &$array) {
+            static function (array &$array) {
                 usort($array, static function (Website $a, Website $b) {
                     $aPages = $a->getPages()->count();
                     $bPages = $b->getPages()->count();

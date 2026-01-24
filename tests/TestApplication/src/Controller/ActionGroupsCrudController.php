@@ -173,10 +173,10 @@ class ActionGroupsCrudController extends AbstractCrudController
             ->add(Crud::PAGE_NEW, $group8)
 
             // test CSS class combinations with regular actions
-            ->update(Crud::PAGE_INDEX, Action::EDIT, function (Action $action) {
+            ->update(Crud::PAGE_INDEX, Action::EDIT, static function (Action $action) {
                 return $action->setCssClass('btn btn-sm btn-primary');
             })
-            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+            ->update(Crud::PAGE_INDEX, Action::DELETE, static function (Action $action) {
                 return $action->addCssClass('text-danger');
             });
     }

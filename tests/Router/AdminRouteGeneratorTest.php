@@ -22,7 +22,7 @@ class AdminRouteGeneratorTest extends WebTestCase
     {
         $client = static::createClient();
         $cacheMock = $this->getMockBuilder(CacheItemPoolInterface::class)->getMock();
-        $cacheMock->method('getItem')->willReturnCallback(function ($key) {
+        $cacheMock->method('getItem')->willReturnCallback(static function ($key) {
             $item = new CacheItem();
             $item->expiresAfter(3600);
 
@@ -52,7 +52,7 @@ class AdminRouteGeneratorTest extends WebTestCase
             return $item;
         });
 
-        $dashboardControllers = new RewindableGenerator(function () {
+        $dashboardControllers = new RewindableGenerator(static function () {
             yield DashboardController::class => new DashboardController();
             yield SecondDashboardController::class => new SecondDashboardController();
         }, 2);

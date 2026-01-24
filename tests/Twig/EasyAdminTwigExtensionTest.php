@@ -114,13 +114,13 @@ class EasyAdminTwigExtensionTest extends KernelTestCase
             }
         }, '/class@anonymous.* #1234/', true];
 
-        yield ['foo', 'foo bar', false, fn ($value) => $value.' bar'];
+        yield ['foo', 'foo bar', false, static fn ($value) => $value.' bar'];
         yield [new class {
             public function someMethod()
             {
                 return 'foo';
             }
         }, 'foo', false, 'someMethod'];
-        yield ['foo', '*foo bar', false, fn ($value, $translator) => $translator->trans($value.' bar')];
+        yield ['foo', '*foo bar', false, static fn ($value, $translator) => $translator->trans($value.' bar')];
     }
 }

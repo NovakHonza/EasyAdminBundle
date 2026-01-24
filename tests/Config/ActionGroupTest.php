@@ -252,7 +252,7 @@ class ActionGroupTest extends TestCase
 
         $group = ActionGroup::new('group_name', 'Action Group 6');
         $group->addAction(Action::new('action1')->linkToCrudAction(''));
-        $group->displayIf(function ($entity) {
+        $group->displayIf(static function ($entity) {
             return null !== $entity && $entity->isActive;
         });
 

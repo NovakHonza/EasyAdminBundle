@@ -114,7 +114,7 @@ class ActionTest extends TestCase
         yield [false];
         yield [''];
         yield ['Edit'];
-        yield [fn (object $entity) => sprintf('Edit %s', $entity)];
+        yield [static fn (object $entity) => sprintf('Edit %s', $entity)];
         yield [static function (object $entity) {
             return sprintf('Edit %s', $entity);
         }];
@@ -135,7 +135,7 @@ class ActionTest extends TestCase
 
     public function testGetAsConfigObjectPreservesCallableUrl(): void
     {
-        $callable = fn () => 'https://dynamic.example.com';
+        $callable = static fn () => 'https://dynamic.example.com';
         $action = Action::new('my_action')
             ->linkToUrl($callable);
 
