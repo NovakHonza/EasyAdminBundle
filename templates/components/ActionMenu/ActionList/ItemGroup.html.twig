@@ -16,7 +16,7 @@
             <a class="dropdown-item flex-grow-1 border-end-0 {{ group.mainAction.cssClass }}"
                 {% if group.mainAction.isRenderedAsForm %}
                     href="#"
-                    onclick="event.preventDefault(); document.getElementById('{{ formId }}').submit();"
+                    data-ea-form-submit="{{ formId }}"
                 {% else %}
                     href="{{ group.mainAction.linkUrl }}"
                 {% endif %}
