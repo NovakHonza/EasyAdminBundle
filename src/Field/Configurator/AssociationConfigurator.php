@@ -133,6 +133,8 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
 
             $field->setFormTypeOptionIfNotSet('class', $targetEntityFqcn);
 
+            $this->configurePreferredChoices($field);
+
             try {
                 if (null !== $entityDto->getInstance()) {
                     $relatedEntityId = $accessor->getValue($entityDto->getInstance(), $propertyName.'.'.$metadata->getSingleIdentifierFieldName());
@@ -235,6 +237,8 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
             : $this->entityFactory->createForEntityInstance($field->getValue());
         $field->setFormTypeOptionIfNotSet('class', $targetEntityDto->getFqcn());
 
+        $this->configurePreferredChoices($field);
+
         try {
             $field->setCustomOption(AssociationField::OPTION_RELATED_URL, $this->generateLinkToAssociatedEntity($targetCrudControllerFqcn, $targetEntityDto));
         } catch (RouteNotFoundException $e) {
@@ -253,6 +257,8 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
 
         /* @var PersistentCollection $collection */
         $field->setFormTypeOptionIfNotSet('class', $entityDto->getClassMetadata()->getAssociationTargetClass($field->getProperty()));
+
+        $this->configurePreferredChoices($field);
 
         if (null === $field->getTextAlign()) {
             $field->setTextAlign(TextAlign::RIGHT);
@@ -374,5 +380,13 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
         }
 
         return $entityDto;
+    }
+
+    private function configurePreferredChoices(FieldDto $field): void
+    {
+        $preferredChoices = $field->getCustomOption(AssociationField::OPTION_PREFERRED_CHOICES);
+        if (null !== $preferredChoices) {
+            $field->setFormTypeOptionIfNotSet('preferred_choices', $preferredChoices);
+        }
     }
 }

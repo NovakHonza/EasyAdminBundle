@@ -38,6 +38,7 @@ final class AssociationField implements FieldInterface
     // the name of the property in the associated entity used to sort the results (only for *-To-One associations)
     public const OPTION_SORT_PROPERTY = 'sortProperty';
     public const OPTION_ESCAPE_HTML_CONTENTS = 'escapeHtml';
+    public const OPTION_PREFERRED_CHOICES = 'preferredChoices';
 
     /**
      * @param TranslatableInterface|string|false|null $label
@@ -60,7 +61,8 @@ final class AssociationField implements FieldInterface
             ->setCustomOption(self::OPTION_RENDER_AS_EMBEDDED_FORM, false)
             ->setCustomOption(self::OPTION_EMBEDDED_CRUD_FORM_NEW_PAGE_NAME, null)
             ->setCustomOption(self::OPTION_EMBEDDED_CRUD_FORM_EDIT_PAGE_NAME, null)
-            ->setCustomOption(self::OPTION_ESCAPE_HTML_CONTENTS, true);
+            ->setCustomOption(self::OPTION_ESCAPE_HTML_CONTENTS, true)
+            ->setCustomOption(self::OPTION_PREFERRED_CHOICES, null);
     }
 
     public function autocomplete(): self
@@ -111,6 +113,28 @@ final class AssociationField implements FieldInterface
     public function renderAsHtml(bool $asHtml = true): self
     {
         $this->setCustomOption(self::OPTION_ESCAPE_HTML_CONTENTS, !$asHtml);
+
+        return $this;
+    }
+
+    /**
+     * Sets the preferred entities that will be displayed at the top of the dropdown,
+     * visually separated from the rest of entities.
+     *
+     * You can pass an array of entity objects or their primary key values:
+     *   ->setPreferredChoices([1, 2, 3])
+     *   ->setPreferredChoices([$featuredCategory1, $featuredCategory2])
+     *
+     * Or a callable that receives an entity and returns true for preferred choices:
+     *   ->setPreferredChoices(fn (Category $category) => $category->isFeatured())
+     *
+     * Note: This option is not compatible with remote autocomplete (->autocomplete()).
+     *
+     * @param array<mixed>|callable $preferredChoices
+     */
+    public function setPreferredChoices(array|callable $preferredChoices): self
+    {
+        $this->setCustomOption(self::OPTION_PREFERRED_CHOICES, $preferredChoices);
 
         return $this;
     }

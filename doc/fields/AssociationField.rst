@@ -104,6 +104,32 @@ to use this option to specify which one to use for the links::
 
     yield AssociationField::new('...')->setCrudController(SomeCrudController::class);
 
+``setPreferredChoices``
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Use this option to display certain entities at the top of the dropdown, visually
+separated from the rest. This is useful when some entities are more commonly
+selected than others::
+
+    // pass an array of entity IDs
+    yield AssociationField::new('...')->setPreferredChoices([1, 2, 3]);
+
+    // or pass an array of entity objects
+    yield AssociationField::new('...')->setPreferredChoices([$featuredCategory1, $featuredCategory2]);
+
+You can also use a callable that receives the entity and returns ``true`` for
+preferred choices::
+
+    yield AssociationField::new('...')->setPreferredChoices(
+        static fn (Category $category): bool => $category->isFeatured()
+    );
+
+.. note::
+
+    This option is not compatible with the remote autocomplete feature
+    (``->autocomplete()``). It only works with the native widget
+    (``->renderAsNativeWidget()``) or the local TomSelect widget (default).
+
 ``setQueryBuilder``
 ~~~~~~~~~~~~~~~~~~~
 

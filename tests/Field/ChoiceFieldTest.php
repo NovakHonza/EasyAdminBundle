@@ -162,4 +162,32 @@ class ChoiceFieldTest extends AbstractFieldTest
         $field->setValue([1, 3])->renderAsBadges(static fn (mixed $value): string => $value > 1 ? 'success' : 'primary');
         self::assertSame('<span class="badge badge-primary">a</span><span class="badge badge-success">c</span>', (string) $this->configure($field)->getFormattedValue());
     }
+
+    public function testPreferredChoicesWithArray(): void
+    {
+        $choices = ['a' => 1, 'b' => 2, 'c' => 3];
+        $field = ChoiceField::new('foo')->setChoices($choices)->setPreferredChoices([1, 2]);
+        $fieldDto = $this->configure($field);
+
+        self::assertSame([1, 2], $fieldDto->getFormTypeOption('preferred_choices'));
+    }
+
+    public function testPreferredChoicesWithCallable(): void
+    {
+        $choices = ['a' => 1, 'b' => 2, 'c' => 3];
+        $callable = static fn ($value): bool => $value < 3;
+        $field = ChoiceField::new('foo')->setChoices($choices)->setPreferredChoices($callable);
+        $fieldDto = $this->configure($field);
+
+        self::assertSame($callable, $fieldDto->getFormTypeOption('preferred_choices'));
+    }
+
+    public function testPreferredChoicesDefaultValue(): void
+    {
+        $field = ChoiceField::new('foo')->setChoices(['a' => 1, 'b' => 2]);
+        $fieldDto = $this->configure($field);
+
+        self::assertNull($fieldDto->getCustomOption(ChoiceField::OPTION_PREFERRED_CHOICES));
+        self::assertNull($fieldDto->getFormTypeOption('preferred_choices'));
+    }
 }

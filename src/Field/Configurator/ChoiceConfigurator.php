@@ -101,6 +101,11 @@ final class ChoiceConfigurator implements FieldConfiguratorInterface
 
         $field->setFormTypeOptionIfNotSet('placeholder', '');
 
+        $preferredChoices = $field->getCustomOption(ChoiceField::OPTION_PREFERRED_CHOICES);
+        if (null !== $preferredChoices) {
+            $field->setFormTypeOptionIfNotSet('preferred_choices', $preferredChoices);
+        }
+
         // the value of this form option must be a string to properly propagate it as an HTML attribute value
         $field->setFormTypeOption('attr.data-ea-autocomplete-render-items-as-html', true === $field->getCustomOption(ChoiceField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true');
 

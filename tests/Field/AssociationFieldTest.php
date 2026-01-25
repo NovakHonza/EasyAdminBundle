@@ -159,4 +159,31 @@ class AssociationFieldTest extends AbstractFieldTest
 
         self::assertTrue($fieldDto->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
     }
+
+    public function testPreferredChoicesWithArray(): void
+    {
+        $field = AssociationField::new('category');
+        $field->setPreferredChoices([1, 2, 3]);
+        $fieldDto = $this->configure($field);
+
+        self::assertSame([1, 2, 3], $fieldDto->getCustomOption(AssociationField::OPTION_PREFERRED_CHOICES));
+    }
+
+    public function testPreferredChoicesWithCallable(): void
+    {
+        $callable = static fn ($entity): bool => $entity->getId() < 5;
+        $field = AssociationField::new('category');
+        $field->setPreferredChoices($callable);
+        $fieldDto = $this->configure($field);
+
+        self::assertSame($callable, $fieldDto->getCustomOption(AssociationField::OPTION_PREFERRED_CHOICES));
+    }
+
+    public function testPreferredChoicesDefaultValue(): void
+    {
+        $field = AssociationField::new('category');
+        $fieldDto = $this->configure($field);
+
+        self::assertNull($fieldDto->getCustomOption(AssociationField::OPTION_PREFERRED_CHOICES));
+    }
 }
