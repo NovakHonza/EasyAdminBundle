@@ -73,6 +73,11 @@ return [
         'content' => 'Não há como desfazer essa operação.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Tem certeza que deseja %action_name%?',
+        'action' => 'Confirmar',
+    ],
+
     'filter' => [
         'title' => 'Filtros',
         'button.clear' => 'Limpar',

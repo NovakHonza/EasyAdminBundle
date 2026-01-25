@@ -73,6 +73,11 @@ return [
         'content' => 'Diese Aktion kann nicht rückgängig gemacht werden.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Sind Sie sicher, dass Sie %action_name% möchten?',
+        'action' => 'Bestätigen',
+    ],
+
     'filter' => [
         'title' => 'Filtern',
         'button.clear' => 'Zurücksetzen',

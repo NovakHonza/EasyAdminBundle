@@ -73,6 +73,11 @@ return [
         'content' => 'Bu işlem geri alınamaz.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => '%action_name% istediğinize emin misiniz?',
+        'action' => 'Onayla',
+    ],
+
     'filter' => [
         'title' => 'Filtreler',
         'button.clear' => 'Temizle',

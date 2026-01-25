@@ -73,6 +73,11 @@ return [
         'content' => 'Šios operacijos atkurti nebegalėsite.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Ar tikrai norite %action_name%?',
+        'action' => 'Patvirtinti',
+    ],
+
     'filter' => [
         'title' => 'Filtrai',
         'button.clear' => 'Išvalyti',

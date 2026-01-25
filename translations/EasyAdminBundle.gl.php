@@ -73,6 +73,11 @@ return [
         'content' => 'Esta acción non se pode desfacer.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Estás seguro de que queres %action_name%?',
+        'action' => 'Confirmar',
+    ],
+
     'filter' => [
         // 'title' => '',
         // 'button.clear' => '',

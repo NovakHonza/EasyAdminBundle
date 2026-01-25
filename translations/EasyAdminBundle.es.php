@@ -73,6 +73,11 @@ return [
         'content' => 'Esta acción no se puede deshacer.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => '¿Estás seguro de que quieres %action_name%?',
+        'action' => 'Confirmar',
+    ],
+
     'filter' => [
         'title' => 'Filtros',
         'button.clear' => 'Borrar',

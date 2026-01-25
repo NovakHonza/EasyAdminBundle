@@ -73,6 +73,11 @@ return [
         'content' => 'Ez a művelet visszavonhatatlan.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Biztosan szeretné %action_name%?',
+        'action' => 'Megerősítés',
+    ],
+
     'filter' => [
         'title' => 'Szűrők',
         'button.clear' => 'Töröl',

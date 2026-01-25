@@ -73,6 +73,11 @@ return [
         'content' => 'Toimintoa ei voi peruuttaa.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Haluatko varmasti %action_name%?',
+        'action' => 'Vahvista',
+    ],
+
     'filter' => [
         // 'title' => '',
         // 'button.clear' => '',

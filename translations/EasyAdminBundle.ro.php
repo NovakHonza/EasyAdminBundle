@@ -73,6 +73,11 @@ return [
         'content' => 'Nu există posibilitatea de a reveni asupra acestei decizii.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Ești sigur că vrei să %action_name%?',
+        'action' => 'Confirmă',
+    ],
+
     'filter' => [
         'title' => 'Filtre',
         'button.clear' => 'Ștergeți',

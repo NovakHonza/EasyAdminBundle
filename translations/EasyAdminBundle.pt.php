@@ -73,6 +73,11 @@ return [
         'content' => 'Esta operação é irreversível.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Tem a certeza que deseja %action_name%?',
+        'action' => 'Confirmar',
+    ],
+
     'filter' => [
         'title' => 'Filtros',
         'button.clear' => 'Limpar',

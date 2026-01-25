@@ -155,7 +155,7 @@ class CategoryCrudControllerTest extends AbstractCrudTestCase
         static::assertIndexFullEntityCount($initialCategoriesCount);
 
         // Try to delete the first found category
-        $form = $crawler->filter('#delete-form')->form();
+        $form = $crawler->filter('#action-confirmation-form')->form();
         $form->getNode()->setAttribute(
             'action',
             $crawler->filter('a.action-delete')->first()->attr('formaction')

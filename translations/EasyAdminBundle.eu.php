@@ -73,6 +73,11 @@ return [
         'content' => 'Ekintza hau ezin da desegin.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Ziur zaude %action_name% nahi duzula?',
+        'action' => 'Berretsi',
+    ],
+
     'filter' => [
         'title' => 'Iragazi',
         'button.clear' => 'Ezabatu',

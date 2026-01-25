@@ -73,6 +73,11 @@ return [
         'content' => '是否删除，该操作不可恢复',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => '您确定要 %action_name% 吗？',
+        'action' => '确认',
+    ],
+
     'filter' => [
         'title' => '过滤器',
         'button.clear' => '清除',

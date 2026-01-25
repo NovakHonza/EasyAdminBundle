@@ -201,6 +201,76 @@ to users::
     However, your closure won't receive the object that represents the current
     entity because global actions are not associated to any specific entity.
 
+Action Confirmation
+-------------------
+
+By default, actions are executed immediately when clicked. The only exception
+is the built-in ``delete`` action, which shows a confirmation message. For potentially
+destructive or important actions, you can require user confirmation before execution.
+
+To enable confirmation for any action, use the ``askConfirmation()`` method::
+
+    use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+    use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+    use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+
+    public function configureActions(Actions $actions): Actions
+    {
+        $archiveAction = Action::new('archive', 'Archive')
+            ->linkToCrudAction('archive')
+            ->askConfirmation();
+
+        return $actions
+            ->add(Crud::PAGE_INDEX, $archiveAction);
+    }
+
+This will display a confirmation modal with a generic message before executing
+the action. You can customize the confirmation message by passing a string::
+
+    $archiveAction = Action::new('archive', 'Archive')
+        ->linkToCrudAction('archive')
+        ->askConfirmation('Are you sure you want to archive this item?');
+
+The confirmation message supports placeholders that are replaced with actual
+values: ``%action_name%`` (the action label), ``%entity_name%`` (the entity
+label in singular), and ``%entity_id%`` (the entity ID)::
+
+    $archiveAction = Action::new('archive', 'Archive')
+        ->linkToCrudAction('archive')
+        ->askConfirmation('Are you sure you want to %action_name% "%entity_name%" #%entity_id%?');
+
+For translatable messages, pass a ``TranslatableInterface`` object::
+
+    use function Symfony\Component\Translation\t;
+
+    $archiveAction = Action::new('archive', 'Archive')
+        ->linkToCrudAction('archive')
+        ->askConfirmation(t('action.archive.confirm'));
+
+You can also customize the confirmation button label by passing a second parameter::
+
+    $publishAction = Action::new('publish', 'Publish')
+        ->linkToCrudAction('publish')
+        ->askConfirmation('Do you accept publishing this article?', 'Accept');
+
+This is useful when the default "Confirm" label doesn't match the action context.
+Both parameters support translatable messages::
+
+    $publishAction = Action::new('publish', 'Publish')
+        ->linkToCrudAction('publish')
+        ->askConfirmation(t('action.publish.confirm'), t('action.publish.button'));
+
+The ``delete`` action shows a confirmation message by default. Although it's
+strongly recommended to keep this behavior, you can disable the confirmation dialog::
+
+    public function configureActions(Actions $actions): Actions
+    {
+        return $actions
+            ->update(Crud::PAGE_INDEX, Action::DELETE, function (Action $action) {
+                return $action->askConfirmation(false);
+            });
+    }
+
 Disabling Actions
 -----------------
 

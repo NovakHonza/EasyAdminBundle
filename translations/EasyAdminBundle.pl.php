@@ -73,6 +73,11 @@ return [
         'content' => 'Tej operacji nie można cofnąć.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Czy na pewno chcesz %action_name%?',
+        'action' => 'Potwierdź',
+    ],
+
     'filter' => [
         'title' => 'Filtry',
         'button.clear' => 'Wyczyść',

@@ -73,6 +73,11 @@ return [
         'content' => 'Razveljavitev za to operacijo ne obstaja.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Ali ste prepričani, da želite %action_name%?',
+        'action' => 'Potrdi',
+    ],
+
     'filter' => [
         'title' => 'Filtri',
         'button.clear' => 'Počisti',

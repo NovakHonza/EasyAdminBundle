@@ -73,6 +73,11 @@ return [
         'content' => 'Denne operation kan ikke fortrydes.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Er du sikker på, at du vil %action_name%?',
+        'action' => 'Bekræft',
+    ],
+
     'filter' => [
         'title' => 'Filtre',
         'button.clear' => 'Ryd',

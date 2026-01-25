@@ -54,7 +54,7 @@
         {% if item.isActionGroup %}
             {{ include(item.templatePath, {group: item, entity: entity}, with_context: false) }}
         {% else %}
-            {{ include(item.templatePath, {action: item}, with_context: false) }}
+            {{ include(item.templatePath, {action: item, entity: entity}, with_context: false) }}
         {% endif %}
     {% endfor %}
 {% endblock %}

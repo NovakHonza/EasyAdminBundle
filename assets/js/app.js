@@ -29,7 +29,7 @@ class App {
         this.#createFilters();
         this.#createAutoCompleteFields();
         this.#createBatchActions();
-        this.#createModalWindowsForDeleteActions();
+        this.#createActionConfirmationModals();
         this.#createPopovers();
         this.#createTooltips();
 
@@ -394,17 +394,54 @@ class App {
         });
     }
 
-    #createModalWindowsForDeleteActions() {
-        document.querySelectorAll('[data-action-name="delete"]').forEach((actionElement) => {
+    #createActionConfirmationModals() {
+        const modalTitle = document.querySelector('#action-confirmation-title');
+        const modalButton = document.querySelector('#modal-action-confirmation-button');
+        const defaultTitleTemplate = modalTitle?.textContent;
+        const defaultButtonLabel = modalButton?.textContent;
+
+        document.querySelectorAll('[data-action-confirmation="true"]').forEach((actionElement) => {
             actionElement.addEventListener('click', (event) => {
                 event.preventDefault();
 
-                document.querySelector('#modal-delete-button').addEventListener('click', () => {
-                    const deleteFormAction = actionElement.getAttribute('formaction');
-                    const deleteForm = document.querySelector('#delete-form');
-                    deleteForm.setAttribute('action', deleteFormAction);
-                    deleteForm.submit();
-                });
+                const actionName = actionElement.textContent.trim() || actionElement.getAttribute('title');
+                const entityName = actionElement.getAttribute('data-action-entity-name') || '';
+                const entityId = actionElement.getAttribute('data-action-entity-id') || '';
+
+                // use custom message if provided, otherwise use default modal title
+                const customMessage = actionElement.getAttribute('data-action-confirmation-message');
+                const messageTemplate = customMessage ?? defaultTitleTemplate;
+
+                modalTitle.textContent = messageTemplate
+                    .replace('%action_name%', actionName)
+                    .replace('%entity_name%', entityName)
+                    .replace('%entity_id%', entityId);
+
+                // use custom button label if provided, otherwise use default
+                const customButtonLabel = actionElement.getAttribute('data-action-confirmation-button');
+                modalButton.textContent = customButtonLabel ?? defaultButtonLabel;
+
+                modalButton.addEventListener(
+                    'click',
+                    () => {
+                        // check if this is a POST action (like DELETE with formaction) or GET (link href)
+                        const formAction = actionElement.getAttribute('formaction');
+
+                        if (formAction) {
+                            // POST action: use the hidden form with CSRF token (like DELETE)
+                            const form = document.querySelector('#action-confirmation-form');
+                            form.setAttribute('action', formAction);
+                            form.submit();
+                        } else {
+                            // GET action: navigate to the href URL
+                            const href = actionElement.getAttribute('href');
+                            if (href) {
+                                window.location.href = href;
+                            }
+                        }
+                    },
+                    { once: true }
+                );
             });
         });
     }

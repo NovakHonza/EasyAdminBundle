@@ -73,6 +73,11 @@ return [
         'content' => 'Du kan inte ångra det här.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Är du säker på att du vill %action_name%?',
+        'action' => 'Bekräfta',
+    ],
+
     'filter' => [
         // 'title' => '',
         // 'button.clear' => '',

@@ -73,6 +73,11 @@ return [
         'content' => 'Du kan ikke angre dette valget.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Er du sikker på at du vil %action_name%?',
+        'action' => 'Bekreft',
+    ],
+
     'filter' => [
         'title' => 'Filtre',
         'button.clear' => 'Tøm',
