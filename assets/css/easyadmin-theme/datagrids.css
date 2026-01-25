@@ -184,6 +184,21 @@ table.datagrid:not(.datagrid-empty) tr:not(.empty-row) td.actions.actions-as-dro
     font-size: var(--font-size-base);
     margin-inline-end: 2px;
 }
+
+.datagrid td.actions .dropdown-item-variant-success:hover,
+.page-actions .dropdown-item-variant-success:hover {
+    --dropdown-icon-color: var(--dropdown-item-success-color);
+
+    background: var(--dropdown-item-success-bg);
+    color: var(--dropdown-item-success-color);
+}
+.datagrid td.actions .dropdown-item-variant-warning:hover,
+.page-actions .dropdown-item-variant-warning:hover {
+    --dropdown-icon-color: var(--dropdown-item-warning-color);
+
+    background: var(--dropdown-item-warning-bg);
+    color: var(--dropdown-item-warning-color);
+}
 .datagrid td.actions .dropdown-item-variant-danger:hover,
 .page-actions .dropdown-item-variant-danger:hover {
     --dropdown-icon-color: var(--dropdown-item-danger-color);
