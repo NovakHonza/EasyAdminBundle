@@ -30,7 +30,11 @@
     {% endblock %}
 
     {% block head_javascript %}
-        <script src="{{ asset('app.js', ea.assets.defaultAssetPackageName) }}"></script>
+        {% guard function csp_nonce %}
+            <script src="{{ asset('app.js', ea.assets.defaultAssetPackageName) }}" nonce="{{ csp_nonce('script') }}"></script>
+        {% else %}
+            <script src="{{ asset('app.js', ea.assets.defaultAssetPackageName) }}"></script>
+        {% endguard %}
 
         {% block importmap %}
             {{ include('@EasyAdmin/includes/_importmap.html.twig', {assets: ea.assets.assetMapperAssets ?? []}, with_context: false) }}
@@ -61,10 +65,18 @@
         data-ea-icon-prefix="{{ ea.assets.defaultIconPrefix }}"
     >
     {% block javascript_page_layout %}
-        <script src="{{ asset('page-layout.js', ea.assets.defaultAssetPackageName) }}"></script>
+        {% guard function csp_nonce %}
+            <script src="{{ asset('page-layout.js', ea.assets.defaultAssetPackageName) }}" nonce="{{ csp_nonce('script') }}"></script>
+        {% else %}
+            <script src="{{ asset('page-layout.js', ea.assets.defaultAssetPackageName) }}"></script>
+        {% endguard %}
     {% endblock javascript_page_layout %}
     {% block javascript_page_color_scheme %}
-        <script src="{{ asset('page-color-scheme.js', ea.assets.defaultAssetPackageName) }}"></script>
+        {% guard function csp_nonce %}
+            <script src="{{ asset('page-color-scheme.js', ea.assets.defaultAssetPackageName) }}" nonce="{{ csp_nonce('script') }}"></script>
+        {% else %}
+            <script src="{{ asset('page-color-scheme.js', ea.assets.defaultAssetPackageName) }}"></script>
+        {% endguard %}
     {% endblock javascript_page_color_scheme %}
 
     {% block wrapper_wrapper %}

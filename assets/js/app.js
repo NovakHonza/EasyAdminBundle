@@ -32,6 +32,7 @@ class App {
         this.#createActionConfirmationModals();
         this.#createPopovers();
         this.#createTooltips();
+        this.#createCspCompliantEventHandlers();
 
         document.addEventListener('ea.collection.item-added', () => this.#createAutoCompleteFields());
     }
@@ -503,6 +504,25 @@ class App {
                 }
 
                 toggleVisibilityClasses(secondValue, comparisonWidget.value !== 'between');
+            });
+        });
+    }
+
+    #createCspCompliantEventHandlers() {
+        // Handle form submissions via data attribute (replaces inline onclick handlers)
+        document.querySelectorAll('[data-ea-form-submit]').forEach((element) => {
+            element.addEventListener('click', (event) => {
+                event.preventDefault();
+                const formId = element.getAttribute('data-ea-form-submit');
+                document.getElementById(formId).submit();
+            });
+        });
+
+        // Handle navigation via data attribute (replaces inline onclick handlers)
+        document.querySelectorAll('[data-ea-navigate]').forEach((element) => {
+            element.addEventListener('click', (event) => {
+                event.preventDefault();
+                window.location = element.getAttribute('data-ea-navigate');
             });
         });
     }
