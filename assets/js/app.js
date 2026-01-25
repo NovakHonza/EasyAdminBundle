@@ -32,7 +32,7 @@ class App {
         this.#createActionConfirmationModals();
         this.#createPopovers();
         this.#createTooltips();
-        this.#createCspCompliantEventHandlers();
+        this.#createActionHandlers();
 
         document.addEventListener('ea.collection.item-added', () => this.#createAutoCompleteFields());
     }
@@ -508,21 +508,21 @@ class App {
         });
     }
 
-    #createCspCompliantEventHandlers() {
-        // Handle form submissions via data attribute (replaces inline onclick handlers)
-        document.querySelectorAll('[data-ea-form-submit]').forEach((element) => {
+    #createActionHandlers() {
+        // handle form submissions via data attribute (replaces inline onclick handlers)
+        document.querySelectorAll('[data-ea-action-form-id]').forEach((element) => {
             element.addEventListener('click', (event) => {
                 event.preventDefault();
-                const formId = element.getAttribute('data-ea-form-submit');
+                const formId = element.getAttribute('data-ea-action-form-id');
                 document.getElementById(formId).submit();
             });
         });
 
-        // Handle navigation via data attribute (replaces inline onclick handlers)
-        document.querySelectorAll('[data-ea-navigate]').forEach((element) => {
+        // handle navigation via data attribute (replaces inline onclick handlers)
+        document.querySelectorAll('[data-ea-action-url]').forEach((element) => {
             element.addEventListener('click', (event) => {
                 event.preventDefault();
-                window.location = element.getAttribute('data-ea-navigate');
+                window.location = element.getAttribute('data-ea-action-url');
             });
         });
     }
