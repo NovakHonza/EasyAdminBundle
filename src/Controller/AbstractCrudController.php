@@ -473,6 +473,10 @@ abstract class AbstractCrudController extends AbstractController implements Crud
 
         $autocompleteContext = $context->getRequest()->query->all(AssociationField::PARAM_AUTOCOMPLETE_CONTEXT);
 
+        if (!isset($autocompleteContext['originatingPage'], $autocompleteContext['propertyName'])) {
+            throw new \RuntimeException('Invalid autocomplete context: missing required parameters "originatingPage" or "propertyName".');
+        }
+
         $crudControllerFqcn = $autocompleteContext[EA::CRUD_CONTROLLER_FQCN] ?? $context->getRequest()->attributes->get(EA::CRUD_CONTROLLER_FQCN) ?? $context->getRequest()->query->get(EA::CRUD_CONTROLLER_FQCN);
         /** @var CrudControllerInterface $controller */
         $controller = $this->container->get(ControllerFactory::class)->getCrudControllerInstance($crudControllerFqcn, Action::INDEX, $context->getRequest());
@@ -485,9 +489,20 @@ abstract class AbstractCrudController extends AbstractController implements Crud
             $queryBuilderCallable($queryBuilder);
         }
 
+        $callback = $field?->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_CALLBACK)
+            ?? $context->getCrud()?->getAutocompleteCallback();
+
+        $template = $field?->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_TEMPLATE)
+            ?? $context->getCrud()?->getAutocompleteTemplate();
+
+        // at field-level, the option is OPTION_ESCAPE_HTML_CONTENTS, which is "render as HTML" inverted
+        $fieldEscapeHtml = $field?->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS);
+        $renderAsHtml = (null !== $fieldEscapeHtml && false === $fieldEscapeHtml)
+            || (null === $fieldEscapeHtml && $context->getCrud()?->getAutocompleteRenderAsHtml());
+
         $paginator = $this->container->get(PaginatorFactory::class)->create($queryBuilder);
 
-        return JsonResponse::fromJsonString($paginator->getResultsAsJson());
+        return JsonResponse::fromJsonString($paginator->getResultsAsJson($callback, $template, $renderAsHtml));
     }
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder

@@ -2,8 +2,18 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Orm;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\Persistence\ObjectManager;
+use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityPaginator;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\RequestStack;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
+use Twig\Environment;
 
 class EntityPaginatorTest extends TestCase
 {
@@ -351,6 +361,325 @@ class EntityPaginatorTest extends TestCase
             $rangeLastResultNumber = $totalResults;
         }
         $rangeLastResultNumberProp->setValue($paginator, $rangeLastResultNumber);
+
+        return $paginator;
+    }
+
+    public function testGetResultsAsJsonWithDefaultToString(): void
+    {
+        $entity = new class {
+            public int $id = 123;
+
+            public function __toString(): string
+            {
+                return 'Test Entity';
+            }
+        };
+
+        $paginator = $this->createPaginatorWithResults([$entity]);
+        $json = $paginator->getResultsAsJson();
+        $result = json_decode($json, true);
+
+        $this->assertArrayHasKey('results', $result);
+        $this->assertCount(1, $result['results']);
+        $this->assertSame('Test Entity', $result['results'][0]['entityAsString']);
+    }
+
+    public function testGetResultsAsJsonWithCallback(): void
+    {
+        $entity = new class {
+            public int $id = 42;
+
+            public function getId(): int
+            {
+                return $this->id;
+            }
+
+            public function getName(): string
+            {
+                return 'Product';
+            }
+
+            public function __toString(): string
+            {
+                return 'Should not be used';
+            }
+        };
+
+        $callback = static fn ($e): string => sprintf('[%d] %s', $e->getId(), $e->getName());
+
+        $paginator = $this->createPaginatorWithResults([$entity]);
+        $json = $paginator->getResultsAsJson($callback);
+        $result = json_decode($json, true);
+
+        $this->assertSame('[42] Product', $result['results'][0]['entityAsString']);
+    }
+
+    public function testGetResultsAsJsonWithCallbackEscapesHtmlByDefault(): void
+    {
+        $entity = new class {
+            public int $id = 1;
+
+            public function getName(): string
+            {
+                return '<script>alert("XSS")</script>';
+            }
+
+            public function __toString(): string
+            {
+                return 'Safe';
+            }
+        };
+
+        $callback = static fn ($e): string => $e->getName();
+
+        $paginator = $this->createPaginatorWithResults([$entity]);
+        $json = $paginator->getResultsAsJson($callback);
+        $result = json_decode($json, true);
+
+        $escapedValue = $result['results'][0]['entityAsString'];
+        $this->assertStringContainsString('&lt;script&gt;', $escapedValue);
+        $this->assertStringNotContainsString('<script>', $escapedValue);
+    }
+
+    public function testGetResultsAsJsonWithCallbackRendersHtmlWhenEnabled(): void
+    {
+        $entity = new class {
+            public int $id = 1;
+
+            public function getName(): string
+            {
+                return '<strong>Bold Text</strong>';
+            }
+
+            public function __toString(): string
+            {
+                return 'Safe';
+            }
+        };
+
+        $callback = static fn ($e): string => $e->getName();
+
+        $paginator = $this->createPaginatorWithResults([$entity]);
+        $json = $paginator->getResultsAsJson($callback, null, true);
+        $result = json_decode($json, true);
+
+        $htmlValue = $result['results'][0]['entityAsString'];
+        $this->assertStringContainsString('<strong>Bold Text</strong>', $htmlValue);
+        $this->assertStringNotContainsString('&lt;', $htmlValue);
+    }
+
+    public function testGetResultsAsJsonWithTemplateEscapesHtmlByDefault(): void
+    {
+        $entity = new class {
+            public int $id = 1;
+
+            public function getName(): string
+            {
+                return 'Test Product';
+            }
+        };
+
+        $twig = $this->createMock(Environment::class);
+        $twig->method('render')
+            ->willReturn('<strong>Test Product</strong>');
+
+        $paginator = $this->createPaginatorWithResults([$entity], $twig);
+        $json = $paginator->getResultsAsJson(null, 'test_template.html.twig');
+        $result = json_decode($json, true);
+
+        $escapedValue = $result['results'][0]['entityAsString'];
+        $this->assertStringContainsString('&lt;strong&gt;', $escapedValue);
+        $this->assertStringNotContainsString('<strong>', $escapedValue);
+    }
+
+    public function testGetResultsAsJsonWithTemplateRendersHtmlWhenEnabled(): void
+    {
+        $entity = new class {
+            public int $id = 1;
+
+            public function getName(): string
+            {
+                return 'Test Product';
+            }
+        };
+
+        $twig = $this->createMock(Environment::class);
+        $twig->method('render')
+            ->willReturn('<div class="product"><strong>Test Product</strong></div>');
+
+        $paginator = $this->createPaginatorWithResults([$entity], $twig);
+        $json = $paginator->getResultsAsJson(null, 'test_template.html.twig', true);
+        $result = json_decode($json, true);
+
+        $htmlValue = $result['results'][0]['entityAsString'];
+        $this->assertStringContainsString('<div class="product">', $htmlValue);
+        $this->assertStringContainsString('<strong>Test Product</strong>', $htmlValue);
+    }
+
+    public function testGetResultsAsJsonTemplateReceivesEntityVariable(): void
+    {
+        $entity = new class {
+            public int $id = 1;
+
+            public function getName(): string
+            {
+                return 'Test Product';
+            }
+        };
+
+        $twig = $this->createMock(Environment::class);
+        $twig->expects($this->once())
+            ->method('render')
+            ->with('test.html.twig', ['entity' => $entity])
+            ->willReturn('Rendered');
+
+        $paginator = $this->createPaginatorWithResults([$entity], $twig);
+        $paginator->getResultsAsJson(null, 'test.html.twig');
+    }
+
+    public function testGetResultsAsJsonTemplatePriorityOverCallback(): void
+    {
+        $entity = new class {
+            public int $id = 1;
+
+            public function __toString(): string
+            {
+                return 'ToString';
+            }
+        };
+
+        $callback = static fn ($e): string => 'Callback';
+
+        $twig = $this->createMock(Environment::class);
+        $twig->method('render')->willReturn('Template');
+
+        $paginator = $this->createPaginatorWithResults([$entity], $twig);
+        $json = $paginator->getResultsAsJson($callback, 'test.html.twig');
+        $result = json_decode($json, true);
+
+        // template should take priority over callback
+        $this->assertSame('Template', $result['results'][0]['entityAsString']);
+    }
+
+    public function testGetResultsAsJsonThrowsExceptionOnTemplateError(): void
+    {
+        $entity = new class {
+            public int $id = 1;
+
+            public function __toString(): string
+            {
+                return 'Test';
+            }
+        };
+
+        $twig = $this->createMock(Environment::class);
+        $twig->method('render')
+            ->willThrowException(new \Twig\Error\RuntimeError('Template error'));
+
+        $paginator = $this->createPaginatorWithResults([$entity], $twig);
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Error rendering autocomplete template');
+        $paginator->getResultsAsJson(null, 'broken_template.html.twig');
+    }
+
+    public function testGetResultsAsJsonHandlesMultipleEntities(): void
+    {
+        $entity1 = new class {
+            public int $id = 1;
+
+            public function getName(): string
+            {
+                return 'Entity 1';
+            }
+
+            public function __toString(): string
+            {
+                return $this->getName();
+            }
+        };
+
+        $entity2 = new class {
+            public int $id = 2;
+
+            public function getName(): string
+            {
+                return 'Entity 2';
+            }
+
+            public function __toString(): string
+            {
+                return $this->getName();
+            }
+        };
+
+        $callback = static fn ($e): string => 'Custom: '.$e->getName();
+
+        $paginator = $this->createPaginatorWithResults([$entity1, $entity2]);
+        $json = $paginator->getResultsAsJson($callback);
+        $result = json_decode($json, true);
+
+        $this->assertCount(2, $result['results']);
+        $this->assertSame('Custom: Entity 1', $result['results'][0]['entityAsString']);
+        $this->assertSame('Custom: Entity 2', $result['results'][1]['entityAsString']);
+    }
+
+    private function createPaginatorWithResults(array $entities, ?Environment $twig = null): EntityPaginator
+    {
+        $adminUrlGenerator = $this->createMock(AdminUrlGeneratorInterface::class);
+        $adminUrlGenerator->method('set')->willReturnSelf();
+        $adminUrlGenerator->method('generateUrl')->willReturn('http://example.com/next');
+
+        // create EntityFactory with minimal mock dependencies
+        // note: When first param is not FieldFactory, constructor uses backwards-compatible signature
+        // where param1 = authChecker, param2 = doctrine, param3 = eventDispatcher
+        $authChecker = $this->createMock(AuthorizationCheckerInterface::class);
+        $authChecker->method('isGranted')->willReturn(true);
+
+        $classMetadata = $this->createMock(ClassMetadata::class);
+        $classMetadata->isIdentifierComposite = false;
+        $classMetadata->method('getIdentifierFieldNames')->willReturn(['id']);
+        $classMetadata->method('getSingleIdentifierFieldName')->willReturn('id');
+
+        $objectManager = $this->createMock(ObjectManager::class);
+        $objectManager->method('getClassMetadata')->willReturn($classMetadata);
+
+        $doctrine = $this->createMock(ManagerRegistry::class);
+        $doctrine->method('getManagerForClass')->willReturn($objectManager);
+
+        $eventDispatcher = $this->createMock(EventDispatcherInterface::class);
+        $entityFactory = new EntityFactory($authChecker, $doctrine, $eventDispatcher);
+
+        $request = new Request();
+        $requestStack = new RequestStack();
+        $requestStack->push($request);
+
+        if (null === $twig) {
+            $twig = $this->createMock(Environment::class);
+        }
+
+        $reflection = new \ReflectionClass(EntityPaginator::class);
+        $paginator = $reflection->newInstanceArgs([
+            $adminUrlGenerator,
+            $entityFactory,
+            $requestStack,
+            $twig,
+        ]);
+
+        // set the results
+        $resultsProp = $reflection->getProperty('results');
+        $resultsProp->setValue($paginator, $entities);
+
+        // set other required properties
+        $currentPageProp = $reflection->getProperty('currentPage');
+        $currentPageProp->setValue($paginator, 1);
+
+        $pageSizeProp = $reflection->getProperty('pageSize');
+        $pageSizeProp->setValue($paginator, 15);
+
+        $numResultsProp = $reflection->getProperty('numResults');
+        $numResultsProp->setValue($paginator, \count($entities));
 
         return $paginator;
     }

@@ -82,6 +82,10 @@ final class CrudDto
     private bool|string|TranslatableInterface $askConfirmationOnBatchActions = true;
     /** @var string|string[]|null Action name(s) to try when clicking a row. Array = fallback chain, null = disabled */
     private string|array|null $defaultRowAction = [Action::EDIT, Action::DETAIL];
+    /** @var callable|null */
+    private $autocompleteCallback;
+    private ?string $autocompleteTemplate = null;
+    private bool $autocompleteRenderAsHtml = false;
 
     public function __construct()
     {
@@ -626,5 +630,35 @@ final class CrudDto
     public function setDefaultRowAction(string|array|null $actionName): void
     {
         $this->defaultRowAction = $actionName;
+    }
+
+    public function getAutocompleteCallback(): ?callable
+    {
+        return $this->autocompleteCallback;
+    }
+
+    public function setAutocompleteCallback(?callable $callback): void
+    {
+        $this->autocompleteCallback = $callback;
+    }
+
+    public function getAutocompleteTemplate(): ?string
+    {
+        return $this->autocompleteTemplate;
+    }
+
+    public function setAutocompleteTemplate(?string $template): void
+    {
+        $this->autocompleteTemplate = $template;
+    }
+
+    public function getAutocompleteRenderAsHtml(): bool
+    {
+        return $this->autocompleteRenderAsHtml;
+    }
+
+    public function setAutocompleteRenderAsHtml(bool $renderAsHtml): void
+    {
+        $this->autocompleteRenderAsHtml = $renderAsHtml;
     }
 }

@@ -186,4 +186,112 @@ class AssociationFieldTest extends AbstractFieldTest
 
         self::assertNull($fieldDto->getCustomOption(AssociationField::OPTION_PREFERRED_CHOICES));
     }
+
+    public function testAutocompleteWithCallback(): void
+    {
+        $callback = static fn ($entity): string => 'Custom: '.$entity->getName();
+        $field = AssociationField::new('category');
+        $field->autocomplete(callback: $callback);
+        $fieldDto = $this->configure($field);
+
+        self::assertTrue($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE));
+        self::assertSame($callback, $fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_CALLBACK));
+    }
+
+    public function testAutocompleteWithTemplate(): void
+    {
+        $field = AssociationField::new('category');
+        $field->autocomplete(template: 'admin/autocomplete/category.html.twig');
+        $fieldDto = $this->configure($field);
+
+        self::assertTrue($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE));
+        self::assertSame('admin/autocomplete/category.html.twig', $fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_TEMPLATE));
+    }
+
+    public function testAutocompleteWithRenderAsHtml(): void
+    {
+        $field = AssociationField::new('category');
+        $field->autocomplete(renderAsHtml: true);
+        $fieldDto = $this->configure($field);
+
+        self::assertTrue($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE));
+        // renderAsHtml: true means OPTION_ESCAPE_HTML_CONTENTS should be false (inverted logic)
+        self::assertFalse($fieldDto->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
+    }
+
+    public function testAutocompleteWithAllOptions(): void
+    {
+        $callback = static fn ($entity): string => $entity->getName();
+        $field = AssociationField::new('category');
+        $field->autocomplete(
+            callback: $callback,
+            template: 'admin/autocomplete/category.html.twig',
+            renderAsHtml: true
+        );
+        $fieldDto = $this->configure($field);
+
+        self::assertTrue($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE));
+        self::assertSame($callback, $fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_CALLBACK));
+        self::assertSame('admin/autocomplete/category.html.twig', $fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_TEMPLATE));
+        // renderAsHtml: true means OPTION_ESCAPE_HTML_CONTENTS should be false (inverted logic)
+        self::assertFalse($fieldDto->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
+    }
+
+    public function testAutocompleteDisabled(): void
+    {
+        $field = AssociationField::new('category');
+        $field->autocomplete(enable: false);
+        $fieldDto = $this->configure($field);
+
+        self::assertFalse($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE));
+    }
+
+    public function testAutocompleteDisabledIgnoresOtherOptions(): void
+    {
+        $callback = static fn ($entity): string => $entity->getName();
+        $field = AssociationField::new('category');
+        $field->autocomplete(
+            enable: false,
+            callback: $callback,
+            template: 'admin/autocomplete/category.html.twig',
+            renderAsHtml: true
+        );
+        $fieldDto = $this->configure($field);
+
+        // when disabled, autocomplete should not be enabled and options should not be set
+        self::assertFalse($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE));
+        self::assertNull($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_CALLBACK));
+        self::assertNull($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_TEMPLATE));
+        // OPTION_ESCAPE_HTML_CONTENTS should remain at default value (true) since autocomplete is disabled
+        self::assertTrue($fieldDto->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
+    }
+
+    public function testAutocompleteEnabledExplicitly(): void
+    {
+        $field = AssociationField::new('category');
+        $field->autocomplete(enable: !0);
+        $fieldDto = $this->configure($field);
+
+        self::assertTrue($fieldDto->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE));
+    }
+
+    public function testAutocompleteRenderAsHtmlSetsSameOptionAsRenderAsHtmlMethod(): void
+    {
+        // both autocomplete(renderAsHtml: true) and renderAsHtml(true) should set the same option
+        $field1 = AssociationField::new('category')->autocomplete(renderAsHtml: true);
+        $field2 = AssociationField::new('category')->renderAsHtml();
+
+        self::assertFalse($field1->getAsDto()->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
+        self::assertFalse($field2->getAsDto()->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
+    }
+
+    public function testAutocompleteRenderAsHtmlFalseSetsSameOptionAsRenderAsHtmlMethod(): void
+    {
+        // both autocomplete(renderAsHtml: false) and renderAsHtml(false) should set the same option
+        $field1 = AssociationField::new('category')->autocomplete(renderAsHtml: false);
+        $field2 = AssociationField::new('category')->renderAsHtml(false);
+
+        self::assertTrue($field1->getAsDto()->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
+        self::assertTrue($field2->getAsDto()->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS));
+    }
 }

@@ -264,6 +264,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, service(AdminUrlGenerator::class))
             ->arg(1, service(EntityFactory::class))
             ->arg(2, service('request_stack'))
+            ->arg(3, service('twig'))
 
         ->alias(EntityPaginatorInterface::class, EntityPaginator::class)
 
