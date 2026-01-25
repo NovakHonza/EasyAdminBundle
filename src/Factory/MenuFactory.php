@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Factory;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -10,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MenuItemDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
@@ -80,10 +82,10 @@ final class MenuFactory implements MenuFactoryInterface
                     continue;
                 }
 
-                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain);
+                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain, $adminContext->getCrud());
             }
 
-            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain);
+            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain, $adminContext->getCrud());
         }
 
         $builtItems = $this->menuItemMatcher->markSelectedMenuItem($builtItems, $adminContext->getRequest());
@@ -94,13 +96,18 @@ final class MenuFactory implements MenuFactoryInterface
     /**
      * @param MenuItemDto[] $subItems
      */
-    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain): MenuItemDto
+    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, CrudDto $crudDto): MenuItemDto
     {
         if (!$menuItemDto->getLabel() instanceof TranslatableInterface) {
             $label = $menuItemDto->getLabel();
-            $menuItemDto->setLabel(
-                '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain)
-            );
+            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType()) {
+                $label = Action::INDEX === $menuItemDto->getRouteParameters()[EA::CRUD_ACTION]
+                    ? $crudDto->getEntityLabelInPlural()
+                    : $crudDto->getEntityLabelInSingular();
+            } else {
+                $label = '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain);
+            }
+            $menuItemDto->setLabel($label);
         }
 
         $url = $this->generateMenuItemUrl($menuItemDto);

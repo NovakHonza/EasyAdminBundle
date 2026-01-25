@@ -16,6 +16,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Factory\MenuFactoryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\ActionConfigDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\AssetsDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
@@ -46,7 +47,16 @@ final class AdminContextFactory
         private readonly EntityFactory $entityFactory,
         private readonly AdminRouteGeneratorInterface $adminRouteGenerator,
         private readonly ActionFactory $actionFactory,
+        private readonly ?EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator = null,
     ) {
+        if (null === $this->entityTranslationIdGenerator) {
+            trigger_deprecation(
+                'easycorp/easyadmin-bundle',
+                '4.27',
+                'Not passing argument "$entityTranslationIdGenerator" will cause an error in 5.0.0.',
+                '$entityTranslationIdGenerator',
+            );
+        }
     }
 
     public function create(Request $request, DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ?string $actionName = null): AdminContext
@@ -199,7 +209,7 @@ final class AdminContextFactory
 
         $translationParameters = [];
         if (null !== $crudDto) {
-            $translationParameters['%entity_name%'] = $entityName = basename(str_replace('\\', '/', $crudDto->getEntityFqcn()));
+            $translationParameters['%entity_name%'] = basename(str_replace('\\', '/', $crudDto->getEntityFqcn()));
             $translationParameters['%entity_as_string%'] = null === $entityDto ? '' : (string) $entityDto;
             // when using pretty URLs, the entity ID is passed as a request attribute (it's part of the route path);
             // in legacy URLs, the entity ID is passed as a regular query parameter
@@ -209,14 +219,22 @@ final class AdminContextFactory
             $entityInstance = null === $entityDto ? null : $entityDto->getInstance();
             $pageName = $crudDto->getCurrentPage();
 
-            $singularLabel = $crudDto->getEntityLabelInSingular($entityInstance, $pageName);
+            $singularLabel = $crudDto->getEntityLabelInSingular($entityInstance, $pageName)
+                ?? ($dashboardDto->isUseEntityTranslations() && null !== $this->entityTranslationIdGenerator
+                    ? $this->entityTranslationIdGenerator->generateForEntity($crudDto->getEntityFqcn(), true)
+                    : $translationParameters['%entity_name%']
+                );
             if (!$singularLabel instanceof TranslatableInterface) {
-                $singularLabel = t($singularLabel ?? $entityName, $translationParameters, $translationDomain);
+                $singularLabel = t($singularLabel, $translationParameters, $translationDomain);
             }
 
-            $pluralLabel = $crudDto->getEntityLabelInPlural($entityInstance, $pageName);
+            $pluralLabel = $crudDto->getEntityLabelInPlural($entityInstance, $pageName)
+                ?? ($dashboardDto->isUseEntityTranslations() && null !== $this->entityTranslationIdGenerator
+                    ? $this->entityTranslationIdGenerator->generateForEntity($crudDto->getEntityFqcn(), false)
+                    : $translationParameters['%entity_name%']
+                );
             if (!$pluralLabel instanceof TranslatableInterface) {
-                $pluralLabel = t($pluralLabel ?? $entityName, $translationParameters, $translationDomain);
+                $pluralLabel = t($pluralLabel, $translationParameters, $translationDomain);
             }
 
             $crudDto->setEntityLabelInSingular($singularLabel);

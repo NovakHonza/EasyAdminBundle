@@ -108,12 +108,12 @@ final class MenuItemDto
         $this->expanded = $isExpanded;
     }
 
-    public function getLabel(): TranslatableInterface|string
+    public function getLabel(): TranslatableInterface|string|null
     {
         return $this->label;
     }
 
-    public function setLabel(TranslatableInterface|string $label): void
+    public function setLabel(TranslatableInterface|string|null $label): void
     {
         $this->label = $label;
     }

@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldConfiguratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterConfiguratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityPaginatorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\DependencyInjection\EasyAdminExtension;
 use EasyCorp\Bundle\EasyAdminBundle\EventListener\AdminRouterSubscriber;
 use EasyCorp\Bundle\EasyAdminBundle\EventListener\CrudResponseListener;
@@ -87,6 +88,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Router\UrlSigner;
 use EasyCorp\Bundle\EasyAdminBundle\Security\AuthorizationChecker;
 use EasyCorp\Bundle\EasyAdminBundle\Security\SecurityVoter;
+use EasyCorp\Bundle\EasyAdminBundle\Translation\EntityTranslationIdGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Alert;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Flag;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Icon;
@@ -197,6 +199,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(4, new Reference(EntityFactory::class))
             ->arg(5, service(AdminRouteGenerator::class))
             ->arg(6, service(ActionFactory::class))
+            ->arg(7, service(EntityTranslationIdGeneratorInterface::class))
 
         ->set(AdminUrlGenerator::class)
             // I don't know if we truly need the share() method to get a new instance of the
@@ -373,6 +376,7 @@ return static function (ContainerConfigurator $container) {
         ->set(CommonPreConfigurator::class)
             ->arg(0, new Reference('property_accessor'))
             ->arg(1, service(EntityFactory::class))
+            ->arg(2, service(EntityTranslationIdGeneratorInterface::class))
             ->tag(EasyAdminExtension::TAG_FIELD_CONFIGURATOR, ['priority' => 9999])
 
         ->set(CountryConfigurator::class)
@@ -425,6 +429,10 @@ return static function (ContainerConfigurator $container) {
         ->set(TimezoneConfigurator::class)
 
         ->set(UrlConfigurator::class)
+
+        ->set(EntityTranslationIdGenerator::class)
+
+        ->alias(EntityTranslationIdGeneratorInterface::class, EntityTranslationIdGenerator::class)
 
         ->set(AssetPackage::class)
             ->arg(0, service('request_stack'))

@@ -185,6 +185,11 @@ final class AdminContext implements AdminContextInterface
         return $this->i18nContext->getTemplatePath($templateName);
     }
 
+    public function isUseEntityTranslations(): bool
+    {
+        return $this->dashboardContext->getDashboardDto()->isUseEntityTranslations();
+    }
+
     /**
      * Creates an AdminContext instance suitable for testing.
      *
