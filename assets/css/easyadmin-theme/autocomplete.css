@@ -732,3 +732,8 @@
 .ts-wrapper.disabled .ts-control {
     background-color: var(--form-control-disabled-bg);
 }
+
+/* when using preferred choices, an empty group header is added; hide it to not add extra vertical space */
+.ts-dropdown .optgroup-header:empty {
+    display: none;
+}
