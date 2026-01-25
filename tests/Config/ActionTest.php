@@ -5,6 +5,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Config;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use PHPUnit\Framework\TestCase;
 use Symfony\Bridge\PhpUnit\ExpectDeprecationTrait;
+use Symfony\Component\Translation\TranslatableMessage;
 use function Symfony\Component\Translation\t;
 
 class ActionTest extends TestCase
@@ -169,5 +170,87 @@ class ActionTest extends TestCase
         $restoredDto = $restoredAction->getAsDto();
 
         $this->assertSame('edit', $restoredDto->getCrudActionName());
+    }
+
+    public function testAskConfirmationDefaultDisabled(): void
+    {
+        $actionConfig = Action::new('archive')->linkToCrudAction('archive');
+
+        $this->assertFalse($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertFalse($actionConfig->getAsDto()->getConfirmationMessage());
+    }
+
+    public function testAskConfirmationEnabled(): void
+    {
+        $actionConfig = Action::new('archive')
+            ->linkToCrudAction('archive')
+            ->askConfirmation();
+
+        $this->assertTrue($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertTrue($actionConfig->getAsDto()->getConfirmationMessage());
+    }
+
+    public function testAskConfirmationDisabled(): void
+    {
+        $actionConfig = Action::new('archive')
+            ->linkToCrudAction('archive')
+            ->askConfirmation()
+            ->askConfirmation(false);
+
+        $this->assertFalse($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertFalse($actionConfig->getAsDto()->getConfirmationMessage());
+    }
+
+    public function testAskConfirmationWithCustomMessage(): void
+    {
+        $customMessage = 'Are you sure you want to archive %entity_name%?';
+        $actionConfig = Action::new('archive')
+            ->linkToCrudAction('archive')
+            ->askConfirmation($customMessage);
+
+        $this->assertTrue($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertSame($customMessage, $actionConfig->getAsDto()->getConfirmationMessage());
+    }
+
+    public function testAskConfirmationWithTranslatableMessage(): void
+    {
+        $translatableMessage = new TranslatableMessage('action.archive.confirm');
+        $actionConfig = Action::new('archive')
+            ->linkToCrudAction('archive')
+            ->askConfirmation($translatableMessage);
+
+        $this->assertTrue($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertSame($translatableMessage, $actionConfig->getAsDto()->getConfirmationMessage());
+    }
+
+    public function testAskConfirmationWithCustomButtonLabel(): void
+    {
+        $actionConfig = Action::new('publish')
+            ->linkToCrudAction('publish')
+            ->askConfirmation('Do you accept publishing this?', 'Accept');
+
+        $this->assertTrue($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertSame('Accept', $actionConfig->getAsDto()->getConfirmationButtonLabel());
+    }
+
+    public function testAskConfirmationWithTranslatableButtonLabel(): void
+    {
+        $translatableButton = new TranslatableMessage('action.publish.button');
+        $actionConfig = Action::new('publish')
+            ->linkToCrudAction('publish')
+            ->askConfirmation(true, $translatableButton);
+
+        $this->assertTrue($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertSame($translatableButton, $actionConfig->getAsDto()->getConfirmationButtonLabel());
+    }
+
+    public function testAskConfirmationButtonLabelDefaultsToNull(): void
+    {
+        $actionConfig = Action::new('archive')
+            ->linkToCrudAction('archive')
+            ->askConfirmation();
+
+        $this->assertTrue($actionConfig->getAsDto()->hasConfirmation());
+        $this->assertNull($actionConfig->getAsDto()->getConfirmationButtonLabel());
     }
 }

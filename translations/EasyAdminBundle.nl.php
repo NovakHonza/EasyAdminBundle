@@ -73,6 +73,11 @@ return [
         'content' => 'Deze actie kan niet ongedaan worden gemaakt.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Weet je zeker dat je wilt %action_name%?',
+        'action' => 'Bevestigen',
+    ],
+
     'filter' => [
         'title' => 'Filters',
         'button.clear' => 'Wis filters',

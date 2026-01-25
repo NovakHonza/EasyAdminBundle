@@ -73,6 +73,11 @@ return [
         'content' => 'Αυτή η ενέργεια δεν αναιρείται.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Είστε σίγουροι ότι θέλετε να %action_name%;',
+        'action' => 'Επιβεβαίωση',
+    ],
+
     'filter' => [
         'title' => 'Φίλτρα',
         'button.clear' => 'Καθαρισμός',

@@ -73,6 +73,11 @@ return [
         'content' => '此動作無法復原。',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => '您確定要 %action_name% 嗎？',
+        'action' => '確認',
+    ],
+
     'filter' => [
         'title' => '篩選器',
         'button.clear' => '清除',

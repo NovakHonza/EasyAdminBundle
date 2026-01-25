@@ -73,6 +73,11 @@ return [
         'content' => 'Aquesta acció no es pot desfer.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Estàs segur que vols %action_name%?',
+        'action' => 'Confirmar',
+    ],
+
     'filter' => [
         'title' => 'Filtres',
         'button.clear' => 'Netejar',

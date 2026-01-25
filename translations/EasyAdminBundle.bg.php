@@ -73,6 +73,11 @@ return [
         'content' => 'Това действие е необратимо.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Сигурни ли сте, че искате да %action_name%?',
+        'action' => 'Потвърди',
+    ],
+
     'filter' => [
         'title' => 'Филтри',
         'button.clear' => 'Изчисти',

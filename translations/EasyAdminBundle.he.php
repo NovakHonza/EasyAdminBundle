@@ -73,6 +73,11 @@ return [
         'content' => 'לא ניתן לבטל פעולה זו לאחר ביצועה.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'האם אתה בטוח שברצונך %action_name%?',
+        'action' => 'אישור',
+    ],
+
     'filter' => [
         'title' => 'סינונים',
         'button.clear' => 'נקה',

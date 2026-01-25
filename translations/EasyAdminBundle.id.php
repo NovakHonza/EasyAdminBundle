@@ -73,6 +73,11 @@ return [
         'content' => 'Tidak ada pembatalan untuk operasi ini.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Apakah Anda yakin ingin %action_name%?',
+        'action' => 'Konfirmasi',
+    ],
+
     'filter' => [
         'title' => 'Filter',
         'button.clear' => 'Bersihkan',

@@ -73,6 +73,11 @@ return [
         'content' => 'Izbrisana stavka se ne može povratiti',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Jeste li sigurni da želite %action_name%?',
+        'action' => 'Potvrdi',
+    ],
+
     'filter' => [
         // 'title' => '',
         // 'button.clear' => '',

@@ -73,6 +73,11 @@ return [
         'content' => 'There is no undo for this operation.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Are you sure you want to %action_name%?',
+        'action' => 'Confirm',
+    ],
+
     'filter' => [
         'title' => 'Filters',
         'button.clear' => 'Clear',

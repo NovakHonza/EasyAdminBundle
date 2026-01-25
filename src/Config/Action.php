@@ -385,6 +385,23 @@ final class Action implements \Stringable
         return $this;
     }
 
+    /**
+     * By default, actions are executed immediately when clicked.
+     * Set to true to show a confirmation modal with a generic message.
+     * Set to a string (or TranslatableInterface) to show a custom confirmation message.
+     * The message can use placeholders: %action_name%, %entity_name%, and %entity_id%.
+     * Optionally, set a custom label for the confirmation button.
+     */
+    public function askConfirmation(
+        bool|string|TranslatableInterface $confirmation = true,
+        string|TranslatableInterface|null $buttonLabel = null,
+    ): self {
+        $this->dto->setConfirmationMessage($confirmation);
+        $this->dto->setConfirmationButtonLabel($buttonLabel);
+
+        return $this;
+    }
+
     public function getAsDto(): ActionDto
     {
         if ((!$this->dto->isDynamicLabel() && null === $this->dto->getLabel()) && null === $this->dto->getIcon()) {

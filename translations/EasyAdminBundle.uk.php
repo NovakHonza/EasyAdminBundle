@@ -73,6 +73,11 @@ return [
         'content' => 'Цю дію не можна буде відмінити.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Ви впевнені, що хочете %action_name%?',
+        'action' => 'Підтвердити',
+    ],
+
     'filter' => [
         'title' => 'Фільтри',
         'button.clear' => 'Очистити',

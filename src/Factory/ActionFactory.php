@@ -206,9 +206,23 @@ final class ActionFactory
         if (Action::DELETE === $actionDto->getName()) {
             $actionDto->addHtmlAttributes([
                 'formaction' => $this->adminUrlGenerator->setController($adminContext->getCrud()->getControllerFqcn())->setAction(Action::DELETE)->setEntityId($entityDto->getPrimaryKeyValue())->generateUrl(),
-                'data-bs-toggle' => 'modal',
-                'data-bs-target' => '#modal-delete',
             ]);
+        }
+
+        // handle action confirmation modals (including DELETE action when askConfirmation is enabled)
+        if ($actionDto->hasConfirmation()) {
+            $confirmationMessage = $actionDto->getConfirmationMessage();
+
+            $actionDto->addHtmlAttributes([
+                'data-bs-toggle' => 'modal',
+                'data-bs-target' => '#modal-action-confirmation',
+                'data-action-confirmation' => 'true',
+            ]);
+
+            // if a custom message is provided (string or TranslatableInterface), store it for Twig to translate
+            if (true !== $confirmationMessage) {
+                $actionDto->setDisplayableConfirmationMessage($confirmationMessage);
+            }
         }
 
         if ($actionDto->isBatchAction()) {

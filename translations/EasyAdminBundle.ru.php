@@ -73,6 +73,11 @@ return [
         'content' => 'Эту операцию нельзя отменить.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Вы уверены, что хотите %action_name%?',
+        'action' => 'Подтвердить',
+    ],
+
     'filter' => [
         'title' => 'Фильтры',
         'button.clear' => 'Очистить',

@@ -73,6 +73,11 @@ return [
         'content' => 'این عملیات غیرقابل بازگشت است.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'آیا مطمئن هستید که می‌خواهید %action_name%؟',
+        'action' => 'تأیید',
+    ],
+
     'filter' => [
         'title' => 'فیلترها',
         'button.clear' => 'پاک کردن',

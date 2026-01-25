@@ -73,6 +73,11 @@ return [
         'content' => 'هذا الإجراء غير قابل للإلغاء.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'هل أنت متأكد أنك تريد %action_name%؟',
+        'action' => 'تأكيد',
+    ],
+
     'filter' => [
         'title' => 'عوامل التصفية',
         'button.clear' => 'أعادة التعيين',

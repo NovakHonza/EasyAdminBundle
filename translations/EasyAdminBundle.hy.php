@@ -73,6 +73,11 @@ return [
         'content' => 'Այս գործողությունը չի կարող չեղարկվել։',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Վստա՞հ եք, որ ուզում եք %action_name%:',
+        'action' => 'Հաստատել',
+    ],
+
     'filter' => [
         'title' => 'Ֆիլտրեր',
         'button.clear' => 'Մաքրել',

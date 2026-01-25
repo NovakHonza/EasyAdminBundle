@@ -73,6 +73,11 @@ return [
         'content' => 'За оваа операција нема поништување.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Дали сте сигурни дека сакате да %action_name%?',
+        'action' => 'Потврди',
+    ],
+
     'filter' => [
         'title' => 'Филтри',
         'button.clear' => 'Откажи ги филтрите',

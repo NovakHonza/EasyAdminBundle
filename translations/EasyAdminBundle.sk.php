@@ -73,6 +73,11 @@ return [
         'content' => 'Táto akcia sa nedá zvrátiť.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Naozaj chcete %action_name%?',
+        'action' => 'Potvrdiť',
+    ],
+
     'filter' => [
         'title' => 'Filtre',
         'button.clear' => 'Zrušit',

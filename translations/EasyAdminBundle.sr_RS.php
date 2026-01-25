@@ -73,6 +73,11 @@ return [
         'content' => 'Ova operacija je nepovratna.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Da li ste sigurni da želite da %action_name%?',
+        'action' => 'Potvrdi',
+    ],
+
     'filter' => [
         'title' => 'Filteri',
         'button.clear' => 'Poništi postojeće filtere',

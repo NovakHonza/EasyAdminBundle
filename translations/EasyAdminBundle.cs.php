@@ -73,6 +73,11 @@ return [
         'content' => 'Tuto akci není možné vrátit zpět.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Opravdu chcete %action_name%?',
+        'action' => 'Potvrdit',
+    ],
+
     'filter' => [
         'title' => 'Filtry',
         'button.clear' => 'Zrušit',

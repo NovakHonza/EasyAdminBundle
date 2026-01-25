@@ -73,6 +73,11 @@ return [
         'content' => 'Dës Aktioun kann net réckgängeg gemaach ginn.',
     ],
 
+    'action_confirmation_modal' => [
+        'title' => 'Sidd Dir sécher, datt Dir %action_name% wëllt?',
+        'action' => 'Confirméieren',
+    ],
+
     'filter' => [
         'title' => 'Filteren',
         'button.clear' => 'Zerécksetzen',
