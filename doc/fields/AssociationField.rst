@@ -30,6 +30,8 @@ Basic Information
 Options
 -------
 
+.. _field-association-autocomplete:
+
 ``autocomplete``
 ~~~~~~~~~~~~~~~~
 
@@ -38,6 +40,97 @@ creates "out of memory" errors when that entity has hundreds or thousands of val
 Use this option to load values dynamically (via Ajax requests) based on user input::
 
     yield AssociationField::new('...')->autocomplete();
+
+The ``autocomplete()`` method accepts an optional boolean parameter to enable
+or disable the autocomplete feature conditionally. This is useful when you
+need to decide at runtime whether to use autocomplete::
+
+    // enable autocomplete only when there are many categories
+    $categoryCount = $this->entityManager->getRepository(Category::class)->count([]);
+    yield AssociationField::new('category')->autocomplete(enable: $categoryCount > 100);
+
+    // enable based on user role
+    yield AssociationField::new('category')->autocomplete(
+        enable: $this->isGranted('ROLE_ADMIN')
+    );
+
+Customizing Autocomplete Display
+.................................
+
+By default, autocomplete fields display entities using their ``__toString()``
+method. You can customize this display using either a 1) callback (for simple
+text) or a 2) Twig template (for complex HTML).
+
+**1) Simple Text Customization (Callback)**
+
+Pass a callback to the ``autocomplete()`` method to customize how entities
+appear in the dropdown. This is useful for adding extra information::
+
+    use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+
+    yield AssociationField::new('city')->autocomplete(
+        callback: static fn (City $c): string => sprintf(
+            '%s, %s',
+            $c->getName(),
+            $c->getState()->getCode()
+        )
+    );
+
+You can combine the ``enable`` parameter with other options::
+
+    yield AssociationField::new('city')->autocomplete(
+        enable: $cityCount > 50,
+        callback: static fn (City $c): string => sprintf('%s, %s', $c->getName(), $c->getState()->getCode())
+    );
+
+**2) Complex HTML Customization (Twig Template)**
+
+For more complex displays with HTML markup, use a Twig template. The
+template receives the entity as the ``entity`` variable::
+
+    yield AssociationField::new('product')->autocomplete(
+        template: 'admin/autocomplete/product.html.twig',
+        renderAsHtml: true
+    );
+
+Create the template file with your custom HTML::
+
+    {# templates/admin/autocomplete/product.html.twig #}
+    <div class="product-option">
+        <strong>{{ entity.name }}</strong>
+        <span class="text-muted">({{ entity.sku }})</span>
+        {% if entity.stock < 10 %}
+            <span class="badge badge-danger">Low Stock</span>
+        {% endif %}
+    </div>
+
+**HTML Rendering and Security**
+
+By default, all output is HTML-escaped for security. This prevents XSS
+attacks but means HTML tags will display as text. Use ``renderAsHtml: true``
+to allow HTML rendering::
+
+    // escaped output (default, safe)
+    yield AssociationField::new('category')->autocomplete(
+        template: 'admin/autocomplete/category.html.twig'
+    );
+
+    // HTML output (use only with trusted content)
+    yield AssociationField::new('product')->autocomplete(
+        template: 'admin/autocomplete/product.html.twig',
+        renderAsHtml: true
+    );
+
+    // callbacks can also generate HTML when combined with ``renderAsHtml``
+    yield AssociationField::new('category')->autocomplete(
+        callback: static fn ($e): string => '<strong>' . htmlspecialchars($e->getTitle()) . '</strong>',
+        renderAsHtml: true
+    );
+
+.. caution::
+
+    When ``renderAsHtml`` is ``true``, you must handle escaping yourself
+    in the template to prevent XSS attacks.
 
 ``renderAsNativeWidget``
 ~~~~~~~~~~~~~~~~~~~~~~~~

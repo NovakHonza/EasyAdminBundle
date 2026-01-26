@@ -14,6 +14,8 @@ final class AssociationField implements FieldInterface
     use FieldTrait;
 
     public const OPTION_AUTOCOMPLETE = 'autocomplete';
+    public const OPTION_AUTOCOMPLETE_CALLBACK = 'autocompleteCallback';
+    public const OPTION_AUTOCOMPLETE_TEMPLATE = 'autocompleteTemplate';
     public const OPTION_EMBEDDED_CRUD_FORM_CONTROLLER = 'crudControllerFqcn';
     /** @deprecated since easycorp/easyadmin-bundle 4.4.3 use AssociationField::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER */
     public const OPTION_CRUD_CONTROLLER = self::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER;
@@ -53,6 +55,8 @@ final class AssociationField implements FieldInterface
             ->addCssClass('field-association')
             ->setDefaultColumns('col-md-7 col-xxl-6')
             ->setCustomOption(self::OPTION_AUTOCOMPLETE, false)
+            ->setCustomOption(self::OPTION_AUTOCOMPLETE_CALLBACK, null)
+            ->setCustomOption(self::OPTION_AUTOCOMPLETE_TEMPLATE, null)
             ->setCustomOption(self::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER, null)
             ->setCustomOption(self::OPTION_WIDGET, self::WIDGET_AUTOCOMPLETE)
             ->setCustomOption(self::OPTION_QUERY_BUILDER_CALLABLE, null)
@@ -65,9 +69,24 @@ final class AssociationField implements FieldInterface
             ->setCustomOption(self::OPTION_PREFERRED_CHOICES, null);
     }
 
-    public function autocomplete(): self
+    public function autocomplete(bool $enable = true, ?callable $callback = null, ?string $template = null, bool $renderAsHtml = false): self
     {
+        if (!$enable) {
+            return $this;
+        }
+
         $this->setCustomOption(self::OPTION_AUTOCOMPLETE, true);
+
+        if (null !== $callback) {
+            $this->setCustomOption(self::OPTION_AUTOCOMPLETE_CALLBACK, $callback);
+        }
+
+        if (null !== $template) {
+            $this->setCustomOption(self::OPTION_AUTOCOMPLETE_TEMPLATE, $template);
+        }
+
+        // the renderAsHtml parameter controls the same option as renderAsHtml() method
+        $this->setCustomOption(self::OPTION_ESCAPE_HTML_CONTENTS, !$renderAsHtml);
 
         return $this;
     }

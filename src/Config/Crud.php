@@ -308,6 +308,25 @@ class Crud
         return $this;
     }
 
+    public function autocomplete(bool $enable = true, ?callable $callback = null, ?string $template = null, bool $renderAsHtml = false): self
+    {
+        if (!$enable) {
+            return $this;
+        }
+
+        if (null !== $callback) {
+            $this->dto->setAutocompleteCallback($callback);
+        }
+
+        if (null !== $template) {
+            $this->dto->setAutocompleteTemplate($template);
+        }
+
+        $this->dto->setAutocompleteRenderAsHtml($renderAsHtml);
+
+        return $this;
+    }
+
     public function setFilters(?FilterConfigDto $filters): self
     {
         $this->dto->setFiltersConfig($filters);

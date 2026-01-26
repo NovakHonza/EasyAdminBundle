@@ -472,6 +472,69 @@ query, the optional :doc:`filters </filters>` and the pagination. If you need to
 fully customize this query, override the ``createIndexQueryBuilder()`` method in
 your CRUD controller.
 
+Autocomplete Options
+~~~~~~~~~~~~~~~~~~~~
+
+Association fields allow you to :ref:`customize the autocomplete display <field-association-autocomplete>`.
+You can also set a default autocomplete display for all association fields in a
+CRUD controller. This default display is applied to all fields that don't
+configure their own autocomplete, giving them a consistent formatting.
+
+There are two ways of configuring the autocomplete: using a **callback** (useful for
+simple formatting) and using a **Twig template** (allowing you to use HTML tags for
+more advanced formatting).
+
+**1) Using a Callback**
+
+Define a callback that applies to all autocomplete fields::
+
+    use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->autocomplete(
+                callback: static fn ($entity): string => method_exists($entity, 'getFullName')
+                    ? $entity->getFullName()
+                    : (string) $entity
+            )
+        ;
+    }
+
+The ``autocomplete()`` method also accepts an ``enable`` parameter to
+conditionally configure autocomplete::
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        $entityCount = $this->entityManager->getRepository($this->getEntityFqcn())->count([]);
+
+        return $crud
+            ->autocomplete(
+                enable: $entityCount > 1_000,
+                callback: static fn ($entity): string => (string) $entity
+            )
+        ;
+    }
+
+**2) Using a Twig Template**
+
+Define a default template for all autocomplete fields::
+
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud
+            ->autocomplete(
+                template: 'admin/autocomplete/default.html.twig',
+                renderAsHtml: false
+            )
+        ;
+    }
+
+The template receives the entity as the ``entity`` variable. When
+``renderAsHtml`` is ``false`` (the default), the output is escaped to
+prevent XSS attacks. Set it to ``true`` only when you trust the content
+and need to display HTML.
+
 Templates and Form Options
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 

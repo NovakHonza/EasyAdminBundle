@@ -105,6 +105,8 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
             $field->setFormTypeOption('attr.data-ea-widget', 'ea-autocomplete');
         }
 
+        // both autocomplete(renderAsHtml: true) and renderAsHtml(true) set the same option.
+        // OPTION_ESCAPE_HTML_CONTENTS has inverted logic (true = escape, false = render as HTML)
         $field->setFormTypeOption('attr.data-ea-autocomplete-render-items-as-html', true === $field->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true');
 
         // check for embedded associations
