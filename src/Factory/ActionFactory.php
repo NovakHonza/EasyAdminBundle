@@ -100,6 +100,62 @@ final class ActionFactory
         }
 
         $entityDto->setActions(ActionCollection::new($processedItems));
+        $entityDto->setDefaultActionUrl($this->resolveDefaultActionUrl($processedItems));
+    }
+
+    /**
+     * Finds the URL for the default row action based on the CRUD configuration.
+     * It searches the processed actions (including nested ActionGroups) and returns
+     * the URL of the first matching action from the configured fallback chain.
+     *
+     * @param array<string, ActionDto|ActionGroupDto> $processedItems
+     */
+    private function resolveDefaultActionUrl(array $processedItems): ?string
+    {
+        $context = $this->adminContextProvider->getContext();
+        $defaultRowAction = $context->getCrud()->getDefaultRowAction();
+
+        if (null === $defaultRowAction) {
+            return null;
+        }
+
+        // normalize to array for uniform handling
+        $actionsToTry = \is_array($defaultRowAction) ? $defaultRowAction : [$defaultRowAction];
+
+        foreach ($actionsToTry as $actionName) {
+            $url = $this->findActionUrl($processedItems, $actionName);
+            if (null !== $url) {
+                return $url;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Searches for an action by name in the processed items, including nested ActionGroups.
+     *
+     * @param array<string, ActionDto|ActionGroupDto> $processedItems
+     */
+    private function findActionUrl(array $processedItems, string $actionName): ?string
+    {
+        // first, check direct actions
+        if (isset($processedItems[$actionName]) && $processedItems[$actionName] instanceof ActionDto) {
+            return $processedItems[$actionName]->getLinkUrl();
+        }
+
+        // then, search inside ActionGroups
+        foreach ($processedItems as $item) {
+            if ($item instanceof ActionGroupDto) {
+                foreach ($item->getActions() as $nestedAction) {
+                    if ($nestedAction->getName() === $actionName) {
+                        return $nestedAction->getLinkUrl();
+                    }
+                }
+            }
+        }
+
+        return null;
     }
 
     public function processGlobalActions(?ActionConfigDto $actionsDto = null): ActionCollection

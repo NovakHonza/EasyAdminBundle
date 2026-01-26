@@ -450,6 +450,34 @@ class Crud
         return $this;
     }
 
+    /**
+     * Sets the action to execute when clicking on a row in the index page.
+     * Pass a string for a single action, an array for a fallback chain (first available wins),
+     * or null to disable. By default, it tries [Action::EDIT, Action::DETAIL].
+     * The action will only work if it's enabled for the CRUD and the user has permission.
+     *
+     * @param string|string[]|null $actionName
+     */
+    public function setDefaultRowAction(string|array|null $actionName): self
+    {
+        if (\is_string($actionName) && '' === trim($actionName)) {
+            throw new \InvalidArgumentException('The default row action cannot be an empty string. Use null to disable it.');
+        }
+
+        if (\is_array($actionName)) {
+            foreach ($actionName as $action) {
+                /** @phpstan-ignore function.alreadyNarrowedType */
+                if (!\is_string($action) || '' === trim($action)) {
+                    throw new \InvalidArgumentException('All actions in the fallback chain must be non-empty strings.');
+                }
+            }
+        }
+
+        $this->dto->setDefaultRowAction($actionName);
+
+        return $this;
+    }
+
     public function getAsDto(): CrudDto
     {
         $this->dto->setPaginator(new PaginatorDto($this->paginatorPageSize, $this->paginatorRangeSize, 1, $this->paginatorFetchJoinCollection, $this->paginatorUseOutputWalkers));

@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Dto;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\SearchMode;
@@ -79,6 +80,8 @@ final class CrudDto
     private ?string $sidebarWidth = null;
     private bool $hideNullValues = false;
     private bool|string|TranslatableInterface $askConfirmationOnBatchActions = true;
+    /** @var string|string[]|null Action name(s) to try when clicking a row. Array = fallback chain, null = disabled */
+    private string|array|null $defaultRowAction = [Action::EDIT, Action::DETAIL];
 
     public function __construct()
     {
@@ -607,5 +610,21 @@ final class CrudDto
     public function setAskConfirmationOnBatchActions(bool|string|TranslatableInterface $askConfirmation): void
     {
         $this->askConfirmationOnBatchActions = $askConfirmation;
+    }
+
+    /**
+     * @return string|string[]|null
+     */
+    public function getDefaultRowAction(): string|array|null
+    {
+        return $this->defaultRowAction;
+    }
+
+    /**
+     * @param string|string[]|null $actionName
+     */
+    public function setDefaultRowAction(string|array|null $actionName): void
+    {
+        $this->defaultRowAction = $actionName;
     }
 }
