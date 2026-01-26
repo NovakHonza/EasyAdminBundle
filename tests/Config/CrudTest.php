@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Config;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatableMessage;
@@ -217,5 +218,60 @@ class CrudTest extends TestCase
 
         $crudConfig = Crud::new();
         $crudConfig->setDateTimeFormat($dateFormat, $timeFormat);
+    }
+
+    public function testDefaultRowActionDefaultValue(): void
+    {
+        $crudConfig = Crud::new();
+
+        $this->assertSame([Action::EDIT, Action::DETAIL], $crudConfig->getAsDto()->getDefaultRowAction());
+    }
+
+    /**
+     * @testWith ["detail"]
+     *           ["edit"]
+     *           ["myCustomAction"]
+     *           [["detail", "edit", "customAction"]]
+     */
+    public function testSetDefaultRowAction(string|array $actionNames): void
+    {
+        $crudConfig = Crud::new();
+        $crudConfig->setDefaultRowAction($actionNames);
+
+        $this->assertSame($actionNames, $crudConfig->getAsDto()->getDefaultRowAction());
+    }
+
+    public function testSetDefaultRowActionWithNull(): void
+    {
+        $crudConfig = Crud::new();
+        $crudConfig->setDefaultRowAction(null);
+
+        $this->assertNull($crudConfig->getAsDto()->getDefaultRowAction());
+    }
+
+    /**
+     * @testWith [""]
+     *           ["   "]
+     */
+    public function testSetDefaultRowActionWithInvalidString(string $actionName): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The default row action cannot be an empty string. Use null to disable it.');
+
+        $crudConfig = Crud::new();
+        $crudConfig->setDefaultRowAction($actionName);
+    }
+
+    /**
+     * @testWith [["edit", ""]]
+     *           [["edit", "   "]]
+     */
+    public function testSetDefaultRowActionWithInvalidArray(array $actionNames): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('All actions in the fallback chain must be non-empty strings.');
+
+        $crudConfig = Crud::new();
+        $crudConfig->setDefaultRowAction($actionNames);
     }
 }

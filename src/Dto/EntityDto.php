@@ -25,6 +25,7 @@ final class EntityDto implements \Stringable
     private mixed $primaryKeyValue = null;
     private ?FieldCollection $fields = null;
     private ?ActionCollection $actions = null;
+    private ?string $defaultActionUrl = null;
 
     /**
      * @param class-string<TEntity>  $fqcn
@@ -164,6 +165,16 @@ final class EntityDto implements \Stringable
     public function getActions(): ActionCollection
     {
         return $this->actions;
+    }
+
+    public function getDefaultActionUrl(): ?string
+    {
+        return $this->defaultActionUrl;
+    }
+
+    public function setDefaultActionUrl(?string $url): void
+    {
+        $this->defaultActionUrl = $url;
     }
 
     public function getClassMetadata(): ClassMetadata
