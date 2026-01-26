@@ -212,7 +212,7 @@ final class EntityPaginator implements EntityPaginatorInterface
 
     public function getResultsAsJson(?callable $callback = null, ?string $twigTemplate = null, bool $renderAsHtml = false): string
     {
-        $jsonResult = [];
+        $jsonResult = ['results' => []];
         foreach ($this->getResults() ?? [] as $entityInstance) {
             $entityDto = $this->entityFactory->createForEntityInstance($entityInstance);
 

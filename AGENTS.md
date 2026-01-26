@@ -61,11 +61,8 @@ src/
 ├── Twig/               # Twig extensions and components
 templates/              # Twig templates
 tests/
-├── TestApplication/    # Main test app with fixtures
-├── PrettyUrlsTestApplication/  # Pretty URLs feature tests
-├── AdminRouteTestApplication/  # Admin route tests
-├── Controller/         # Controller tests
-├── Field/              # Field tests
+├── Functional/         # Functional tests
+├── TestUtils/          # Tests for the utility classes used in tests
 ├── Unit/               # Unit tests
 ```
 
@@ -218,8 +215,7 @@ make checks-before-pr
 - Use `@testWith` and data providers when possible to avoid duplicated tests
 
 ### Test Fixtures
-- Entity fixtures in `tests/TestApplication/src/Entity/`
-- CRUD controllers in `tests/TestApplication/src/Controller/`
+- Data fixtures in each functional app in `tests/Functional/Apps/`
 - Doctrine fixtures loaded via `DoctrineFixturesBundle`
 - Deprecation baseline: `tests/baseline-ignore.txt`
 
