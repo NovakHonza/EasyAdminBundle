@@ -1,16 +1,16 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Controller;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Default;
 
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Test\AbstractCrudTestCase;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller\DefaultRowActionCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller\DefaultRowActionDetailCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller\DefaultRowActionDisabledCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller\DefaultRowActionFallbackCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller\DefaultRowActionMissingCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller\SecureDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Entity\Category;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DashboardController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionDetailCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionDisabledCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionFallbackCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionMissingCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
 
 class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
 {
@@ -23,7 +23,7 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
 
     protected function getDashboardFqcn(): string
     {
-        return SecureDashboardController::class;
+        return DashboardController::class;
     }
 
     protected function setUp(): void
@@ -47,7 +47,7 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
         $firstRow = $rows->first();
         static::assertNotNull($firstRow->attr('data-default-action-url'), 'Row should have data-default-action-url attribute');
         static::assertStringContainsString('ea-clickable-row', $firstRow->attr('class'), 'Row should have ea-clickable-row class');
-        static::assertStringContainsString('crudAction=edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
+        static::assertStringContainsString('/edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
     }
 
     public function testDefaultRowActionWithDetailAction(): void
@@ -61,7 +61,7 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
         $firstRow = $rows->first();
         static::assertNotNull($firstRow->attr('data-default-action-url'), 'Row should have data-default-action-url attribute');
         static::assertStringContainsString('ea-clickable-row', $firstRow->attr('class'), 'Row should have ea-clickable-row class');
-        static::assertStringContainsString('crudAction=detail', $firstRow->attr('data-default-action-url'), 'URL should contain detail action');
+        static::assertStringContainsString('/'.$firstRow->attr('data-id'), $firstRow->attr('data-default-action-url'), 'URL should contain the entity ID for detail action');
     }
 
     public function testDefaultRowActionDisabled(): void
@@ -103,7 +103,7 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
         $firstRow = $rows->first();
         static::assertNotNull($firstRow->attr('data-default-action-url'), 'Row should have data-default-action-url with fallback to DETAIL');
         static::assertStringContainsString('ea-clickable-row', $firstRow->attr('class'), 'Row should have ea-clickable-row class');
-        static::assertStringContainsString('crudAction=detail', $firstRow->attr('data-default-action-url'), 'URL should contain detail action (fallback)');
+        static::assertStringContainsString('/'.$firstRow->attr('data-id'), $firstRow->attr('data-default-action-url'), 'URL should contain the entity ID for detail action (fallback)');
     }
 
     public function testDefaultRowActionUrlIsCorrectForEachEntity(): void
@@ -120,7 +120,7 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
             $url = $row->attr('data-default-action-url');
 
             static::assertNotNull($url, 'Each row should have a data-default-action-url');
-            static::assertStringContainsString('entityId='.$entityId, $url, 'URL should contain the correct entity ID');
+            static::assertStringContainsString('/'.$entityId.'/', $url, 'URL should contain the correct entity ID in the path');
 
             $entityIds[] = $entityId;
         });
