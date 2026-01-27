@@ -1,6 +1,6 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Filter\Configurator;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Unit\Filter\Configurator;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;

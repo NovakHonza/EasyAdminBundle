@@ -1,20 +1,21 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Entity\Category;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
 
 /**
- * Tests the setDefaultRowAction() method with Action::DETAIL.
+ * Tests the setDefaultRowAction() method.
+ * By default, uses Action::EDIT as the default row action.
  *
  * @extends AbstractCrudController<Category>
  */
-class DefaultRowActionDetailCrudController extends AbstractCrudController
+class DefaultRowActionCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
@@ -26,11 +27,6 @@ class DefaultRowActionDetailCrudController extends AbstractCrudController
         return [
             TextField::new('name'),
         ];
-    }
-
-    public function configureCrud(Crud $crud): Crud
-    {
-        return $crud->setDefaultRowAction(Action::DETAIL);
     }
 
     public function configureActions(Actions $actions): Actions

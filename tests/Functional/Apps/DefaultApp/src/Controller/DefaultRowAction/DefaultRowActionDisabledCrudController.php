@@ -1,20 +1,20 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Controller;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Entity\Category;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
 
 /**
- * Tests the setDefaultRowAction() when the action does not exist.
- * The default row action is set to Action::EDIT but the edit action is disabled.
+ * Tests the setDefaultRowAction() method with null (disabled).
  *
  * @extends AbstractCrudController<Category>
  */
-class DefaultRowActionMissingCrudController extends AbstractCrudController
+class DefaultRowActionDisabledCrudController extends AbstractCrudController
 {
     public static function getEntityFqcn(): string
     {
@@ -28,10 +28,15 @@ class DefaultRowActionMissingCrudController extends AbstractCrudController
         ];
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud->setDefaultRowAction(null);
+    }
+
     public function configureActions(Actions $actions): Actions
     {
         return $actions
-            ->disable(Action::EDIT)
+            ->add(Crud::PAGE_INDEX, Action::DETAIL)
         ;
     }
 }

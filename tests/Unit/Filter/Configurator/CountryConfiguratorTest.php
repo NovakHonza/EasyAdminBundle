@@ -1,28 +1,28 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Filter\Configurator;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Unit\Filter\Configurator;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Context\I18nContext;
 use EasyCorp\Bundle\EasyAdminBundle\Context\RequestContext;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
-use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\LocaleConfigurator;
-use EasyCorp\Bundle\EasyAdminBundle\Filter\LocaleFilter;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\CountryConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\CountryFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TextFilter;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Intl\Locales;
+use Symfony\Component\Intl\Countries;
 
-class LocaleConfiguratorTest extends TestCase
+class CountryConfiguratorTest extends TestCase
 {
-    private LocaleConfigurator $configurator;
+    private CountryConfigurator $configurator;
     private EntityDto $entityDto;
     private AdminContext $adminContext;
 
     protected function setUp(): void
     {
-        $this->configurator = new LocaleConfigurator();
+        $this->configurator = new CountryConfigurator();
 
         $metadata = new ClassMetadata('App\Entity\Test');
         $metadata->setIdentifier(['id']);
@@ -36,9 +36,9 @@ class LocaleConfiguratorTest extends TestCase
         );
     }
 
-    public function testSupportsLocaleFilter(): void
+    public function testSupportsCountryFilter(): void
     {
-        $filter = LocaleFilter::new('locale');
+        $filter = CountryFilter::new('country');
         $filterDto = $filter->getAsDto();
 
         $this->assertTrue($this->configurator->supports($filterDto, null, $this->entityDto, $this->adminContext));
@@ -52,23 +52,23 @@ class LocaleConfiguratorTest extends TestCase
         $this->assertFalse($this->configurator->supports($filterDto, null, $this->entityDto, $this->adminContext));
     }
 
-    public function testConfigureSetsAllLocales(): void
+    public function testConfigureSetsAllCountries(): void
     {
-        $filter = LocaleFilter::new('locale');
+        $filter = CountryFilter::new('country');
         $filterDto = $filter->getAsDto();
 
         $this->configurator->configure($filterDto, null, $this->entityDto, $this->adminContext);
 
         $choices = $filterDto->getFormTypeOption('value_type_options.choices');
-        $expectedLocales = array_flip(Locales::getNames());
+        $expectedCountries = array_flip(Countries::getNames());
 
-        $this->assertSame($expectedLocales, $choices);
+        $this->assertSame($expectedCountries, $choices);
         $this->assertFalse($filterDto->getFormTypeOption('value_type_options.choice_translation_domain'));
     }
 
     public function testConfigureWithIncludeOnly(): void
     {
-        $filter = LocaleFilter::new('locale')->includeOnly(['en_US', 'es_ES', 'fr_FR']);
+        $filter = CountryFilter::new('country')->includeOnly(['ES', 'FR', 'DE']);
         $filterDto = $filter->getAsDto();
 
         $this->configurator->configure($filterDto, null, $this->entityDto, $this->adminContext);
@@ -76,35 +76,49 @@ class LocaleConfiguratorTest extends TestCase
         $choices = $filterDto->getFormTypeOption('value_type_options.choices');
 
         $this->assertCount(3, $choices);
-        $this->assertArrayHasKey(Locales::getName('en_US'), $choices);
-        $this->assertArrayHasKey(Locales::getName('es_ES'), $choices);
-        $this->assertArrayHasKey(Locales::getName('fr_FR'), $choices);
-        $this->assertSame('en_US', $choices[Locales::getName('en_US')]);
+        $this->assertArrayHasKey(Countries::getName('ES'), $choices);
+        $this->assertArrayHasKey(Countries::getName('FR'), $choices);
+        $this->assertArrayHasKey(Countries::getName('DE'), $choices);
+        $this->assertSame('ES', $choices[Countries::getName('ES')]);
     }
 
     public function testConfigureWithRemove(): void
     {
-        $filter = LocaleFilter::new('locale')->remove(['en_US', 'es_ES']);
+        $filter = CountryFilter::new('country')->remove(['US', 'CA']);
         $filterDto = $filter->getAsDto();
 
         $this->configurator->configure($filterDto, null, $this->entityDto, $this->adminContext);
 
         $choices = $filterDto->getFormTypeOption('value_type_options.choices');
 
-        $this->assertArrayNotHasKey(Locales::getName('en_US'), $choices);
-        $this->assertArrayNotHasKey(Locales::getName('es_ES'), $choices);
-        $this->assertArrayHasKey(Locales::getName('fr_FR'), $choices);
+        $this->assertArrayNotHasKey(Countries::getName('US'), $choices);
+        $this->assertArrayNotHasKey(Countries::getName('CA'), $choices);
+        $this->assertArrayHasKey(Countries::getName('ES'), $choices);
     }
 
     public function testConfigureWithPreferredChoices(): void
     {
-        $filter = LocaleFilter::new('locale')->preferredChoices(['en_US', 'es_ES']);
+        $filter = CountryFilter::new('country')->preferredChoices(['ES', 'FR']);
         $filterDto = $filter->getAsDto();
 
         $this->configurator->configure($filterDto, null, $this->entityDto, $this->adminContext);
 
         $preferredChoices = $filterDto->getFormTypeOption('value_type_options.preferred_choices');
 
-        $this->assertSame(['en_US', 'es_ES'], $preferredChoices);
+        $this->assertSame(['ES', 'FR'], $preferredChoices);
+    }
+
+    public function testConfigureWithAlpha3Codes(): void
+    {
+        $filter = CountryFilter::new('country')->useAlpha3Codes()->includeOnly(['ESP', 'FRA']);
+        $filterDto = $filter->getAsDto();
+
+        $this->configurator->configure($filterDto, null, $this->entityDto, $this->adminContext);
+
+        $choices = $filterDto->getFormTypeOption('value_type_options.choices');
+
+        $this->assertCount(2, $choices);
+        $this->assertSame('ESP', $choices[Countries::getAlpha3Name('ESP')]);
+        $this->assertSame('FRA', $choices[Countries::getAlpha3Name('FRA')]);
     }
 }

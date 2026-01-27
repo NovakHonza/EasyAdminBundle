@@ -1,6 +1,6 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Filter;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Unit\Filter;
 
 use EasyCorp\Bundle\EasyAdminBundle\Filter\TimezoneFilter;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Filter\Type\ChoiceFilterType;
