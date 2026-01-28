@@ -59,6 +59,12 @@ These are the built-in actions included by default in each page:
   * Added by default: ``Action::SAVE_AND_RETURN``, ``Action::SAVE_AND_ADD_ANOTHER``
   * Other available actions: ``Action::SAVE_AND_CONTINUE``, ``Action::INDEX``
 
+.. note::
+
+    By default, clicking a row in the ``index`` page navigates to ``edit`` action
+    (or ``detail`` if edit is unavailable). See :ref:`default row action <default-row-action>`
+    to customize this.
+
 Adding Actions
 --------------
 

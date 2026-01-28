@@ -572,6 +572,8 @@ Templates and Form Options
         ;
     }
 
+.. _default-row-action:
+
 Default Row Action
 ~~~~~~~~~~~~~~~~~~
 
