@@ -17,7 +17,11 @@
     <title>{{ page_title_block_output|striptags|raw }}</title>
 
     {% block head_stylesheets %}
-        <link rel="stylesheet" href="{{ asset('app.css', ea.assets.defaultAssetPackageName) }}">
+        {% guard function csp_nonce %}
+            <link rel="stylesheet" href="{{ asset('app.css', ea.assets.defaultAssetPackageName) }}" nonce="{{ csp_nonce('style') }}">
+        {% else %}
+            <link rel="stylesheet" href="{{ asset('app.css', ea.assets.defaultAssetPackageName) }}">
+        {% endguard %}
     {% endblock %}
 
     {% block configured_stylesheets %}
