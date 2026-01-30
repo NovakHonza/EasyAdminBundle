@@ -191,6 +191,25 @@ final class AdminContext implements AdminContextInterface
     }
 
     /**
+     * Returns a new AdminContext with a different EntityDto.
+     * Useful for nested CRUD operations (e.g., CollectionField).
+     */
+    public function withEntity(EntityDto $entityDto): self
+    {
+        return new self(
+            $this->requestContext,
+            new CrudContext(
+                $this->crudContext->getCrud(),
+                $entityDto,
+                $this->crudContext->getSearch(),
+                $this->crudContext->getCrudControllers()
+            ),
+            $this->dashboardContext,
+            $this->i18nContext,
+        );
+    }
+
+    /**
      * Creates an AdminContext instance suitable for testing.
      *
      * This method provides sensible defaults for all sub-contexts, making it easy
