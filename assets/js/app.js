@@ -401,6 +401,14 @@ class App {
         const modalButton = document.querySelector('#modal-action-confirmation-button');
         const defaultTitleTemplate = modalTitle?.textContent;
         const defaultButtonLabel = modalButton?.textContent;
+        const variantToClass = {
+            default: 'btn-secondary',
+            primary: 'btn-primary',
+            success: 'btn-success',
+            warning: 'btn-warning',
+            danger: 'btn-danger',
+        };
+        const allVariantClasses = Object.values(variantToClass);
 
         document.querySelectorAll('[data-action-confirmation="true"]').forEach((actionElement) => {
             actionElement.addEventListener('click', (event) => {
@@ -422,6 +430,12 @@ class App {
                 // use custom button label if provided, otherwise use default
                 const customButtonLabel = actionElement.getAttribute('data-action-confirmation-button');
                 modalButton.textContent = customButtonLabel ?? defaultButtonLabel;
+
+                // apply to the modal button the same variant as the action that opened the modal
+                const variant = actionElement.getAttribute('data-action-variant') || 'danger';
+                const variantClass = variantToClass[variant] || 'btn-danger';
+                modalButton.classList.remove(...allVariantClasses);
+                modalButton.classList.add(variantClass);
 
                 modalButton.addEventListener(
                     'click',

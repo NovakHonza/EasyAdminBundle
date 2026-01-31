@@ -273,6 +273,7 @@ final class ActionFactory
                 'data-bs-toggle' => 'modal',
                 'data-bs-target' => '#modal-action-confirmation',
                 'data-action-confirmation' => 'true',
+                'data-action-variant' => $actionDto->getVariant()->value,
             ]);
 
             // if a custom message is provided (string or TranslatableInterface), store it for Twig to translate
