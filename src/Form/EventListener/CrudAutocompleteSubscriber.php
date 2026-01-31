@@ -10,12 +10,18 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
+use Twig\Environment;
 
 /**
  * @author Yonel Ceruto <yonelceruto@gmail.com>
  */
 class CrudAutocompleteSubscriber implements EventSubscriberInterface
 {
+    public function __construct(
+        private readonly Environment $twig,
+    ) {
+    }
+
     public static function getSubscribedEvents(): array
     {
         return [
@@ -35,6 +41,29 @@ class CrudAutocompleteSubscriber implements EventSubscriberInterface
         $options = $form->getConfig()->getOptions();
         $options['compound'] = false;
         $options['choices'] = is_iterable($data) ? $data : [$data];
+
+        // apply custom choice_label if autocomplete is customized so the selected item looks the same as the other entries.
+        // note: we don't escape here because Twig already escapes the <option> content automatically;
+        // the renderAsHtml flag controls how TomSelect renders the item (via data-ea-autocomplete-render-items-as-html).
+        $callback = $options['autocomplete_callback'] ?? null;
+        $template = $options['autocomplete_template'] ?? null;
+
+        if (null !== $template) {
+            $twig = $this->twig;
+            $options['choice_label'] = static function ($entity) use ($twig, $template): string {
+                return $twig->render($template, ['entity' => $entity]);
+            };
+        } elseif (null !== $callback) {
+            $options['choice_label'] = static function ($entity) use ($callback): string {
+                return (string) $callback($entity);
+            };
+        }
+
+        // remove custom options before passing to EntityType
+        unset(
+            $options['autocomplete_callback'],
+            $options['autocomplete_template']
+        );
 
         $form->add('autocomplete', EntityType::class, $options);
     }

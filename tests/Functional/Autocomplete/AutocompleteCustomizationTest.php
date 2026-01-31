@@ -249,4 +249,71 @@ class AutocompleteCustomizationTest extends AbstractCrudTestCase
         $this->assertStringNotContainsString('&lt;strong&gt;', $firstResult);
         $this->assertStringContainsString('Important Project', $firstResult);
     }
+
+    public function testSelectedItemRenderedSameAsDropdownEntries(): void
+    {
+        // create a project and an issue with that project pre-selected
+        $project = $this->createProject('Selected Project');
+
+        $issue = new ProjectIssue();
+        $issue->setName('Test Issue');
+        $issue->setProject($project);
+
+        $this->entityManager->persist($project);
+        $this->entityManager->persist($issue);
+        $this->entityManager->flush();
+
+        // open the edit form for the issue
+        $editUrl = $this->adminUrlGenerator
+            ->setDashboard(DashboardController::class)
+            ->setController(ProjectIssueWithAutocompleteCrudController::class)
+            ->setAction('edit')
+            ->setEntityId($issue->getId())
+            ->generateUrl();
+
+        $this->client->request('GET', $editUrl);
+        $this->assertResponseIsSuccessful();
+
+        // the selected option should use the same callback format as dropdown entries:
+        // "Project: {name} (ID: {id})"
+        $expectedLabel = sprintf('Project: %s (ID: %s)', $project->getName(), $project->getId());
+        $this->assertSelectorExists(sprintf('option[selected]:contains("%s")', $expectedLabel));
+    }
+
+    public function testSelectedItemRenderedWithHtmlCallback(): void
+    {
+        // create a project and an issue with that project pre-selected
+        $project = $this->createProject('HTML Project');
+
+        $issue = new ProjectIssue();
+        $issue->setName('HTML Test Issue');
+        $issue->setProject($project);
+
+        $this->entityManager->persist($project);
+        $this->entityManager->persist($issue);
+        $this->entityManager->flush();
+
+        // open the edit form using the controller with renderAsHtml: true
+        $editUrl = $this->adminUrlGenerator
+            ->setDashboard(DashboardController::class)
+            ->setController(ProjectIssueWithRenderAsHtmlCrudController::class)
+            ->setAction('edit')
+            ->setEntityId($issue->getId())
+            ->generateUrl();
+
+        $this->client->request('GET', $editUrl);
+        $this->assertResponseIsSuccessful();
+
+        // the selected option should contain the HTML-formatted label
+        // the callback returns: "<strong>{name}</strong> (ID: {id})"
+        $crawler = $this->client->getCrawler();
+        $selectedOption = $crawler->filter('select[name*="project"] option[selected]');
+
+        $this->assertCount(1, $selectedOption);
+        $optionText = $selectedOption->text();
+
+        // the option text should contain the project name and ID
+        $this->assertStringContainsString('HTML Project', $optionText);
+        $this->assertStringContainsString('(ID:', $optionText);
+    }
 }

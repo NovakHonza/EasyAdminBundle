@@ -187,6 +187,16 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
             }
 
             $field->setFormTypeOption('attr.data-ea-autocomplete-endpoint-url', $autocompleteEndpointUrl ?? null);
+
+            // pass autocomplete options to render the selected item the same as the other entries
+            $autocompleteCallback = $field->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_CALLBACK);
+            $autocompleteTemplate = $field->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_TEMPLATE);
+
+            if (null !== $autocompleteCallback) {
+                $field->setFormTypeOption('autocomplete_callback', $autocompleteCallback);
+            } elseif (null !== $autocompleteTemplate) {
+                $field->setFormTypeOption('autocomplete_template', $autocompleteTemplate);
+            }
         } else {
             $field->setFormTypeOptionIfNotSet('query_builder', static function (EntityRepository $repository) use ($field) {
                 // TODO: should this use `createIndexQueryBuilder` instead, so we get the default ordering etc.?
