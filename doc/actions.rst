@@ -193,7 +193,7 @@ to users::
 
     public function configureActions(Actions $actions): Actions
     {
-        $viewInvoice = Action::new('View Invoice', 'fas fa-file-invoice')
+        $viewInvoice = Action::new('View Invoice', icon: 'fas fa-file-invoice')
             ->displayIf(static fn (Invoice $invoice): bool => $invoice->isPaid())
 
         return $actions
