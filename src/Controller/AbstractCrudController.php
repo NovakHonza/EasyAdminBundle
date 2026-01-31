@@ -480,8 +480,22 @@ abstract class AbstractCrudController extends AbstractController implements Crud
         $crudControllerFqcn = $autocompleteContext[EA::CRUD_CONTROLLER_FQCN] ?? $context->getRequest()->attributes->get(EA::CRUD_CONTROLLER_FQCN) ?? $context->getRequest()->query->get(EA::CRUD_CONTROLLER_FQCN);
         /** @var CrudControllerInterface $controller */
         $controller = $this->container->get(ControllerFactory::class)->getCrudControllerInstance($crudControllerFqcn, Action::INDEX, $context->getRequest());
+        $originatingPage = $autocompleteContext['originatingPage'];
+        $propertyName = $autocompleteContext['propertyName'];
+        $fields = FieldCollection::new($controller->configureFields($originatingPage));
+
+        // find the first field with matching property that is displayed on the originating page;
+        // this ensures we get the correct field when a controller defines more than one field for the
+        // same property, each of them displayed only on certain pages (via hideOnIndex(), onlyOnForms(), etc.)
         /** @var FieldDto|null $field */
-        $field = FieldCollection::new($controller->configureFields($autocompleteContext['originatingPage']))->getByProperty($autocompleteContext['propertyName']);
+        $field = null;
+        foreach ($fields as $fieldDto) {
+            if ($propertyName === $fieldDto->getProperty() && $fieldDto->isDisplayedOn($originatingPage)) {
+                $field = $fieldDto;
+                break;
+            }
+        }
+
         /** @var \Closure|null $queryBuilderCallable */
         $queryBuilderCallable = $field?->getCustomOption(AssociationField::OPTION_QUERY_BUILDER_CALLABLE);
 
