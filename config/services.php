@@ -11,6 +11,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldConfiguratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterConfiguratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityPaginatorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\DependencyInjection\EasyAdminExtension;
 use EasyCorp\Bundle\EasyAdminBundle\EventListener\AdminRouterSubscriber;
 use EasyCorp\Bundle\EasyAdminBundle\EventListener\CrudResponseListener;
@@ -54,13 +56,19 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\Configurator\UrlConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\ChoiceConfigurator as ChoiceFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\CommonConfigurator as CommonFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\ComparisonConfigurator as ComparisonFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\CountryConfigurator as CountryFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\CurrencyConfigurator as CurrencyFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\DateTimeConfigurator as DateTimeFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\EntityConfigurator as EntityFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\LanguageConfigurator as LanguageFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\LocaleConfigurator as LocaleFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\NullConfigurator as NullFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\NumericConfigurator as NumericFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\TextConfigurator as TextFilterConfigurator;
+use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\TimezoneConfigurator as TimezoneFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Extension\CollectionTypeExtension;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Extension\EaCrudFormTypeExtension;
+use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudAutocompleteType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudFormType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FiltersFormType;
@@ -76,17 +84,22 @@ use EasyCorp\Bundle\EasyAdminBundle\Provider\FieldProvider;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminRouteGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminRouteLoader;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Security\AuthorizationChecker;
 use EasyCorp\Bundle\EasyAdminBundle\Security\SecurityVoter;
+use EasyCorp\Bundle\EasyAdminBundle\Translation\EntityTranslationIdGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Alert;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Flag;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Icon;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\EasyAdminTwigExtension;
+use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Component\HttpKernel\Event\ViewEvent;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
+use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 
 return static function (ContainerConfigurator $container) {
     $services = $container->services()
@@ -176,7 +189,9 @@ return static function (ContainerConfigurator $container) {
             ->arg(1, new Reference(MenuFactory::class))
             ->arg(2, new Reference(EntityFactory::class))
             ->arg(3, service(AdminRouteGenerator::class))
-            ->arg(4, service('cache.easyadmin'))
+            ->arg(4, service(ActionFactory::class))
+            ->arg(5, service(EntityTranslationIdGeneratorInterface::class))
+            ->arg(6, service('cache.easyadmin'))
 
         ->set(AdminUrlGenerator::class)
             // I don't know if we truly need the share() method to get a new instance of the
@@ -237,6 +252,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, service(AdminUrlGenerator::class))
             ->arg(1, service(EntityFactory::class))
             ->arg(2, service('request_stack'))
+            ->arg(3, service('twig'))
 
         ->alias(EntityPaginatorInterface::class, EntityPaginator::class)
 
@@ -273,6 +289,7 @@ return static function (ContainerConfigurator $container) {
 
         ->set(FileUploadType::class)
             ->arg(0, param('kernel.project_dir'))
+            ->arg(1, service('filesystem'))
             ->tag('form.type')
 
         ->set(ChoiceFilterConfigurator::class)
@@ -282,9 +299,18 @@ return static function (ContainerConfigurator $container) {
 
         ->set(ComparisonFilterConfigurator::class)
 
+        ->set(CountryFilterConfigurator::class)
+
+        ->set(CurrencyFilterConfigurator::class)
+
         ->set(DateTimeFilterConfigurator::class)
 
         ->set(EntityFilterConfigurator::class)
+            ->arg(0, new Reference(AdminUrlGenerator::class))
+
+        ->set(LanguageFilterConfigurator::class)
+
+        ->set(LocaleFilterConfigurator::class)
 
         ->set(NullFilterConfigurator::class)
 
@@ -292,11 +318,14 @@ return static function (ContainerConfigurator $container) {
 
         ->set(TextFilterConfigurator::class)
 
+        ->set(TimezoneFilterConfigurator::class)
+
         ->set(ActionFactory::class)
             ->arg(0, new Reference(AdminContextProvider::class))
             ->arg(1, new Reference(AuthorizationChecker::class))
             ->arg(2, new Reference(AdminUrlGenerator::class))
             ->arg(3, new Reference('security.csrf.token_manager', ContainerInterface::NULL_ON_INVALID_REFERENCE))
+            ->arg(4, tagged_iterator(EasyAdminExtension::TAG_ACTIONS_EXTENSION))
 
         ->set(SecurityVoter::class)
             ->arg(0, service(AuthorizationChecker::class))
@@ -306,6 +335,10 @@ return static function (ContainerConfigurator $container) {
         ->set(CrudFormType::class)
             ->arg(0, service('form.type_guesser.doctrine'))
             ->tag('form.type', ['alias' => 'ea_crud'])
+
+        ->set(CrudAutocompleteType::class)
+            ->arg(0, service('twig'))
+            ->tag('form.type', ['alias' => 'ea_autocomplete'])
 
         ->set(ArrayConfigurator::class)
 
@@ -334,6 +367,7 @@ return static function (ContainerConfigurator $container) {
         ->set(CommonPreConfigurator::class)
             ->arg(0, new Reference('property_accessor'))
             ->arg(1, service(EntityFactory::class))
+            ->arg(2, service(EntityTranslationIdGeneratorInterface::class))
             ->tag(EasyAdminExtension::TAG_FIELD_CONFIGURATOR, ['priority' => 9999])
 
         ->set(CountryConfigurator::class)
@@ -387,6 +421,10 @@ return static function (ContainerConfigurator $container) {
         ->set(TimezoneConfigurator::class)
 
         ->set(UrlConfigurator::class)
+
+        ->set(EntityTranslationIdGenerator::class)
+
+        ->alias(EntityTranslationIdGeneratorInterface::class, EntityTranslationIdGenerator::class)
 
         ->set(AssetPackage::class)
             ->arg(0, service('request_stack'))

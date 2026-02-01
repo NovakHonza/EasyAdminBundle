@@ -7,13 +7,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonElement;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonStyle;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonType;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonVariant;
-use function Symfony\Component\String\u;
 use Symfony\Contracts\Translation\TranslatableInterface;
+use function Symfony\Component\String\u;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class Action
+final class Action implements \Stringable
 {
     public const BATCH_DELETE = 'batchDelete';
     public const DELETE = 'delete';
@@ -43,8 +43,8 @@ final class Action
     }
 
     /**
-     * @param TranslatableInterface|string|(callable(object $entity): string)|false|null $label Use FALSE to hide the label; use NULL to autogenerate it
-     * @param string|null                                                                $icon  The full CSS classes of the FontAwesome icon to render (see https://fontawesome.com/v6/search?m=free)
+     * @param TranslatableInterface|string|callable|false|null $label Use FALSE to hide the label; use NULL to autogenerate it
+     * @param string|null                                      $icon  The full CSS classes of the FontAwesome icon to render (see https://fontawesome.com/v6/search?m=free)
      */
     public static function new(string $name, TranslatableInterface|string|callable|bool|null $label = null, ?string $icon = null): self
     {
@@ -79,7 +79,7 @@ final class Action
     }
 
     /**
-     * @param TranslatableInterface|string|(callable(object $entity): string)|false|null $label Use FALSE to hide the label; use NULL to autogenerate it
+     * @param TranslatableInterface|string|callable|false|null $label Use FALSE to hide the label; use NULL to autogenerate it
      */
     public function setLabel(TranslatableInterface|string|callable|bool|null $label): self
     {
@@ -303,6 +303,23 @@ final class Action
         if ($asTextLink) {
             $this->dto->setStyle(ButtonStyle::Text);
         }
+
+        return $this;
+    }
+
+    /**
+     * By default, actions are executed immediately when clicked.
+     * Set to true to show a confirmation modal with a generic message.
+     * Set to a string (or TranslatableInterface) to show a custom confirmation message.
+     * The message can use placeholders: %action_name%, %entity_name%, and %entity_id%.
+     * Optionally, set a custom label for the confirmation button.
+     */
+    public function askConfirmation(
+        bool|string|TranslatableInterface $confirmation = true,
+        string|TranslatableInterface|null $buttonLabel = null,
+    ): self {
+        $this->dto->setConfirmationMessage($confirmation);
+        $this->dto->setConfirmationButtonLabel($buttonLabel);
 
         return $this;
     }

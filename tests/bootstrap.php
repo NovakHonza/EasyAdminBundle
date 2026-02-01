@@ -1,10 +1,8 @@
 <?php
 
-use EasyCorp\Bundle\EasyAdminBundle\Tests\TestApplication\Kernel;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\NullOutput;
 use Symfony\Component\Filesystem\Filesystem;
 
 // needed to avoid encoding issues when running tests on different platforms
@@ -19,30 +17,41 @@ if (!file_exists($file)) {
 }
 $autoload = require $file;
 
-$kernel = new Kernel();
+/**
+ * Helper function to initialize a test application database with fixtures.
+ */
+function initializeTestAppDatabase(object $kernel, Filesystem $filesystem): void
+{
+    // delete the existing cache directory to avoid issues
+    $filesystem->remove($kernel->getCacheDir());
 
-// delete the existing cache directory to avoid issues
-(new Filesystem())->remove($kernel->getCacheDir());
+    $application = new Application($kernel);
+    $application->setAutoExit(false);
 
-$application = new Application($kernel);
-$application->setAutoExit(false);
+    $input = new ArrayInput(['command' => 'doctrine:database:drop', '--no-interaction' => true, '--force' => true]);
+    $application->run($input, new ConsoleOutput());
 
-$output = '-1' === getenv('SHELL_VERBOSITY') ? new NullOutput() : new ConsoleOutput();
+    $input = new ArrayInput(['command' => 'doctrine:database:create', '--no-interaction' => true]);
+    $application->run($input, new ConsoleOutput());
 
-$input = new ArrayInput(['command' => 'doctrine:database:drop', '--no-interaction' => true, '--force' => true]);
-$application->run($input, $output);
+    $input = new ArrayInput(['command' => 'doctrine:schema:create']);
+    $application->run($input, new ConsoleOutput());
 
-$input = new ArrayInput(['command' => 'doctrine:database:create', '--no-interaction' => true]);
-$application->run($input, $output);
+    $input = new ArrayInput(['command' => 'doctrine:fixtures:load', '--no-interaction' => true, '--append' => false]);
+    $application->run($input, new ConsoleOutput());
 
-$input = new ArrayInput(['command' => 'doctrine:schema:create']);
-$application->run($input, $output);
+    $kernel->shutdown();
+}
 
-$input = new ArrayInput(['command' => 'doctrine:fixtures:load', '--no-interaction' => true, '--append' => false]);
-$application->run($input, $output);
+$filesystem = new Filesystem();
 
-// this is needed so the custom route loader triggers and generates the routes
-$input = new ArrayInput(['command' => 'debug:router']);
-$application->run($input, $output);
+$testAppKernels = [
+    EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Kernel::class,
+    EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\SecuredApp\Kernel::class,
+    EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\UglyUrlsApp\Kernel::class,
+    EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\CustomizationApp\Kernel::class,
+];
 
-unset($input, $application);
+foreach ($testAppKernels as $kernelClass) {
+    initializeTestAppDatabase(new $kernelClass(), $filesystem);
+}

@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldConfiguratorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
@@ -17,17 +18,20 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Contracts\Translation\TranslatableInterface;
 use function Symfony\Component\String\u;
 use function Symfony\Component\Translation\t;
-use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
 final readonly class CommonPreConfigurator implements FieldConfiguratorInterface
 {
-    public function __construct(private PropertyAccessorInterface $propertyAccessor, private EntityFactory $entityFactory)
-    {
+    public function __construct(
+        private PropertyAccessorInterface $propertyAccessor,
+        private EntityFactory $entityFactory,
+        private EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator,
+    ) {
     }
 
     public function supports(FieldDto $field, EntityDto $entityDto): bool
@@ -56,7 +60,7 @@ final readonly class CommonPreConfigurator implements FieldConfiguratorInterface
             }
         }
 
-        $label = $this->buildLabelOption($field, $translationDomain, $context->getCrud()->getCurrentPage());
+        $label = $this->buildLabelOption($entityDto, $field, $translationDomain, $context->getCrud()->getCurrentPage(), $context->isUseEntityTranslations());
         $field->setLabel($label);
 
         $isRequired = $this->buildRequiredOption($field, $entityDto);
@@ -109,7 +113,7 @@ final readonly class CommonPreConfigurator implements FieldConfiguratorInterface
         return '' === $help ? null : t($help, $field->getTranslationParameters(), $translationDomain);
     }
 
-    private function buildLabelOption(FieldDto $field, string $translationDomain, ?string $currentPage): TranslatableInterface|string|bool|null
+    private function buildLabelOption(EntityDto $entityDto, FieldDto $field, string $translationDomain, ?string $currentPage, bool $useEntityTranslations): TranslatableInterface|string|false|null
     {
         // don't autogenerate a label for these special fields (there's a dedicated configurator for them)
         if (FormField::class === $field->getFieldFqcn()) {
@@ -131,7 +135,9 @@ final readonly class CommonPreConfigurator implements FieldConfiguratorInterface
         // it field doesn't define its label explicitly, generate an automatic
         // label based on the field's field name
         if (null === $label = $field->getLabel()) {
-            $label = $this->humanizeString($field->getProperty());
+            $label = $useEntityTranslations
+                ? $this->entityTranslationIdGenerator->generateForProperty($entityDto->getFqcn(), $field->getProperty())
+                : $this->humanizeString($field->getProperty());
         }
 
         if ('' === $label || false === $label) {

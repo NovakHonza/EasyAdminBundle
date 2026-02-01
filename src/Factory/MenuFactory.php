@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MenuItemDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
@@ -19,8 +20,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
-use function Symfony\Component\Translation\t;
 use Symfony\Contracts\Translation\TranslatableInterface;
+use function Symfony\Component\Translation\t;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
@@ -38,7 +39,7 @@ final readonly class MenuFactory implements MenuFactoryInterface
     }
 
     /**
-     * @param MenuItemInterface[] $menuItems
+     * @param array<MenuItemDto|MenuItemInterface> $menuItems
      */
     public function createMainMenu(array $menuItems): MainMenuDto
     {
@@ -83,10 +84,10 @@ final readonly class MenuFactory implements MenuFactoryInterface
                     continue;
                 }
 
-                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain);
+                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain, $adminContext->getCrud());
             }
 
-            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain);
+            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain, $adminContext->getCrud());
         }
 
         $builtItems = $this->menuItemMatcher->markSelectedMenuItem($builtItems, $adminContext->getRequest());
@@ -97,13 +98,18 @@ final readonly class MenuFactory implements MenuFactoryInterface
     /**
      * @param MenuItemDto[] $subItems
      */
-    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain): MenuItemDto
+    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, ?CrudDto $crudDto): MenuItemDto
     {
         if (!$menuItemDto->getLabel() instanceof TranslatableInterface) {
             $label = $menuItemDto->getLabel();
-            $menuItemDto->setLabel(
-                '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain)
-            );
+            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType() && null !== $crudDto) {
+                $label = Action::INDEX === $menuItemDto->getRouteParameters()[EA::CRUD_ACTION]
+                    ? $crudDto->getEntityLabelInPlural()
+                    : $crudDto->getEntityLabelInSingular();
+            } else {
+                $label = '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain);
+            }
+            $menuItemDto->setLabel($label);
         }
 
         $url = $this->generateMenuItemUrl($menuItemDto);

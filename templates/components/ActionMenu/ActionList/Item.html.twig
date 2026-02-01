@@ -17,7 +17,7 @@
     <a {{ attributes.defaults({class: 'dropdown-item'}|merge(htmlAttributes)) }}
         {% if renderAsForm %}
             href="#"
-            onclick="event.preventDefault(); document.getElementById('{{ formId }}').submit();"
+            data-ea-action-form-id="{{ formId }}"
         {% else %}
             href="{{ url }}"
         {% endif %}

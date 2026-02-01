@@ -11,7 +11,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @internal
  */
-final readonly class TranslatableChoiceMessage implements TranslatableInterface
+final readonly class TranslatableChoiceMessage implements \Stringable, TTranslatableInterface
 {
     public function __construct(
         /** @var TranslatableMessage $message */

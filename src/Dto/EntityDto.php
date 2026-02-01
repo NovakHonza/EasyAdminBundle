@@ -12,14 +12,15 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  *
- * @template TEntity of object = object
+ * @template TEntity of object
  */
-final class EntityDto
+final class EntityDto implements \Stringable
 {
     private bool $isAccessible = true;
     private mixed $primaryKeyValue = null;
     private ?FieldCollection $fields = null;
     private ?ActionCollection $actions = null;
+    private ?string $defaultActionUrl = null;
 
     /**
      * @param class-string<TEntity>  $fqcn
@@ -36,7 +37,15 @@ final class EntityDto
 
     public function __toString(): string
     {
-        return $this->toString();
+        if (null === $this->instance) {
+            return '';
+        }
+
+        if ($this->instance instanceof \Stringable) {
+            return (string) $this->instance;
+        }
+
+        return sprintf('%s #%s', $this->getName(), substr($this->getPrimaryKeyValueAsString(), 0, 16));
     }
 
     /**
@@ -50,19 +59,6 @@ final class EntityDto
     public function getName(): string
     {
         return basename(str_replace('\\', '/', $this->fqcn));
-    }
-
-    public function toString(): string
-    {
-        if (null === $this->entityInstance) {
-            return '';
-        }
-
-        if (method_exists($this->entityInstance, '__toString')) {
-            return (string) $this->entityInstance;
-        }
-
-        return sprintf('%s #%s', $this->getName(), substr($this->getPrimaryKeyValueAsString(), 0, 16));
     }
 
     /**
@@ -136,6 +132,16 @@ final class EntityDto
     public function getActions(): ActionCollection
     {
         return $this->actions;
+    }
+
+    public function getDefaultActionUrl(): ?string
+    {
+        return $this->defaultActionUrl;
+    }
+
+    public function setDefaultActionUrl(?string $url): void
+    {
+        $this->defaultActionUrl = $url;
     }
 
     public function getClassMetadata(): ClassMetadata

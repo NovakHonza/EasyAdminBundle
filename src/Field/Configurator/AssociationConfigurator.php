@@ -3,6 +3,7 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Field\Configurator;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -51,12 +52,16 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
     public function configure(FieldDto $field, EntityDto $entityDto, AdminContext $context): void
     {
         $propertyName = $field->getProperty();
-        if (!$entityDto->getClassMetadata()->hasAssociation($propertyName)) {
+
+        if (!$this->isAssociation($entityDto->getClassMetadata(), $propertyName)) {
             throw new \RuntimeException(sprintf('The "%s" field is not a Doctrine association, so it cannot be used as an association field.', $propertyName));
         }
 
-        $targetEntityFqcn = $entityDto->getClassMetadata()->getAssociationTargetClass($propertyName);
         // the target CRUD controller can be NULL; in that case, field value doesn't link to the related entity
+        // FIX THIS: old code from 4.x
+        $targetCrudControllerFqcn = $field->getCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER)
+            ?? $context->getCrudControllers()->findCrudFqcnByEntityFqcn($entityDto->getClassMetadata()->getAssociationTargetClass($propertyName));
+        // FIX THIS: new code from 5.x
         $targetCrudControllerFqcn = $field->getCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER);
         if (null === $targetCrudControllerFqcn) {
             $entityFqcnToCrudFqcn = $this->cache->getItem(Cache::ENTITY_FQCN_TO_CRUD_FQCN)->get();
@@ -81,12 +86,18 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
                         'The "%s" association field of "%s" wants to render its contents using an EasyAdmin CRUD form. However, no CRUD form was found related to this field. You can either create a CRUD controller for the entity "%s" or pass the CRUD controller to use as the first argument of the "renderAsEmbeddedForm()" method.',
                         $field->getProperty(),
                         $context->getCrud()?->getControllerFqcn(),
-                        $targetEntityFqcn
+                        $entityDto->getClassMetadata()->getAssociationTargetClass($propertyName)
                     )
                 );
             }
 
-            $this->configureCrudForm($field, $entityDto, $propertyName, $targetEntityFqcn, $targetCrudControllerFqcn);
+            $this->configureCrudForm(
+                $field,
+                $entityDto,
+                $propertyName,
+                $entityDto->getClassMetadata()->getAssociationTargetClass($propertyName),
+                $targetCrudControllerFqcn,
+            );
 
             return;
         }
@@ -97,6 +108,8 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
             $field->setFormTypeOption('attr.data-ea-widget', 'ea-autocomplete');
         }
 
+        // both autocomplete(renderAsHtml: true) and renderAsHtml(true) set the same option.
+        // OPTION_ESCAPE_HTML_CONTENTS has inverted logic (true = escape, false = render as HTML)
         $field->setFormTypeOption('attr.data-ea-autocomplete-render-items-as-html', true === $field->getCustomOption(AssociationField::OPTION_ESCAPE_HTML_CONTENTS) ? 'false' : 'true');
 
         // check for embedded associations
@@ -124,6 +137,8 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
             $targetCrudControllerFqcn = $field->getCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER);
 
             $field->setFormTypeOptionIfNotSet('class', $targetEntityFqcn);
+
+            $this->configurePreferredChoices($field);
 
             try {
                 if (null !== $entityDto->getInstance()) {
@@ -174,6 +189,16 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
             }
 
             $field->setFormTypeOption('attr.data-ea-autocomplete-endpoint-url', $autocompleteEndpointUrl ?? null);
+
+            // pass autocomplete options to render the selected item the same as the other entries
+            $autocompleteCallback = $field->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_CALLBACK);
+            $autocompleteTemplate = $field->getCustomOption(AssociationField::OPTION_AUTOCOMPLETE_TEMPLATE);
+
+            if (null !== $autocompleteCallback) {
+                $field->setFormTypeOption('autocomplete_callback', $autocompleteCallback);
+            } elseif (null !== $autocompleteTemplate) {
+                $field->setFormTypeOption('autocomplete_template', $autocompleteTemplate);
+            }
         } else {
             $field->setFormTypeOptionIfNotSet('query_builder', static function (EntityRepository $repository) use ($field) {
                 // TODO: should this use `createIndexQueryBuilder` instead, so we get the default ordering etc.?
@@ -186,6 +211,28 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
                 return $queryBuilder;
             });
         }
+    }
+
+    /**
+     * Recursive check if a string is a Doctrine association (e.g. "foo") or a nested Doctrine
+     * association (e.g. "foo.bar").
+     */
+    private function isAssociation(ClassMetadata $entityClassMetadata, string $property): bool
+    {
+        $nestedProperties = explode('.', $property);
+
+        $nextProperty = array_shift($nestedProperties);
+
+        if (!$entityClassMetadata->hasAssociation($nextProperty)) {
+            return false;
+        } elseif (0 === \count($nestedProperties)) {
+            return true;
+        }
+
+        return $this->isAssociation(
+            $this->entityFactory->getEntityMetadata($entityClassMetadata->getAssociationTargetClass($nextProperty)),
+            implode('.', $nestedProperties),
+        );
     }
 
     private function configureToOneAssociation(FieldDto $field, EntityDto $entityDto): void
@@ -203,6 +250,8 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
             ? $this->entityFactory->create($targetEntityFqcn)
             : $this->entityFactory->createForEntityInstance($field->getValue());
         $field->setFormTypeOptionIfNotSet('class', $targetEntityDto->getFqcn());
+
+        $this->configurePreferredChoices($field);
 
         try {
             $field->setCustomOption(AssociationField::OPTION_RELATED_URL, $this->generateLinkToAssociatedEntity($targetCrudControllerFqcn, $targetEntityDto));
@@ -223,6 +272,8 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
         /* @var PersistentCollection $collection */
         $field->setFormTypeOptionIfNotSet('class', $entityDto->getClassMetadata()->getAssociationTargetClass($field->getProperty()));
 
+        $this->configurePreferredChoices($field);
+
         if (null === $field->getTextAlign()) {
             $field->setTextAlign(TextAlign::RIGHT);
         }
@@ -236,7 +287,7 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
             return null;
         }
 
-        if (method_exists($entityInstance, '__toString')) {
+        if ($entityInstance instanceof \Stringable) {
             return (string) $entityInstance;
         }
 
@@ -339,5 +390,13 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
         $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
 
         return $entityDto;
+    }
+
+    private function configurePreferredChoices(FieldDto $field): void
+    {
+        $preferredChoices = $field->getCustomOption(AssociationField::OPTION_PREFERRED_CHOICES);
+        if (null !== $preferredChoices) {
+            $field->setFormTypeOptionIfNotSet('preferred_choices', $preferredChoices);
+        }
     }
 }

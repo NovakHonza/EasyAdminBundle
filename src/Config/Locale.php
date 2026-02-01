@@ -8,7 +8,7 @@ use Symfony\Component\Intl\Locales;
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final readonly class Locale
+final readonly class Locale implements \Stringable
 {
     private function __construct(private LocaleDto $dto)
     {

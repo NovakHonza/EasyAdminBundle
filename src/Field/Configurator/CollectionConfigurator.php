@@ -94,7 +94,7 @@ final readonly class CollectionConfigurator implements FieldConfiguratorInterfac
 
         $collectionItemsAsText = [];
         foreach ($field->getValue() ?? [] as $item) {
-            if (!\is_string($item) && !(\is_object($item) && method_exists($item, '__toString'))) {
+            if (!\is_string($item) && !$item instanceof \Stringable) {
                 return $this->countNumElements($field->getValue());
             }
 
@@ -102,8 +102,9 @@ final readonly class CollectionConfigurator implements FieldConfiguratorInterfac
         }
 
         $isDetailAction = Action::DETAIL === $context->getCrud()->getCurrentAction();
+        $maxLength = $field->getCustomOption(CollectionField::OPTION_MAX_LENGTH) ?? ($isDetailAction ? 512 : 32);
 
-        return u(', ')->join($collectionItemsAsText)->truncate($isDetailAction ? 512 : 32, '…')->toString();
+        return u(', ')->join($collectionItemsAsText)->truncate($maxLength, '…')->toString();
     }
 
     private function countNumElements(mixed $collection): int

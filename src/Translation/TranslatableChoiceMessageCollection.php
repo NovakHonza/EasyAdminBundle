@@ -10,7 +10,7 @@ use Symfony\Contracts\Translation\TranslatorInterface;
  *
  * @internal
  */
-final readonly class TranslatableChoiceMessageCollection implements TranslatableInterface
+final readonly class TranslatableChoiceMessageCollection implements \Stringable, TranslatableInterface
 {
     public function __construct(
         /** @var TranslatableChoiceMessage[] */

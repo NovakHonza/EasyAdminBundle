@@ -13,12 +13,21 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+/**
+ * @template TEntity of object
+ */
 interface AdminContextInterface
 {
     public function getRequest(): Request;
 
     public function getI18n(): I18nDto;
 
+    // REMOVE
+    public function getCrudControllers(): CrudControllerRegistry;
+
+    /**
+     * @return EntityDto<TEntity>
+     */
     public function getEntity(): EntityDto;
 
     public function getUser(): ?UserInterface;
