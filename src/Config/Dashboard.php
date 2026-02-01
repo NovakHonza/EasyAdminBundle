@@ -131,7 +131,7 @@ final class Dashboard
         return $this;
     }
 
-    public function useEntityTranslations(bool $useEntityTranslations): self
+    public function useEntityTranslations(bool $useEntityTranslations = true): self
     {
         $this->dto->setUseEntityTranslations($useEntityTranslations);
 

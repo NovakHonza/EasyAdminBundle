@@ -958,6 +958,9 @@ context object::
 Translation
 -----------
 
+Translation Domain
+~~~~~~~~~~~~~~~~~~
+
 The backend interface is fully translated using the `Symfony translation`_
 features. EasyAdmin own messages and contents use the ``EasyAdminBundle``
 `translation domain`_ (thanks to our community for kindly providing translations
@@ -982,6 +985,15 @@ this value with the ``translationDomain()`` method::
         }
     }
 
+.. tip::
+
+    If you want to make the backend use a different language than the public
+    website, add the ``{_locale}`` parameter to your dashboard route and use
+    the ``setLocales()`` method to configure the locales available in the backend.
+
+Entity Translation
+~~~~~~~~~~~~~~~~~~
+
 Internally, EasyAdmin manages translations via ``TranslatableMessage`` objects.
 These objects are passed to the templates, where they are translated into the
 user locale. You can also use ``TranslatableMessage`` objects to define any text
@@ -1004,6 +1016,171 @@ some page, etc.)::
     Using translatable objects is recommended for multilingual backends because
     Symfony can extract all of them automatically to update your translation files.
 
+.. note::
+
+    The contents stored in the database (e.g. the content of a blog post or the
+    name of a product) are not translated. EasyAdmin does not support the
+    translation of the entity property contents into different languages.
+
+Alternatively, EasyAdmin can help you generate translation keys for entity labels
+(singular and plural) and field/property labels. This allows you to centralize all
+entity-related translations in your translation files instead of defining them
+individually in each CRUD controller.
+
+To enable this feature, call the ``useEntityTranslations()`` method in your
+dashboard configuration::
+
+    // src/Controller/Admin/DashboardController.php
+    use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
+
+    class DashboardController extends AbstractDashboardController
+    {
+        public function configureDashboard(): Dashboard
+        {
+            return Dashboard::new()
+                // ...
+                ->useEntityTranslations();
+        }
+    }
+
+Once enabled, EasyAdmin will look for translations using the following patterns
+for the translation keys:
+
+* **Entity singular label**: ``entities.<EntityFQCN>.singular``
+* **Entity plural label**: ``entities.<EntityFQCN>.plural``
+* **Property/field label**: ``entities.<EntityFQCN>.properties.<propertyName>``
+
+You can define these translations in any format supported by Symfony. Here's an
+example using PHP arrays::
+
+    // translations/messages.en.php
+    return [
+        'entities' => [
+            App\Entity\BlogPost::class => [
+                'singular' => 'Blog Post',
+                'plural' => 'Blog Posts',
+                'properties' => [
+                    'title' => 'Post Title',
+                    'publishedAt' => 'Publication Date',
+                    'isPublished' => 'Published?',
+                ],
+            ],
+            App\Entity\User::class => [
+                'singular' => 'User',
+                'plural' => 'Users',
+                'properties' => [
+                    'email' => 'Email Address',
+                    'createdAt' => 'Registration Date',
+                ],
+            ],
+        ],
+    ];
+
+Or using YAML format:
+
+.. code-block:: yaml
+
+    # translations/messages.en.yaml
+    entities:
+        App\Entity\BlogPost:
+            singular: 'Blog Post'
+            plural: 'Blog Posts'
+            properties:
+                title: 'Post Title'
+                publishedAt: 'Publication Date'
+                isPublished: 'Published?'
+
+When using this feature, you can omit the label when creating CRUD menu items:
+
+    public function configureMenuItems(): iterable
+    {
+        yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+
+        // no label needed: will use the translated plural label
+        yield MenuItem::linkToCrud(null, 'fa fa-file-text', BlogPost::class);
+        yield MenuItem::linkToCrud(null, 'fa fa-users', User::class);
+    }
+
+.. note::
+
+    The entity translations use the configured translation domain. You can set a
+    custom domain in the dashboard as explained above with ``setTranslationDomain()``.
+
+Customizing Translation IDs
+...........................
+
+If you need a different translation key structure, implement the
+``EntityTranslationIdGeneratorInterface`` and register it as a service::
+
+    // src/Translation/CustomEntityTranslationIdGenerator.php
+    namespace App\Translation;
+
+    use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
+
+    class CustomEntityTranslationIdGenerator implements EntityTranslationIdGeneratorInterface
+    {
+        public function generateForEntity(string $entity, bool $singular): string
+        {
+            // use the class name instead of the FQCN
+            $shortName = basename(str_replace('\\', '/', $entity));
+
+            return sprintf('admin.entities.%s.%s',
+                strtolower($shortName),
+                $singular ? 'singular' : 'plural'
+            );
+        }
+
+        public function generateForProperty(string $entity, string $property): string
+        {
+            $shortName = basename(str_replace('\\', '/', $entity));
+
+            return sprintf('admin.entities.%s.fields.%s',
+                strtolower($shortName),
+                $property
+            );
+        }
+    }
+
+Register your custom generator:
+
+.. code-block:: yaml
+
+    # config/services.yaml
+    services:
+        EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface:
+            class: App\Translation\CustomEntityTranslationIdGenerator
+
+With this custom generator, your translations would look like:
+
+.. code-block:: yaml
+
+    # translations/messages.en.yaml
+    admin:
+        entities:
+            blogpost:
+                singular: 'Blog Post'
+                plural: 'Blog Posts'
+                fields:
+                    title: 'Post Title'
+
+Translation Precedence
+......................
+
+Entity translations follow these precedence rules:
+
+#. **Explicit labels** defined in CRUD controllers (via ``setEntityLabelInSingular()``,
+   ``setEntityLabelInPlural()``, or field ``setLabel()``) always take priority
+#. **Entity translations** are used when no explicit label is defined and
+   ``useEntityTranslations()`` is enabled
+#. **Auto-generated labels** (humanized property names) are used as a fallback
+   when entity translations are disabled
+
+This means you can enable entity translations globally and still override specific
+labels in individual CRUD controllers when needed.
+
+Text Direction
+~~~~~~~~~~~~~~
+
 The backend uses the same language configured in the Symfony application.
 When the locale is Arabic (``ar``), Persian (``fa``) or Hebrew (``he``), the
 HTML text direction is set to ``rtl`` (right-to-left) automatically. Otherwise,
@@ -1025,18 +1202,6 @@ value explicitly::
                 ->setTextDirection('rtl');
         }
     }
-
-.. tip::
-
-    If you want to make the backend use a different language than the public
-    website, add the ``{_locale}`` parameter to your dashboard route and use
-    the ``setLocales()`` method to configure the locales available in the backend.
-
-.. note::
-
-    The contents stored in the database (e.g. the content of a blog post or the
-    name of a product) are not translated. EasyAdmin does not support the
-    translation of the entity property contents into different languages.
 
 Page Templates
 --------------
