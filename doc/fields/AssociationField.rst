@@ -61,6 +61,11 @@ By default, autocomplete fields display entities using their ``__toString()``
 method. You can customize this display using either a 1) callback (for simple
 text) or a 2) Twig template (for complex HTML).
 
+.. tip::
+    If you customize the autocomplete for a given class (for example, ``User``)
+    in the same way across different CRUD controllers, you can
+    :ref:`configure this globally <crud-autocomplete>` per CRUD and/or Dashboard.
+
 **1) Simple Text Customization (Callback)**
 
 Pass a callback to the ``autocomplete()`` method to customize how entities
@@ -69,11 +74,7 @@ appear in the dropdown. This is useful for adding extra information::
     use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 
     yield AssociationField::new('city')->autocomplete(
-        callback: static fn (City $c): string => sprintf(
-            '%s, %s',
-            $c->getName(),
-            $c->getState()->getCode()
-        )
+        callback: static fn (City $c): string => sprintf('%s, %s', $c->getName(), $c->getState()->getCode())
     );
 
 You can combine the ``enable`` parameter with other options::

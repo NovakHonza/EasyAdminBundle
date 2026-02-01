@@ -472,10 +472,13 @@ query, the optional :doc:`filters </filters>` and the pagination. If you need to
 fully customize this query, override the ``createIndexQueryBuilder()`` method in
 your CRUD controller.
 
+.. _crud-autocomplete:
+
 Autocomplete Options
 ~~~~~~~~~~~~~~~~~~~~
 
-Association fields allow you to :ref:`customize the autocomplete display <field-association-autocomplete>`.
+:doc:`Association fields </fields/AssociationField>` allow you to
+:ref:`customize the autocomplete display <field-association-autocomplete>` per field.
 You can also set a default autocomplete display for all association fields in a
 CRUD controller. This default display is applied to all fields that don't
 configure their own autocomplete, giving them a consistent formatting.
@@ -494,9 +497,7 @@ Define a callback that applies to all autocomplete fields::
     {
         return $crud
             ->autocomplete(
-                callback: static fn ($entity): string => method_exists($entity, 'getFullName')
-                    ? $entity->getFullName()
-                    : (string) $entity
+                callback: static fn ($entity): string => method_exists($entity, 'getFullName') ? $entity->getFullName() : (string) $entity
             )
         ;
     }
