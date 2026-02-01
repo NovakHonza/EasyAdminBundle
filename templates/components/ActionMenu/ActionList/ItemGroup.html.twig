@@ -20,7 +20,7 @@
                 {% else %}
                     href="{{ group.mainAction.linkUrl }}"
                 {% endif %}
-                {% for attr, value in group.mainAction.htmlAttributes %}{{ attr }}="{{ value }}" {% endfor %}>
+                {% for attr, value in group.mainAction.htmlAttributes|ea_html_attrs %}{{ attr }}="{{ value }}" {% endfor %}>
                 {% if group.icon %}
                     <twig:ea:Icon name="{{ group.icon }}" />
                 {% elseif showBlankIcons or group.hasAnyActionWithIcon %}
@@ -60,7 +60,7 @@
                 <twig:ea:ActionMenu:ActionList:Item
                     class="{{ subItem.cssClass }} dropdown-item-variant-{{ subItem.variant.value }}"
                     label="{{ subItem.label|trans }}" icon="{{ subItem.icon }}"
-                    htmlAttributes="{{ subItem.htmlAttributes }}"
+                    htmlAttributes="{{ subItem.htmlAttributes|ea_html_attrs }}"
                     url="{{ subItem.linkUrl }}" renderLabelRaw="true"
                     renderAsForm="{{ subItem.isRenderedAsForm }}"
                     showBlankIcons="{{ group.hasAnyActionWithIcon }}" />

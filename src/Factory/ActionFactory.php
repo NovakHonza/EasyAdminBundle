@@ -276,9 +276,35 @@ final class ActionFactory
                 'data-action-variant' => $actionDto->getVariant()->value,
             ]);
 
-            // if a custom message is provided (string or TranslatableInterface), store it for Twig to translate
+            // add confirmation message attribute
             if (true !== $confirmationMessage) {
-                $actionDto->setDisplayableConfirmationMessage($confirmationMessage);
+                $actionDto->setHtmlAttribute(
+                    'data-action-confirmation-message',
+                    $confirmationMessage instanceof TranslatableInterface
+                        ? $confirmationMessage
+                        : t($confirmationMessage, $defaultTranslationParameters, $translationDomain)
+                );
+            }
+
+            // add confirmation button label attribute
+            $buttonLabel = $actionDto->getConfirmationButtonLabel();
+            if (null !== $buttonLabel) {
+                $actionDto->setHtmlAttribute(
+                    'data-action-confirmation-button',
+                    $buttonLabel instanceof TranslatableInterface
+                        ? $buttonLabel
+                        : t($buttonLabel, $defaultTranslationParameters, $translationDomain)
+                );
+            }
+
+            // add entity context attributes (only for entity actions)
+            if (null !== $entityDto) {
+                $entityLabel = $adminContext->getCrud()->getEntityLabelInSingular();
+                $actionDto->setHtmlAttribute(
+                    'data-action-entity-name',
+                    \is_string($entityLabel) ? t($entityLabel, $defaultTranslationParameters, $translationDomain) : $entityLabel
+                );
+                $actionDto->setHtmlAttribute('data-action-entity-id', $entityDto->getPrimaryKeyValueAsString());
             }
         }
 
