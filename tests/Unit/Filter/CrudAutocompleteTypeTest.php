@@ -13,6 +13,7 @@ use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\ChoiceList\View\ChoiceView;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Form\Test\TypeTestCase;
+use Twig\Environment;
 
 class CrudAutocompleteTypeTest extends TypeTestCase
 {
@@ -54,11 +55,13 @@ class CrudAutocompleteTypeTest extends TypeTestCase
             ->willReturn($this->entityManager)
         ;
 
+        $twig = $this->createStub(Environment::class);
+
         return [
             new PreloadedExtension(
                 [
                     'entity' => new EntityType($registry),
-                    'easyadmin_autocomplete' => new CrudAutocompleteType(),
+                    'easyadmin_autocomplete' => new CrudAutocompleteType($twig),
                 ],
                 [],
             ),

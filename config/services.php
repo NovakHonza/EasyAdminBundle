@@ -67,6 +67,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\TextConfigurator as Text
 use EasyCorp\Bundle\EasyAdminBundle\Filter\Configurator\TimezoneConfigurator as TimezoneFilterConfigurator;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Extension\CollectionTypeExtension;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Extension\EaCrudFormTypeExtension;
+use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudAutocompleteType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudFormType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FiltersFormType;
@@ -347,6 +348,10 @@ return static function (ContainerConfigurator $container) {
         ->set(CrudFormType::class)
             ->arg(0, service('form.type_guesser.doctrine'))
             ->tag('form.type', ['alias' => 'ea_crud'])
+
+        ->set(CrudAutocompleteType::class)
+            ->arg(0, service('twig'))
+            ->tag('form.type', ['alias' => 'ea_autocomplete'])
 
         ->set(ArrayConfigurator::class)
 
