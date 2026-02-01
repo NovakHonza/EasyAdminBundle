@@ -26,6 +26,9 @@ $configuration = [
         'enabled' => true,
         'collect' => false,
     ],
+    'translator' => [
+        'default_path' => '%kernel.project_dir%/translations',
+    ],
 ];
 
 if (EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Kernel::VERSION_ID < 60000) {
