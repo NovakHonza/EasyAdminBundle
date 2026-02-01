@@ -96,11 +96,11 @@ final class MenuFactory implements MenuFactoryInterface
     /**
      * @param MenuItemDto[] $subItems
      */
-    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, CrudDto $crudDto): MenuItemDto
+    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, ?CrudDto $crudDto): MenuItemDto
     {
         if (!$menuItemDto->getLabel() instanceof TranslatableInterface) {
             $label = $menuItemDto->getLabel();
-            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType()) {
+            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType() && null !== $crudDto) {
                 $label = Action::INDEX === $menuItemDto->getRouteParameters()[EA::CRUD_ACTION]
                     ? $crudDto->getEntityLabelInPlural()
                     : $crudDto->getEntityLabelInSingular();
