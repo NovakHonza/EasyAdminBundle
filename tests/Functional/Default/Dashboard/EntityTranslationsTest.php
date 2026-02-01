@@ -52,7 +52,7 @@ class EntityTranslationsTest extends AbstractCrudTestCase
         $tableHeaders = $crawler->filter('table.datagrid thead th');
 
         $headerTexts = [];
-        $tableHeaders->each(function ($node) use (&$headerTexts) {
+        $tableHeaders->each(static function ($node) use (&$headerTexts) {
             $headerTexts[] = trim($node->text());
         });
 
@@ -70,7 +70,7 @@ class EntityTranslationsTest extends AbstractCrudTestCase
         // when menu item label is null, it should use the entity's plural translation
         $menuItems = $crawler->filter('.menu-item a');
         $menuTexts = [];
-        $menuItems->each(function ($node) use (&$menuTexts) {
+        $menuItems->each(static function ($node) use (&$menuTexts) {
             $menuTexts[] = trim($node->text());
         });
 

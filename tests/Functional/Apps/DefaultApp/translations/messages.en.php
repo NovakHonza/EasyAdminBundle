@@ -2,7 +2,7 @@
 
 return [
     'entities' => [
-        \EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category::class => [
+        EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category::class => [
             'singular' => 'Category (singular from file)',
             'plural' => 'Categories (plural from file)',
             'properties' => [

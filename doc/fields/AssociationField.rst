@@ -62,6 +62,7 @@ method. You can customize this display using either a 1) callback (for simple
 text) or a 2) Twig template (for complex HTML).
 
 .. tip::
+
     If you customize the autocomplete for a given class (for example, ``User``)
     in the same way across different CRUD controllers, you can
     :ref:`configure this globally <crud-autocomplete>` per CRUD and/or Dashboard.
