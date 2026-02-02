@@ -144,14 +144,14 @@ final class CollectionConfigurator implements FieldConfiguratorInterface
             }
 
             $targetCrudControllerFqcn = $fieldDto->getCustomOption(CollectionField::OPTION_ENTRY_CRUD_CONTROLLER_FQCN)
-                ?? $context->getCrudControllers()->findCrudFqcnByEntityFqcn($entityDto->getClassMetadata()->getAssociationTargetClass($fieldDto->getProperty()));
+                ?? $context->getAdminControllers()->findCrudControllerByEntity($entityDto->getClassMetadata()->getAssociationTargetClass($fieldDto->getProperty()));
 
             if (null === $targetCrudControllerFqcn) {
                 throw new \RuntimeException(sprintf('The "%s" collection field of "%s" wants to render its entries using an EasyAdmin CRUD form. However, no CRUD form was found related to this field. You can either create a CRUD controller for the entity "%s" or pass the CRUD controller to use as the first argument of the "useEntryCrudForm()" method.', $fieldDto->getProperty(), $context->getCrud()?->getControllerFqcn(), $entityDto->getClassMetadata()->getAssociationTargetClass($fieldDto->getProperty())));
             }
         } elseif (null === $fieldDto->getFormTypeOption('entry_type')
             && $entityDto->getClassMetadata()->hasAssociation($fieldDto->getProperty())) {
-            $targetCrudControllerFqcn = $context->getCrudControllers()->findCrudFqcnByEntityFqcn($entityDto->getClassMetadata()->getAssociationTargetClass($fieldDto->getProperty()));
+            $targetCrudControllerFqcn = $context->getAdminControllers()->findCrudControllerByEntity($entityDto->getClassMetadata()->getAssociationTargetClass($fieldDto->getProperty()));
 
             if (null === $targetCrudControllerFqcn) {
                 return;

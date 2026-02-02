@@ -69,7 +69,7 @@ final class EntityConfigurator implements FilterConfiguratorInterface
         if ($supportsAutocomplete) {
             $associationMapping = $entityDto->getClassMetadata()->associationMappings[$propertyName];
             $targetEntityFqcn = $associationMapping['targetEntity'];
-            if (null === $targetCrudControllerFqcn = $context->getCrudControllers()->findCrudFqcnByEntityFqcn($targetEntityFqcn)) {
+            if (null === $targetCrudControllerFqcn = $context->getAdminControllers()->findCrudControllerByEntity($targetEntityFqcn)) {
                 throw new \LogicException('The target CRUD controller for the entity '.$targetEntityFqcn.' is not defined.');
             }
             $autocompleteEndpointUrl = $this->adminUrlGenerator

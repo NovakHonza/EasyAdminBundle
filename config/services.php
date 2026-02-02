@@ -81,8 +81,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityUpdater;
 use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
 use EasyCorp\Bundle\EasyAdminBundle\Provider\FieldProvider;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\CrudControllerRegistry;
-use EasyCorp\Bundle\EasyAdminBundle\Registry\DashboardControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminRouteGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminRouteLoader;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
@@ -181,7 +181,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(5, service('cache.easyadmin'))
             ->arg(6, service(AdminRouteGenerator::class))
             ->arg(7, '%kernel.build_dir%')
-            ->arg(8, service(CrudControllerRegistry::class))
+            ->arg(8, service(AdminControllerRegistry::class))
             ->tag('kernel.event_subscriber')
 
         ->set(ControllerFactory::class)
@@ -196,11 +196,12 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, '%kernel.build_dir%')
             ->arg(1, new Reference('security.token_storage', ContainerInterface::NULL_ON_INVALID_REFERENCE))
             ->arg(2, new Reference(MenuFactory::class))
-            ->arg(3, new Reference(CrudControllerRegistry::class))
+            ->arg(3, new Reference(AdminControllerRegistry::class))
             ->arg(4, new Reference(EntityFactory::class))
             ->arg(5, service(AdminRouteGenerator::class))
             ->arg(6, service(ActionFactory::class))
             ->arg(7, service(EntityTranslationIdGeneratorInterface::class))
+            ->arg(8, new Reference(CrudControllerRegistry::class))
 
         ->set(AdminUrlGenerator::class)
             // I don't know if we truly need the share() method to get a new instance of the
@@ -209,7 +210,7 @@ return static function (ContainerConfigurator $container) {
             ->share(false)
             ->arg(0, service(AdminContextProvider::class))
             ->arg(1, service('router'))
-            ->arg(2, service(DashboardControllerRegistry::class))
+            ->arg(2, service(AdminControllerRegistry::class))
             ->arg(3, service(AdminRouteGenerator::class))
             ->arg(4, service('cache.easyadmin'))
 
@@ -220,6 +221,11 @@ return static function (ContainerConfigurator $container) {
         ->set('cache.easyadmin')
             ->parent('cache.system')
             ->tag('cache.pool')
+
+        ->set(AdminControllerRegistry::class)
+            ->arg(0, '%kernel.build_dir%')
+            ->arg(1, abstract_arg('CRUD controller FQCN to Entity FQCN map'))
+            ->arg(2, abstract_arg('Dashboard controller FQCNs'))
 
         ->set(AdminRouteGenerator::class)
             ->arg(0, tagged_iterator(EasyAdminExtension::TAG_DASHBOARD_CONTROLLER))

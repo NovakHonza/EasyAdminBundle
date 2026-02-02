@@ -25,6 +25,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FilterConfigDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\I18nDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\CrudControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\TemplateRegistry;
 use Symfony\Component\HttpFoundation\Request;
@@ -43,11 +44,12 @@ final class AdminContextFactory
         private readonly string $buildDir,
         private readonly ?TokenStorageInterface $tokenStorage,
         private readonly MenuFactoryInterface $menuFactory,
-        private readonly CrudControllerRegistry $crudControllers,
+        private readonly AdminControllerRegistry $adminControllers,
         private readonly EntityFactory $entityFactory,
         private readonly AdminRouteGeneratorInterface $adminRouteGenerator,
         private readonly ActionFactory $actionFactory,
         private readonly ?EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator = null,
+        private readonly ?CrudControllerRegistry $crudControllers = null,
     ) {
         if (null === $this->entityTranslationIdGenerator) {
             trigger_deprecation(
@@ -72,7 +74,7 @@ final class AdminContextFactory
 
         // build a first version of CrudDto without actions so we can create AdminContext, which is
         // needed for action extensions; later, we'll update the CrudDto object with the full action config
-        $crudDto = $this->getCrudDto($this->crudControllers, $dashboardController, $crudController, new ActionConfigDto(), $filters, $crudAction, $pageName);
+        $crudDto = $this->getCrudDto($this->adminControllers, $dashboardController, $crudController, new ActionConfigDto(), $filters, $crudAction, $pageName);
         $entityDto = $this->getEntityDto($request, $crudDto);
         $searchDto = $this->getSearchDto($request, $crudDto);
         $i18nDto = $this->getI18nDto($request, $dashboardDto, $crudDto, $entityDto);
@@ -81,7 +83,7 @@ final class AdminContextFactory
 
         // build sub-contexts
         $requestContext = new RequestContext($request, $user);
-        $crudContext = new CrudContext($crudDto, $entityDto, $searchDto, $this->crudControllers);
+        $crudContext = new CrudContext($crudDto, $entityDto, $searchDto, $this->adminControllers, $this->crudControllers);
         $dashboardContext = new DashboardContext($dashboardDto, $dashboardController::class, $assetDto, $usePrettyUrls);
         $i18nContext = new I18nContext($i18nDto, $templateRegistry);
 
@@ -150,7 +152,7 @@ final class AdminContextFactory
         return $crudController->configureAssets($defaultAssets)->getAsDto()->loadedOn($pageName);
     }
 
-    private function getCrudDto(CrudControllerRegistry $crudControllers, DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ActionConfigDto $actionConfigDto, FilterConfigDto $filters, ?string $crudAction, ?string $pageName): ?CrudDto
+    private function getCrudDto(AdminControllerRegistry $adminControllers, DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ActionConfigDto $actionConfigDto, FilterConfigDto $filters, ?string $crudAction, ?string $pageName): ?CrudDto
     {
         if (null === $crudController) {
             return null;
@@ -159,7 +161,7 @@ final class AdminContextFactory
         $defaultCrud = $dashboardController->configureCrud();
         $crudDto = $crudController->configureCrud($defaultCrud)->getAsDto();
 
-        $entityFqcn = $crudControllers->findEntityFqcnByCrudFqcn($crudController::class);
+        $entityFqcn = $adminControllers->findEntityByCrudController($crudController::class);
 
         $crudDto->setControllerFqcn($crudController::class);
         $crudDto->setActionsConfig($actionConfigDto);
