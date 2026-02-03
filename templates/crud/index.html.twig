@@ -182,28 +182,10 @@
                                                                 showBlankIcons="{{ hasAnyActionWithIcon }}"
                                                                 entity="{{ entity }}" />
                                                         {% else %}
-                                                            {# add confirmation-related attributes if needed #}
-                                                            {% set item_html_attributes = item.htmlAttributes %}
-                                                            {% if item.displayableConfirmationMessage is not null %}
-                                                                {% set item_html_attributes = item_html_attributes|merge({
-                                                                    'data-action-confirmation-message': item.displayableConfirmationMessage|trans,
-                                                                }) %}
-                                                            {% endif %}
-                                                            {% if item.hasConfirmation %}
-                                                                {% set item_html_attributes = item_html_attributes|merge({
-                                                                    'data-action-entity-name': ea.crud.entityLabelInSingular|default('')|trans,
-                                                                    'data-action-entity-id': entity.primaryKeyValueAsString|default(''),
-                                                                }) %}
-                                                                {% if item.confirmationButtonLabel is not null %}
-                                                                    {% set item_html_attributes = item_html_attributes|merge({
-                                                                        'data-action-confirmation-button': item.confirmationButtonLabel|trans,
-                                                                    }) %}
-                                                                {% endif %}
-                                                            {% endif %}
                                                             <twig:ea:ActionMenu:ActionList:Item
                                                                 class="{{ item.cssClass }} dropdown-item-variant-{{ item.variant.value }}" url="{{ item.linkUrl }}"
                                                                 icon="{{ item.icon }}" icon:class="action-icon"
-                                                                htmlAttributes="{{ item_html_attributes }}"
+                                                                htmlAttributes="{{ item.htmlAttributes|ea_html_attrs }}"
                                                                 renderAsForm="{{ item.isRenderedAsForm }}"
                                                                 label="{{ item.label|trans }}" label:class="action-label" renderLabelRaw
                                                                 showBlankIcons="{{ hasAnyActionWithIcon }}" />

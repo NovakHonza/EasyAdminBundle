@@ -2,29 +2,11 @@
 {# @var action \EasyCorp\Bundle\EasyAdminBundle\Dto\ActionDto #}
 {# @var entity \EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto #}
 
-{% set html_attributes = action.htmlAttributes %}
-{% if action.displayableConfirmationMessage is not null %}
-    {% set html_attributes = html_attributes|merge({
-        'data-action-confirmation-message': action.displayableConfirmationMessage|trans,
-    }) %}
-{% endif %}
-{% if action.hasConfirmation %}
-    {% set html_attributes = html_attributes|merge({
-        'data-action-entity-name': ea().crud.entityLabelInSingular|default('')|trans,
-        'data-action-entity-id': entity.primaryKeyValueAsString|default(''),
-    }) %}
-    {% if action.confirmationButtonLabel is not null %}
-        {% set html_attributes = html_attributes|merge({
-            'data-action-confirmation-button': action.confirmationButtonLabel|trans,
-        }) %}
-    {% endif %}
-{% endif %}
-
 <twig:ea:Button
     variant="{{ action.variant }}"
     isInvisible="{{ action.usesTextStyle }}"
     class="{{ action.htmlElement.isLink and isIncludedInDropdown|default(false) ? 'dropdown-item' }} {{ action.cssClass }}"
-    htmlAttributes="{{ html_attributes }}"
+    htmlAttributes="{{ action.htmlAttributes|ea_html_attrs }}"
     htmlElement="{{ action.htmlElement }}"
     type="{{ action.buttonType.value }}"
     icon="{{ action.icon }}"
