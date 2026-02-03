@@ -22,6 +22,13 @@ class CrudAutocompleteSubscriberUuidTest extends TestCase
 {
     private const UUID_STRING = '1ecc57ff-5604-6800-83f2-5765340cd236';
 
+    protected function setUp(): void
+    {
+        if (!class_exists(PostgreSQLPlatform::class)) {
+            $this->markTestSkipped('Doctrine DBAL 3.x+ is required (PostgreSQLPlatform/MySQLPlatform classes).');
+        }
+    }
+
     public function testUuidConvertedToRfc4122OnNativeGuidPlatform(): void
     {
         $expectedValue = Uuid::fromString(self::UUID_STRING)->toRfc4122();
