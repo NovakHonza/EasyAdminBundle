@@ -157,6 +157,40 @@ class CountryFieldTest extends AbstractFieldTest
         self::assertTrue($fieldDto->getFormTypeOption('multiple'));
     }
 
+    public function testShowFlagFalseInForms(): void
+    {
+        $this->initializeConfigurator();
+
+        $field = CountryField::new('foo')->showFlag(false);
+        $fieldDto = $this->configure($field, pageName: Crud::PAGE_NEW);
+        $formSelectChoices = $fieldDto->getFormTypeOption(ChoiceField::OPTION_CHOICES);
+
+        // when showFlag(false), choices should be plain text country names (not HTML)
+        self::assertArrayHasKey('Spain', $formSelectChoices);
+        self::assertSame('ES', $formSelectChoices['Spain']);
+
+        // and the HTML rendering attribute should not be set
+        self::assertNull($fieldDto->getFormTypeOption('attr.data-ea-autocomplete-render-items-as-html'));
+    }
+
+    public function testShowNameFalseInForms(): void
+    {
+        $this->initializeConfigurator();
+
+        $field = CountryField::new('foo')->showName(false);
+        $fieldDto = $this->configure($field, pageName: Crud::PAGE_NEW);
+        $formSelectChoices = $fieldDto->getFormTypeOption(ChoiceField::OPTION_CHOICES);
+
+        // when showName(false), choices should be HTML with only the flag SVG (no <span> with country name)
+        $spainChoiceLabel = array_search('ES', $formSelectChoices);
+
+        self::assertStringContainsString('<svg', $spainChoiceLabel);
+        self::assertStringContainsString('country-flag', $spainChoiceLabel);
+        // the <span> element with country name should NOT be present (SVG title is ok)
+        self::assertStringNotContainsString('<span>', $spainChoiceLabel);
+        self::assertSame('true', $fieldDto->getFormTypeOption('attr.data-ea-autocomplete-render-items-as-html'));
+    }
+
     public function testUsingAlpha3Format(): void
     {
         $this->initializeConfigurator();
