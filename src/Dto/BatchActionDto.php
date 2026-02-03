@@ -7,7 +7,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Dto;
  *
  * @template TEntity of object
  */
-readonly class BatchActionDto
+final readonly class BatchActionDto
 {
     /**
      * @param array<mixed>          $entityIds
