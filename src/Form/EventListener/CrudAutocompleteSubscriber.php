@@ -106,7 +106,6 @@ class CrudAutocompleteSubscriber implements EventSubscriberInterface
                                 // Use RFC4122 format for platforms with native GUID type (e.g., PostgreSQL),
                                 // and binary format for platforms without native GUID type (e.g., MySQL, SQLite)
                                 $platform = $options['em']->getConnection()->getDatabasePlatform();
-
                                 $hasNativeGuidType = $platform->getGuidTypeDeclarationSQL([]) !== $platform->getStringTypeDeclarationSQL(['fixed' => true, 'length' => 36]);
 
                                 return $hasNativeGuidType

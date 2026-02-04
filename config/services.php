@@ -372,8 +372,6 @@ return static function (ContainerConfigurator $container) {
             ->arg(1, new Reference(AuthorizationChecker::class))
             ->arg(2, new Reference('security.csrf.token_manager', ContainerInterface::NULL_ON_INVALID_REFERENCE))
 
-        ->set(CollectionConfigurator::class)
-
         ->set(CommonPostConfigurator::class)
             ->arg(0, service(AdminContextProvider::class))
             ->arg(1, '%kernel.charset%')
@@ -424,7 +422,8 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, service('request_stack'))
             ->arg(1, service(EntityFactory::class))
             ->arg(2, service(ControllerFactory::class))
-            ->arg(3, new Reference(FieldFactory::class))
+            ->arg(3, service(AdminContextProvider::class))
+            ->arg(4, new Reference(FieldFactory::class))
 
         ->set(SlugConfigurator::class)
 
