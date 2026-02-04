@@ -6,7 +6,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\CustomizationApp\Entity\BlogPost;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\CustomizationApp\Controller\Crud\BlogPostCrudController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -29,6 +29,6 @@ class AssetsTestDashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Blog Posts', 'fas fa-list', BlogPost::class);
+        yield MenuItem::linkTo(BlogPostCrudController::class, 'Blog Posts', 'fas fa-list');
     }
 }

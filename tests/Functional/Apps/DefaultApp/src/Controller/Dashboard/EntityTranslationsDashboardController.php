@@ -6,7 +6,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -32,6 +32,6 @@ class EntityTranslationsDashboardController extends AbstractDashboardController
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
         // use null label to test that entity translations are used for menu items
-        yield MenuItem::linkToCrud(null, 'fas fa-tags', Category::class);
+        yield MenuItem::linkTo(CategoryCrudController::class, null, 'fas fa-tags');
     }
 }
