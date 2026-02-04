@@ -1,18 +1,18 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Inspector;
+namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\DataCollector;
 
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
-use EasyCorp\Bundle\EasyAdminBundle\Inspector\DataCollector;
+use EasyCorp\Bundle\EasyAdminBundle\DataCollector\EasyAdminDataCollector;
 use EasyCorp\Bundle\EasyAdminBundle\Test\AbstractCrudTestCase;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
 use Symfony\Component\VarDumper\Cloner\Data;
 
-class DataCollectorTest extends AbstractCrudTestCase
+class EasyAdminDataCollectorTest extends AbstractCrudTestCase
 {
     protected EntityRepository $categories;
 
@@ -40,7 +40,7 @@ class DataCollectorTest extends AbstractCrudTestCase
         $sort = ['name' => 'DESC', 'slug' => 'ASC'];
         $this->client->request('GET', $this->generateIndexUrl().'?'.http_build_query([EA::SORT => $sort]));
 
-        /** @var DataCollector $collector */
+        /** @var EasyAdminDataCollector $collector */
         $collector = $this->client->getProfile()->getCollector('easyadmin');
 
         $this->assertTrue($collector->isEasyAdminRequest());
@@ -63,7 +63,7 @@ class DataCollectorTest extends AbstractCrudTestCase
 
         $this->client->request('GET', $this->generateEditFormUrl($category->getId()));
 
-        /** @var DataCollector $collector */
+        /** @var EasyAdminDataCollector $collector */
         $collector = $this->client->getProfile()->getCollector('easyadmin');
 
         $this->assertTrue($collector->isEasyAdminRequest());
@@ -83,7 +83,7 @@ class DataCollectorTest extends AbstractCrudTestCase
     {
         $this->client->request('GET', $this->generateIndexUrl());
 
-        /** @var DataCollector $collector */
+        /** @var EasyAdminDataCollector $collector */
         $collector = $this->client->getProfile()->getCollector('easyadmin');
 
         $this->assertSame(

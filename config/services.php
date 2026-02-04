@@ -13,6 +13,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterConfiguratorInterface
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityPaginatorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\DataCollector\EasyAdminDataCollector;
 use EasyCorp\Bundle\EasyAdminBundle\DependencyInjection\EasyAdminExtension;
 use EasyCorp\Bundle\EasyAdminBundle\EventListener\AdminRouterSubscriber;
 use EasyCorp\Bundle\EasyAdminBundle\EventListener\CrudResponseListener;
@@ -72,7 +73,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudAutocompleteType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudFormType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FileUploadType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FiltersFormType;
-use EasyCorp\Bundle\EasyAdminBundle\Inspector\DataCollector;
 use EasyCorp\Bundle\EasyAdminBundle\Intl\IntlFormatter;
 use EasyCorp\Bundle\EasyAdminBundle\Maker\ClassMaker;
 use EasyCorp\Bundle\EasyAdminBundle\Menu\MenuItemMatcher;
@@ -126,7 +126,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, service('router'))
             ->tag('kernel.cache_warmer')
 
-        ->set(DataCollector::class)
+        ->set(EasyAdminDataCollector::class)
             ->arg(0, service(AdminContextProvider::class))
             ->tag('data_collector', ['id' => 'easyadmin', 'template' => '@EasyAdmin/inspector/data_collector.html.twig'])
 
