@@ -81,6 +81,9 @@ final class ActionCollection implements CollectionInterface
         return new \ArrayIterator($this->actions);
     }
 
+    /**
+     * @deprecated since 4.28.1 and will be removed in 5.0.0 without replacement
+     */
     public function getEntityActions(): self
     {
         return self::new(array_filter(
