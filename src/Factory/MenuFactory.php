@@ -10,8 +10,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Factory\MenuFactoryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MenuItemDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
@@ -33,7 +33,16 @@ final class MenuFactory implements MenuFactoryInterface
         private readonly LogoutUrlGenerator $logoutUrlGenerator,
         private readonly AdminUrlGeneratorInterface $adminUrlGenerator,
         private readonly MenuItemMatcherInterface $menuItemMatcher,
+        private readonly ?EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator = null,
     ) {
+        if (null === $this->entityTranslationIdGenerator) {
+            trigger_deprecation(
+                'easycorp/easyadmin-bundle',
+                '4.28',
+                'Not passing argument "$entityTranslationIdGenerator" will cause an error in 5.0.0.',
+                '$entityTranslationIdGenerator',
+            );
+        }
     }
 
     /**
@@ -82,10 +91,10 @@ final class MenuFactory implements MenuFactoryInterface
                     continue;
                 }
 
-                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain, $adminContext->getCrud());
+                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain, $adminContext->isUseEntityTranslations());
             }
 
-            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain, $adminContext->getCrud());
+            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain, $adminContext->isUseEntityTranslations());
         }
 
         $builtItems = $this->menuItemMatcher->markSelectedMenuItem($builtItems, $adminContext->getRequest());
@@ -96,14 +105,14 @@ final class MenuFactory implements MenuFactoryInterface
     /**
      * @param MenuItemDto[] $subItems
      */
-    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, ?CrudDto $crudDto): MenuItemDto
+    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, bool $isUseEntityTranslations): MenuItemDto
     {
         if (!$menuItemDto->getLabel() instanceof TranslatableInterface) {
             $label = $menuItemDto->getLabel();
-            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType() && null !== $crudDto) {
+            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType() && $isUseEntityTranslations) {
                 $label = Action::INDEX === $menuItemDto->getRouteParameters()[EA::CRUD_ACTION]
-                    ? $crudDto->getEntityLabelInPlural()
-                    : $crudDto->getEntityLabelInSingular();
+                    ? $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], false)
+                    : $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], true);
             } else {
                 $label = '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain);
             }
