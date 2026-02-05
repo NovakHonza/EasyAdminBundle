@@ -132,6 +132,7 @@ make checks-before-pr
 - Braces required for all control structures
 - Trailing commas in multi-line arrays
 - Blank line before `return` (unless only statement in block)
+- Don't add comments in classes as separators (e.g. `// === Methods for dashboards ===`)
 
 ### Naming
 - Variables/methods: `camelCase`

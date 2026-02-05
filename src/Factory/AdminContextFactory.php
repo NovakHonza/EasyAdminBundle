@@ -2,7 +2,6 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Factory;
 
-use EasyCorp\Bundle\EasyAdminBundle\Config\Cache;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\TextDirection;
@@ -25,6 +24,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FilterConfigDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\I18nDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\TemplateRegistry;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
@@ -42,10 +42,11 @@ final readonly class AdminContextFactory
     public function __construct(
         private ?TokenStorageInterface $tokenStorage,
         private MenuFactoryInterface $menuFactory,
+        private AdminControllerRegistry $adminControllers,
         private EntityFactory $entityFactory,
         private AdminRouteGeneratorInterface $adminRouteGenerator,
         private ActionFactory $actionFactory,
-        private EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator = null,
+        private ?EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator,
         private CacheItemPoolInterface $cache,
     ) {
     }
@@ -63,7 +64,7 @@ final readonly class AdminContextFactory
 
         // build a first version of CrudDto without actions so we can create AdminContext, which is
         // needed for action extensions; later, we'll update the CrudDto object with the full action config
-        $crudDto = $this->getCrudDto($dashboardController, $crudController, new ActionConfigDto(), $filters, $crudAction, $pageName);
+        $crudDto = $this->getCrudDto($this->adminControllers, $dashboardController, $crudController, new ActionConfigDto(), $filters, $crudAction, $pageName);
         $entityDto = $this->getEntityDto($request, $crudDto);
         $searchDto = $this->getSearchDto($request, $crudDto);
         $i18nDto = $this->getI18nDto($request, $dashboardDto, $crudDto, $entityDto);
@@ -72,7 +73,7 @@ final readonly class AdminContextFactory
 
         // build sub-contexts
         $requestContext = new RequestContext($request, $user);
-        $crudContext = new CrudContext($crudDto, $entityDto, $searchDto, $this->crudControllers);
+        $crudContext = new CrudContext($crudDto, $entityDto, $searchDto, $this->adminControllers, $this->crudControllers);
         $dashboardContext = new DashboardContext($dashboardDto, $dashboardController::class, $assetDto);
         $i18nContext = new I18nContext($i18nDto, $templateRegistry);
 
@@ -130,7 +131,7 @@ final readonly class AdminContextFactory
         return $crudController->configureAssets($defaultAssets)->getAsDto()->loadedOn($pageName);
     }
 
-    private function getCrudDto(DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ActionConfigDto $actionConfigDto, FilterConfigDto $filters, ?string $crudAction, ?string $pageName): ?CrudDto
+    private function getCrudDto(AdminControllerRegistry $adminControllers, DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ActionConfigDto $actionConfigDto, FilterConfigDto $filters, ?string $crudAction, ?string $pageName): ?CrudDto
     {
         if (null === $crudController) {
             return null;
@@ -139,11 +140,7 @@ final readonly class AdminContextFactory
         $defaultCrud = $dashboardController->configureCrud();
         $crudDto = $crudController->configureCrud($defaultCrud)->getAsDto();
 
-        $crudFqcnToEntityFqcn = $this->cache->getItem(Cache::CRUD_FQCN_TO_ENTITY_FQCN)->get();
-        $entityFqcn = $crudFqcnToEntityFqcn[$crudController::class] ?? null;
-        if (null === $entityFqcn) {
-            throw new \RuntimeException(sprintf('The entity FQCN associated to the CRUD controller "%s" cannot be determined. Clear the application cache to force EasyAdmin to regenerate the needed data.', $crudController::class));
-        }
+        $entityFqcn = $adminControllers->findEntityByCrudController($crudController::class);
 
         $crudDto->setControllerFqcn($crudController::class);
         $crudDto->setActionsConfig($actionConfigDto);

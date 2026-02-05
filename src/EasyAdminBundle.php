@@ -2,6 +2,8 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle;
 
+use EasyCorp\Bundle\EasyAdminBundle\DependencyInjection\CreateControllerRegistriesPass;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 /**
@@ -10,6 +12,11 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 class EasyAdminBundle extends Bundle
 {
     public const VERSION = '5.0.0-DEV';
+
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new CreateControllerRegistriesPass());
+    }
 
     public function getPath(): string
     {

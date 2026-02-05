@@ -46,6 +46,7 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
             new TwigFilter('ea_flatten_array', [$this, 'flattenArray']),
             new TwigFilter('ea_filesize', [$this, 'fileSize']),
             new TwigFilter('ea_as_string', [$this, 'representAsString']),
+            new TwigFilter('ea_html_attrs', [$this, 'processHtmlAttributes']),
         ];
     }
 
@@ -82,6 +83,26 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
         }
 
         return $flattenedArray;
+    }
+
+    /**
+     * Processes an array of HTML attributes, translating any TranslatableInterface values.
+     * This is needed because Twig Components don't accept non-scalar attribute values.
+     *
+     * @param array<string, mixed> $attributes
+     *
+     * @return array<string, mixed>
+     */
+    public function processHtmlAttributes(array $attributes): array
+    {
+        $processed = [];
+        foreach ($attributes as $name => $value) {
+            $processed[$name] = $value instanceof TranslatableInterface
+                ? $value->trans($this->translator)
+                : $value;
+        }
+
+        return $processed;
     }
 
     public function fileSize(int $bytes): string

@@ -623,6 +623,7 @@ class name)* of the CRUD controller, you must pass the FQCN of the Doctrine
 entity associated to the CRUD controller::
 
     use App\Entity\Category;
+    use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
     use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 
     public function configureMenuItems(): iterable
@@ -635,10 +636,10 @@ entity associated to the CRUD controller::
 
             // links to a different CRUD action
             MenuItem::linkToCrud('Add Category', 'fa fa-tags', Category::class)
-                ->setAction('new'),
+                ->setAction(Action::NEW),
 
             MenuItem::linkToCrud('Show Main Category', 'fa fa-tags', Category::class)
-                ->setAction('detail')
+                ->setAction(Action::DETAIL)
                 ->setEntityId(1),
 
             // if the same Doctrine entity is associated to more than one CRUD controller,

@@ -2,8 +2,6 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Context;
 
-use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Context\AdminContextInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\AssetsDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
@@ -13,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\LocaleDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -76,9 +75,9 @@ final class AdminContext implements AdminContextInterface
         return $this->crudContext->getSearch();
     }
 
-    public function getCrudControllers(): CrudControllerRegistry
+    public function getAdminControllers(): AdminControllerRegistry
     {
-        return $this->crudContext->getCrudControllers();
+        return $this->crudContext->getAdminControllers();
     }
 
     public function getMainMenu(): MainMenuDto
@@ -164,6 +163,25 @@ final class AdminContext implements AdminContextInterface
     public function isUseEntityTranslations(): bool
     {
         return $this->dashboardContext->getDashboardDto()->isUseEntityTranslations();
+    }
+
+    /**
+     * Returns a new AdminContext with a different EntityDto.
+     * Useful for nested CRUD operations (e.g., CollectionField).
+     */
+    public function withEntity(EntityDto $entityDto): self
+    {
+        return new self(
+            $this->requestContext,
+            new CrudContext(
+                $this->crudContext->getCrud(),
+                $entityDto,
+                $this->crudContext->getSearch(),
+                $this->crudContext->getAdminControllers(),
+            ),
+            $this->dashboardContext,
+            $this->i18nContext,
+        );
     }
 
     /**

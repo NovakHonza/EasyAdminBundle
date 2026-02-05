@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\LocaleDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -22,8 +23,7 @@ interface AdminContextInterface
 
     public function getI18n(): I18nDto;
 
-    // REMOVE
-    public function getCrudControllers(): CrudControllerRegistry;
+    public function getAdminControllers(): AdminControllerRegistry;
 
     /**
      * @return EntityDto<TEntity>

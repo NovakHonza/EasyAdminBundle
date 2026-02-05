@@ -5,6 +5,9 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Unit\Registry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\DashboardControllerRegistry;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class DashboardControllerRegistryTest extends TestCase
 {
     private string $tempDir;
@@ -276,7 +279,7 @@ class DashboardControllerRegistryTest extends TestCase
             [
                 'admin' => 'App\Controller\Admin\DashboardController',
                 'reports' => 'App\Controller\Reports\DashboardController',
-            ]
+            ],
         );
     }
 

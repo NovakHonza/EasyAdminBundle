@@ -2,7 +2,6 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Factory;
 
-use EasyCorp\Bundle\EasyAdminBundle\Config\Cache;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -10,8 +9,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Factory\MenuFactoryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MenuItemDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
@@ -35,6 +34,7 @@ final readonly class MenuFactory implements MenuFactoryInterface
         private AdminUrlGeneratorInterface $adminUrlGenerator,
         private MenuItemMatcherInterface $menuItemMatcher,
         private CacheItemPoolInterface $cache,
+        private ?EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator = null,
     ) {
     }
 
@@ -84,10 +84,10 @@ final readonly class MenuFactory implements MenuFactoryInterface
                     continue;
                 }
 
-                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain, $adminContext->getCrud());
+                $subItems[] = $this->buildMenuItem($menuSubItemDto, [], $translationDomain, $adminContext->isUseEntityTranslations());
             }
 
-            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain, $adminContext->getCrud());
+            $builtItems[] = $this->buildMenuItem($menuItemDto, $subItems, $translationDomain, $adminContext->isUseEntityTranslations());
         }
 
         $builtItems = $this->menuItemMatcher->markSelectedMenuItem($builtItems, $adminContext->getRequest());
@@ -98,14 +98,14 @@ final readonly class MenuFactory implements MenuFactoryInterface
     /**
      * @param MenuItemDto[] $subItems
      */
-    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, ?CrudDto $crudDto): MenuItemDto
+    private function buildMenuItem(MenuItemDto $menuItemDto, array $subItems, string $translationDomain, bool $isUseEntityTranslations): MenuItemDto
     {
         if (!$menuItemDto->getLabel() instanceof TranslatableInterface) {
             $label = $menuItemDto->getLabel();
-            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType() && null !== $crudDto) {
+            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType() && $isUseEntityTranslations) {
                 $label = Action::INDEX === $menuItemDto->getRouteParameters()[EA::CRUD_ACTION]
-                    ? $crudDto->getEntityLabelInPlural()
-                    : $crudDto->getEntityLabelInSingular();
+                    ? $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], false)
+                    : $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], true);
             } else {
                 $label = '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain);
             }
@@ -151,11 +151,8 @@ final readonly class MenuFactory implements MenuFactoryInterface
                 $this->adminUrlGenerator->setController($crudControllerFqcn);
             // 2. ...otherwise, find the CRUD controller from the entityFqcn
             } else {
-                $entityFqcnToCrudFqcn = $this->cache->getItem(Cache::ENTITY_FQCN_TO_CRUD_FQCN)->get();
-                $crudControllersAssociatedToEntity = $entityFqcnToCrudFqcn[$entityFqcn] ?? [];
-                $controllerFqcn = $crudControllersAssociatedToEntity[0] ?? null;
-
-                if (null === $controllerFqcn) {
+                $adminControllers = $this->adminContextProvider->getContext()?->getAdminControllers();
+                if (null === $controllerFqcn = $adminControllers->findCrudControllerByEntity($entityFqcn)) {
                     throw new \RuntimeException(sprintf('Unable to find the controller related to the "%s" Entity; did you forget to extend "%s"?', $entityFqcn, AbstractCrudController::class));
                 }
 

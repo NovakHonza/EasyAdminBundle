@@ -19,6 +19,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Form\Type\Layout\EaFormTabPaneGroupCloseType
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\Layout\EaFormTabPaneGroupOpenType;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\IdentityTranslator;
+use Symfony\Component\Translation\TranslatableMessage;
+use Symfony\Contracts\Translation\TranslatableInterface;
 
 class FormLayoutFactoryTest extends TestCase
 {
@@ -290,6 +292,44 @@ class FormLayoutFactoryTest extends TestCase
                     tab_pane_close
                 tab_pane_group_close
             LAYOUT,
+        ];
+    }
+
+    /**
+     * @dataProvider provideTabLabels
+     */
+    public function testTabLabelTranslation(TranslatableInterface|string $label, string $expectedTabId): void
+    {
+        $fields = FieldCollection::new([
+            FormField::addTab($label),
+            TextField::new('some_field'),
+        ]);
+
+        $formLayoutFactory = new FormLayoutFactory(new IdentityTranslator());
+        $formLayoutFactory->createLayout($fields, Crud::PAGE_EDIT);
+
+        $tabField = null;
+        foreach ($fields as $fieldDto) {
+            if ($fieldDto->isFormTab()) {
+                $tabField = $fieldDto;
+                break;
+            }
+        }
+
+        $this->assertNotNull($tabField, 'A tab field should exist in the layout');
+        $this->assertSame($expectedTabId, $tabField->getCustomOption(FormField::OPTION_TAB_ID));
+    }
+
+    public function provideTabLabels(): \Generator
+    {
+        yield 'string label' => [
+            'My Tab',
+            'tab-my-tab',
+        ];
+
+        yield 'TranslatableInterface label' => [
+            new TranslatableMessage('My Translatable Tab'),
+            'tab-my-translatable-tab',
         ];
     }
 
