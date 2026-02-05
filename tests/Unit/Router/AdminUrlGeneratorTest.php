@@ -195,73 +195,11 @@ class AdminUrlGeneratorTest extends KernelTestCase
         $this->assertSame(3, $adminUrlGenerator->get(EA::MENU_INDEX));
     }
 
-    /**
-     * @group legacy
-     */
-    public function testDeprecatedParameterMessage(): void
-    {
-        $this->expectDeprecation('Since easycorp/easyadmin-bundle 4.5.0: Using the "menuIndex" query parameter is deprecated. Menu items are now highlighted automatically based on the Request data, so you don\'t have to deal with menu items manually anymore.');
-
-        $adminUrlGenerator = $this->getAdminUrlGenerator();
-        $adminUrlGenerator->set('menuIndex', 1);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testIncludeReferrer(): void
-    {
-        $adminUrlGenerator = $this->getAdminUrlGenerator();
-
-        $adminUrlGenerator->includeReferrer();
-        $this->assertSame('http://localhost/admin?foo=bar&referrer=/?foo%3Dbar', $adminUrlGenerator->generateUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testRemoveReferrer(): void
-    {
-        $adminUrlGenerator = $this->getAdminUrlGenerator();
-
-        $adminUrlGenerator->removeReferrer();
-        $this->assertSame('http://localhost/admin?foo=bar', $adminUrlGenerator->generateUrl());
-
-        $adminUrlGenerator->setReferrer('https://example.com/foo');
-        $adminUrlGenerator->removeReferrer();
-        $this->assertSame('http://localhost/admin?foo=bar', $adminUrlGenerator->generateUrl());
-    }
-
     public function testNoReferrerByDefault(): void
     {
         $adminUrlGenerator = $this->getAdminUrlGenerator();
 
         $this->assertStringNotContainsString('referrer', $adminUrlGenerator->generateUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testCustomReferrer(): void
-    {
-        $adminUrlGenerator = $this->getAdminUrlGenerator();
-
-        $adminUrlGenerator->setReferrer('any_custom_value');
-        $this->assertSame('http://localhost/admin?foo=bar&referrer=any_custom_value', $adminUrlGenerator->generateUrl());
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testPersistentCustomReferrer(): void
-    {
-        $adminUrlGenerator = $this->getAdminUrlGenerator();
-        $adminUrlGenerator->setReferrer('any_custom_value');
-        $this->assertSame('http://localhost/admin?foo=bar&referrer=any_custom_value', $adminUrlGenerator->generateUrl());
-
-        // test that the custom referrer value does not persist after generating the URL
-        $adminUrlGenerator->includeReferrer();
-        $this->assertSame('http://localhost/admin?foo=bar&referrer=/?foo%3Dbar', $adminUrlGenerator->generateUrl());
     }
 
     public function testRelativeUrls(): void

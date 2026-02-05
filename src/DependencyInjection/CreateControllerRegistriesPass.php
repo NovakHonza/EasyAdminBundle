@@ -18,8 +18,6 @@ class CreateControllerRegistriesPass implements CompilerPassInterface
     public function process(ContainerBuilder $container): void
     {
         $this->createAdminControllerRegistryService($container);
-        $this->createDashboardControllerRegistryService($container);
-        $this->createCrudControllerRegistryService($container);
     }
 
     private function createAdminControllerRegistryService(ContainerBuilder $container): void

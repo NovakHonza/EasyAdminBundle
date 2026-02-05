@@ -8,7 +8,6 @@ use function Symfony\Component\String\u;
 
 /**
  * Unified registry for Dashboard and CRUD controllers.
- * Replaces the deprecated DashboardControllerRegistry and CrudControllerRegistry.
  *
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */

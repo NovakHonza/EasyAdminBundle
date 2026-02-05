@@ -21,7 +21,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudAutocompleteType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudFormType;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
@@ -39,7 +38,6 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
         private RequestStack $requestStack,
         private ControllerFactory $controllerFactory,
         private FieldFactory $fieldFactory,
-        private CacheItemPoolInterface $cache,
     ) {
     }
 
