@@ -158,8 +158,8 @@ final class MenuFactory implements MenuFactoryInterface
                 $this->adminUrlGenerator->setController($crudControllerFqcn);
             // 2. ...otherwise, find the CRUD controller from the entityFqcn
             } else {
-                $crudControllers = $this->adminContextProvider->getContext()?->getCrudControllers();
-                if (null === $controllerFqcn = $crudControllers->findCrudFqcnByEntityFqcn($entityFqcn)) {
+                $adminControllers = $this->adminContextProvider->getContext()?->getAdminControllers(); // @phpstan-ignore method.notFound (method will be added to the interface in 5.0)
+                if (null === $controllerFqcn = $adminControllers->findCrudControllerByEntity($entityFqcn)) {
                     throw new \RuntimeException(sprintf('Unable to find the controller related to the "%s" Entity; did you forget to extend "%s"?', $entityFqcn, AbstractCrudController::class));
                 }
 

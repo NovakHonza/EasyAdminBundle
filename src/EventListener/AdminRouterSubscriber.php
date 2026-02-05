@@ -9,7 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInte
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\AdminContextFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\ControllerFactory;
-use EasyCorp\Bundle\EasyAdminBundle\Registry\CrudControllerRegistry;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminRouteGenerator;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -47,7 +47,7 @@ class AdminRouterSubscriber implements EventSubscriberInterface
         private readonly CacheItemPoolInterface $cache,
         private readonly AdminRouteGeneratorInterface $adminRouteGenerator,
         private readonly string $buildDir,
-        private readonly CrudControllerRegistry $crudControllerRegistry,
+        private readonly AdminControllerRegistry $adminControllers,
     ) {
     }
 
@@ -158,7 +158,7 @@ class AdminRouterSubscriber implements EventSubscriberInterface
             if (is_subclass_of($entityFqcnOrCrudControllerFqcn, CrudControllerInterface::class)) {
                 $crudControllerFqcn = $entityFqcnOrCrudControllerFqcn;
             } else {
-                $crudControllerFqcn = $this->crudControllerRegistry->findCrudFqcnByEntityFqcn($entityFqcnOrCrudControllerFqcn);
+                $crudControllerFqcn = $this->adminControllers->findCrudControllerByEntity($entityFqcnOrCrudControllerFqcn);
             }
 
             $prettyUrlRoute = $this->adminRouteGenerator->findRouteName($dashboardControllerFqcn, $crudControllerFqcn, $request->query->get(EA::CRUD_ACTION, ''));

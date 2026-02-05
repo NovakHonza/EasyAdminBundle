@@ -5,6 +5,9 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Unit\Registry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\CrudControllerRegistry;
 use PHPUnit\Framework\TestCase;
 
+/**
+ * @group legacy
+ */
 class CrudControllerRegistryTest extends TestCase
 {
     private CrudControllerRegistry $registry;
@@ -39,7 +42,7 @@ class CrudControllerRegistryTest extends TestCase
             $crudFqcnToEntityFqcnMap,
             $crudFqcnToCrudIdMap,
             $entityFqcnToCrudFqcnMap,
-            $crudIdToCrudFqcnMap
+            $crudIdToCrudFqcnMap,
         );
     }
 

@@ -12,6 +12,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\LocaleDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\CrudControllerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
@@ -85,8 +86,23 @@ final class AdminContext implements AdminContextInterface
         return $this->crudContext->getSearch();
     }
 
+    public function getAdminControllers(): AdminControllerRegistry
+    {
+        return $this->crudContext->getAdminControllers();
+    }
+
+    /**
+     * @deprecated since 4.28.1, use getAdminControllers() instead
+     */
     public function getCrudControllers(): CrudControllerRegistry
     {
+        trigger_deprecation(
+            'easycorp/easyadmin-bundle',
+            '4.28.1',
+            'The "%s()" method is deprecated. Use "getAdminControllers()" instead.',
+            __METHOD__
+        );
+
         return $this->crudContext->getCrudControllers();
     }
 
@@ -202,7 +218,7 @@ final class AdminContext implements AdminContextInterface
                 $this->crudContext->getCrud(),
                 $entityDto,
                 $this->crudContext->getSearch(),
-                $this->crudContext->getCrudControllers()
+                $this->crudContext->getAdminControllers(),
             ),
             $this->dashboardContext,
             $this->i18nContext,

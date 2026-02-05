@@ -10,7 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\DashboardContext;
 use EasyCorp\Bundle\EasyAdminBundle\Context\RequestContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
-use EasyCorp\Bundle\EasyAdminBundle\Registry\DashboardControllerRegistryInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
 use Psr\Cache\CacheItemPoolInterface;
@@ -293,12 +293,20 @@ class AdminUrlGeneratorTest extends KernelTestCase
 
         $adminContextProvider = new AdminContextProvider($requestStack);
 
-        $dashboardControllerRegistry = $this->getMockBuilder(DashboardControllerRegistryInterface::class)->disableOriginalConstructor()->getMock();
-        $dashboardControllerRegistry->method('getRouteByControllerFqcn')->willReturnMap([
-            ['App\Controller\Admin\CustomHtmlAttributeDashboardController', 'custom_html_attribute_admin'],
-        ]);
-        $dashboardControllerRegistry->method('getNumberOfDashboards')->willReturn(2);
-        $dashboardControllerRegistry->method('getFirstDashboardRoute')->willReturn('admin');
+        // create a minimal temp directory and cache file for testing
+        $tempDir = sys_get_temp_dir().'/easyadmin_test_url_gen_'.uniqid();
+        @mkdir($tempDir.'/easyadmin', 0777, true);
+        $cacheContent = '<?php return '.var_export([
+            'admin' => 'App\Controller\Admin\DashboardController::index',
+            'custom_html_attribute_admin' => 'App\Controller\Admin\CustomHtmlAttributeDashboardController::index',
+        ], true).';';
+        file_put_contents($tempDir.'/easyadmin/routes-dashboard.php', $cacheContent);
+
+        $adminControllers = new AdminControllerRegistry(
+            $tempDir,
+            [], // crudFqcnToEntityFqcnMap
+            ['App\Controller\Admin\DashboardController', 'App\Controller\Admin\CustomHtmlAttributeDashboardController']
+        );
 
         $router = self::getContainer()->get('router');
 
@@ -316,6 +324,6 @@ class AdminUrlGeneratorTest extends KernelTestCase
         $cacheMock->method('getItem')->willReturn($cacheItem);
         $cacheMock->method('save')->willReturn(true);
 
-        return new AdminUrlGenerator($adminContextProvider, $router, $dashboardControllerRegistry, $adminRouteGenerator, $cacheMock);
+        return new AdminUrlGenerator($adminContextProvider, $router, $adminControllers, $adminRouteGenerator, $cacheMock);
     }
 }

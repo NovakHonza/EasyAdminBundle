@@ -64,7 +64,7 @@ final class AssociationConfigurator implements FieldConfiguratorInterface
 
         // the target CRUD controller can be NULL; in that case, field value doesn't link to the related entity
         $targetCrudControllerFqcn = $field->getCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER)
-            ?? $context->getCrudControllers()->findCrudFqcnByEntityFqcn($entityDto->getClassMetadata()->getAssociationTargetClass($propertyName));
+            ?? $context->getAdminControllers()->findCrudControllerByEntity($entityDto->getClassMetadata()->getAssociationTargetClass($propertyName));
 
         if (true === $field->getCustomOption(AssociationField::OPTION_RENDER_AS_EMBEDDED_FORM)) {
             if (false === $entityDto->getClassMetadata()->isSingleValuedAssociation($propertyName)) {
