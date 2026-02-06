@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\Synthetic;
 
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\ActionGroup;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
@@ -9,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Synthetic\ActionTestEntity;
+use Symfony\Component\HttpFoundation\Response;
 use function Symfony\Component\Translation\t;
 
 /**
@@ -196,5 +198,11 @@ class ActionGroupsEntityCrudController extends AbstractCrudController
             ->update(Crud::PAGE_INDEX, Action::DELETE, static function (Action $action) {
                 return $action->addCssClass('text-danger');
             });
+    }
+
+    #[AdminRoute('/a-global-action', name: 'a_global_action')]
+    public function aGlobalAction(): Response
+    {
+        return new Response('Global action executed');
     }
 }

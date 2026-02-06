@@ -116,7 +116,6 @@ final class DashboardContext
         ?MainMenuDto $mainMenu = null,
         ?UserMenuDto $userMenu = null,
         ?AssetsDto $assets = null,
-        bool $usePrettyUrls = false,
     ): self {
         if (null === $dashboardDto) {
             // create a new DashboardDto with required defaults for tests
@@ -130,7 +129,6 @@ final class DashboardContext
             $dto,
             $dashboardControllerFqcn,
             $assets ?? new AssetsDto(),
-            $usePrettyUrls
         );
 
         // set menus directly for testing (no lazy loading needed)

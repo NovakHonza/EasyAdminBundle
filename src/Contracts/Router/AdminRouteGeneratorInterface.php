@@ -10,7 +10,7 @@ use Symfony\Component\Routing\RouteCollection;
  *
  * The generated ROUTES are based on a set of default route names and paths, but
  * that can be overwritten at the dashboard, controller and method/action level
- * using the #[AdminDashboard], #[AdminCrud] and #[AdminCrud] attributes.
+ * using the #[AdminDashboard], and #[AdminRoute] attributes.
  *
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  *

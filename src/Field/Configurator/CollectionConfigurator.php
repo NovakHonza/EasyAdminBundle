@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldConfiguratorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\ControllerFactory;
@@ -16,14 +17,12 @@ use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FieldFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\CrudFormType;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Form\Extension\Core\Type\CountryType;
 use Symfony\Component\Form\Extension\Core\Type\CurrencyType;
 use Symfony\Component\Form\Extension\Core\Type\LanguageType;
 use Symfony\Component\Form\Extension\Core\Type\LocaleType;
 use Symfony\Component\Form\Extension\Core\Type\TimezoneType;
 use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException;
 use function Symfony\Component\String\u;
 
 /**
@@ -36,7 +35,7 @@ final readonly class CollectionConfigurator implements FieldConfiguratorInterfac
         private EntityFactory $entityFactory,
         private ControllerFactory $controllerFactory,
         private FieldFactory $fieldFactory,
-        private CacheItemPoolInterface $cache,
+        private AdminContextProviderInterface $adminContextProvider,
     ) {
     }
 
@@ -169,11 +168,7 @@ final readonly class CollectionConfigurator implements FieldConfiguratorInterfac
 
         $fieldDto->setFormTypeOption('entry_type', CrudFormType::class);
         $fieldDto->setFormTypeOption('entry_options.entityDto', $editEntityDto);
-        try {
-            $fieldDto->setFormTypeOption('prototype_options.entityDto', $newEntityDto);
-        } catch (UndefinedOptionsException $exception) {
-            throw new \RuntimeException(sprintf('The "%s" collection field of "%s" uses the "useEntryCrudForm()" method, which requires Symfony 6.1 or newer to work. Upgrade your Symfony version or use instead the "setEntryType()" method to render the collection entries using a Symfony form.', $fieldDto->getProperty(), $context->getCrud()?->getControllerFqcn()), 0, $exception);
-        }
+        $fieldDto->setFormTypeOption('prototype_options.entityDto', $newEntityDto);
     }
 
     /**
@@ -202,12 +197,7 @@ final readonly class CollectionConfigurator implements FieldConfiguratorInterfac
 
         try {
             $fields = $crudController->configureFields($crudControllerPageName);
-
-            if (null === $this->fieldFactory) {
-                $this->entityFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
-            } else {
-                $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
-            }
+            $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
         } finally {
             // restore the original context
             if ($originalContext instanceof AdminContext && null !== $request) {

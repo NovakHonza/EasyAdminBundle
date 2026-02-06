@@ -1,8 +1,8 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Config;
+namespace EasyCorp\Bundle\EasyAdminBundle\Config\Option;
 
-final class Cache
+final class CacheKey
 {
     public const ROUTE_NAME_TO_ATTRIBUTES = 'easyadmin.routes.route_to_fqcn';
     public const ROUTE_ATTRIBUTES_TO_NAME = 'easyadmin.routes.fqcn_to_route';

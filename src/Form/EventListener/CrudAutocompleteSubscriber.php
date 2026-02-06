@@ -4,6 +4,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Form\EventListener;
 
 use Doctrine\ORM\Mapping\FieldMapping;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -101,8 +102,7 @@ class CrudAutocompleteSubscriber implements EventSubscriberInterface
                             /** @phpstan-ignore-next-line function.alreadyNarrowedType */
                             $idFieldType = property_exists($idFieldMapping, 'type') ? $idFieldMapping->type : $idFieldMapping['type'];
 
-                            // TODO: replace 'uuid' by Symfony\Bridge\Doctrine\Types\UuidType::NAME when Symfony 5.4 is no longer supported
-                            if ('uuid' === $idFieldType) {
+                            if (UuidType::NAME === $idFieldType) {
                                 // Use RFC4122 format for platforms with native GUID type (e.g., PostgreSQL),
                                 // and binary format for platforms without native GUID type (e.g., MySQL, SQLite)
                                 $platform = $options['em']->getConnection()->getDatabasePlatform();

@@ -2,7 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\EventListener;
 
-use EasyCorp\Bundle\EasyAdminBundle\Config\Cache;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\CacheKey;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\AdminContextFactory;
@@ -66,7 +66,7 @@ readonly class AdminRouterSubscriber implements EventSubscriberInterface
         // 'rm -fr var/cache/* && bin/console cache:clear'). If that's the case, regenerate the
         // admin routes to force saving them in the cache again.
         // see https://github.com/EasyCorp/EasyAdminBundle/issues/6680
-        $adminRoutes = $this->cache->getItem(Cache::ROUTE_NAME_TO_ATTRIBUTES)->get();
+        $adminRoutes = $this->cache->getItem(CacheKey::ROUTE_NAME_TO_ATTRIBUTES)->get();
         if (null === $adminRoutes) {
             $this->adminRouteGenerator->generateAll();
         }

@@ -5,27 +5,37 @@ on:
             - "4.x"
     pull_request:
 
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: true
+
+permissions:
+    contents: read
+
 jobs:
     phpstan:
         runs-on: ubuntu-latest
+        timeout-minutes: 15
         steps:
             - uses: actions/checkout@v6
 
             - name: Setup PHP, with composer and extensions
               uses: shivammathur/setup-php@v2
               with:
-                  php-version: 8.2
+                  php-version: 8.4
                   coverage: none
+                  tools: composer:2.8
 
             - name: Install dependencies
               run: |
-                  composer install
+                  composer install --no-interaction --no-progress --prefer-dist
                   vendor/bin/simple-phpunit install
 
             - name: "Run PHPStan analysis"
               run: vendor/bin/phpstan analyse
 
     phpunit:
+        timeout-minutes: 45
         strategy:
             fail-fast: false
             matrix:
@@ -33,52 +43,57 @@ jobs:
                     # Latest Symfony version support
                     - os: macos-latest
                       php_version: "8.4"
-                      symfony_version: "7.3"
+                      symfony_version: "8.0.*"
                       stability: "stable"
                     - os: windows-latest
                       php_version: "8.4"
-                      symfony_version: "7.3"
+                      symfony_version: "8.0.*"
                       stability: "stable"
                     # LTS Symfony version support
                     - os: macos-latest
                       php_version: "8.4"
-                      symfony_version: "6.4"
+                      symfony_version: "7.4.*"
                       stability: "stable"
                     - os: windows-latest
                       php_version: "8.4"
-                      symfony_version: "6.4"
+                      symfony_version: "7.4.*"
                       stability: "stable"
                     # Lowest deps support
                     - os: ubuntu-latest
                       php_version: "8.2"
                       composer_args: "--prefer-lowest"
                       stability: "stable"
-                    # Lowest PHP version support. Remove when it is dropped
+                      symfony_deprecations_helper: "disabled"
+                    # All supported Symfony versions
                     - os: ubuntu-latest
-                      php_version: "8.2"
-                      symfony_version: "6.4"
-                      stability: "stable"
-                    - os: ubuntu-latest
-                      php_version: "8.3"
-                      symfony_version: "7.1"
+                      php_version: "8.4"
+                      symfony_version: "6.4.*"
                       stability: "stable"
                     - os: ubuntu-latest
                       php_version: "8.4"
-                      symfony_version: "7.2"
+                      symfony_version: "7.1.*"
                       stability: "stable"
-                    # New PHP version
+                      symfony_deprecations_helper: "disabled"
+                    - os: ubuntu-latest
+                      php_version: "8.4"
+                      symfony_version: "7.2.*"
+                      stability: "stable"
+                    - os: ubuntu-latest
+                      php_version: "8.4"
+                      symfony_version: "7.3.*"
+                      stability: "stable"
+                    - os: ubuntu-latest
+                      php_version: "8.4"
+                      symfony_version: "7.4.*"
+                      stability: "stable"
+                    - os: ubuntu-latest
+                      php_version: "8.4"
+                      symfony_version: "8.0.*"
+                      stability: "stable"
+                    # Upcoming Symfony version
                     - os: ubuntu-latest
                       php_version: "8.5"
-                      symfony_version: "7.3"
-                      stability: "stable"
-                    # Upcoming Symfony versions
-                    - os: ubuntu-latest
-                      php_version: "8.4"
-                      symfony_version: "7.4.x"
-                      stability: "dev"
-                    - os: ubuntu-latest
-                      php_version: "8.4"
-                      symfony_version: "8.0.x"
+                      symfony_version: "8.1.*@dev"
                       stability: "dev"
         runs-on: ${{ matrix.os }}
         continue-on-error: ${{ matrix.stability == 'dev' }}
@@ -106,11 +121,11 @@ jobs:
 
             - name: Configure Symfony version for symfony/flex
               if: ${{ matrix.symfony_version }}
-              run: composer config extra.symfony.require "${{ matrix.symfony_version }}.*"
+              run: composer config extra.symfony.require "${{ matrix.symfony_version }}"
 
             - name: Install dependencies
               run: |
-                  composer update ${{ matrix.composer_args }};
+                  composer update --no-interaction --no-progress --prefer-dist ${{ matrix.composer_args }}
                   vendor/bin/simple-phpunit install
 
             - name: Show installed dependencies
@@ -118,12 +133,20 @@ jobs:
                   composer show
 
             - name: Run tests
+              if: ${{ runner.os != 'Windows' }}
               shell: bash
               run: |
                   make tests
+              env:
+                  SYMFONY_DEPRECATIONS_HELPER: ${{ matrix.symfony_deprecations_helper || '' }}
+
+            - name: Run tests (Windows)
+              if: ${{ runner.os == 'Windows' }}
+              run: vendor/bin/simple-phpunit
 
     php-linter:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
         steps:
             - uses: actions/checkout@v6
 
@@ -135,6 +158,7 @@ jobs:
 
     doc-linter:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
         steps:
             - uses: actions/checkout@v6
 
@@ -147,6 +171,7 @@ jobs:
 
     css-linter:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
         steps:
             - uses: actions/checkout@v6
 
@@ -155,10 +180,11 @@ jobs:
               with:
                   php-version: 8.2
                   coverage: none
+                  tools: composer:2.8
 
             - name: Install dependencies
               run: |
-                  composer install
+                  composer install --no-interaction --no-progress --prefer-dist
 
             -   name: Lint logical CSS properties
                 run: |
@@ -166,6 +192,7 @@ jobs:
 
     twig-linter:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
         steps:
             - uses: actions/checkout@v6
 
@@ -174,10 +201,11 @@ jobs:
               with:
                   php-version: 8.2
                   coverage: none
+                  tools: composer:2.8
 
             - name: Install dependencies
               run: |
-                  composer install
+                  composer install --no-interaction --no-progress --prefer-dist
 
             -   name: Lint Twig template syntax
                 run: |
@@ -185,6 +213,7 @@ jobs:
 
     js-linter:
         runs-on: ubuntu-latest
+        timeout-minutes: 10
         steps:
             - uses: actions/checkout@v6
             - run: npm i -g corepack && corepack enable
@@ -193,4 +222,3 @@ jobs:
                   cache: 'yarn'
             - run: yarn --immutable
             - run: yarn ci
-

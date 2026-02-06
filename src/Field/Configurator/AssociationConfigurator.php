@@ -55,7 +55,6 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
         }
 
         // the target CRUD controller can be NULL; in that case, field value doesn't link to the related entity
-        // FIX THIS: old code from 4.x
         $targetCrudControllerFqcn = $field->getCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER)
             ?? $context->getAdminControllers()->findCrudControllerByEntity($entityDto->getClassMetadata()->getAssociationTargetClass($propertyName));
 

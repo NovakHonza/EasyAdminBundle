@@ -102,7 +102,7 @@ class CrudAutocompleteSubscriberUuidTest extends TestCase
         $classMetadata = $this->createStub(ClassMetadata::class);
         $classMetadata->method('getFieldMapping')
             ->with('id')
-            ->willReturn(new FieldMapping('uuid', 'id', 'id'));
+            ->willReturn($this->createUuidFieldMapping());
 
         $connection = $this->createStub(Connection::class);
         $connection->method('getDatabasePlatform')->willReturn($platform);
@@ -135,5 +135,14 @@ class CrudAutocompleteSubscriberUuidTest extends TestCase
         $event->method('getForm')->willReturn($form);
 
         return $event;
+    }
+
+    private function createUuidFieldMapping(): array|FieldMapping
+    {
+        if (!class_exists(FieldMapping::class)) {
+            return ['type' => 'uuid'];
+        }
+
+        return new FieldMapping('uuid', 'id', 'id');
     }
 }

@@ -3,6 +3,7 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Router;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\CacheKey;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
@@ -58,8 +59,7 @@ final class AdminUrlGenerator implements \Stringable, AdminUrlGeneratorInterface
 
     public function setRoute(string $routeName, array $routeParameters = []): AdminUrlGeneratorInterface
     {
-        $this->unset(EA::CRUD_CONTROLLER_FQCN);
-        $this->unset(EA::CRUD_ACTION);
+        $this->unsetAllExcept(EA::DASHBOARD_CONTROLLER_FQCN);
         $this->setRouteParameter(EA::ROUTE_NAME, $routeName);
         $this->setRouteParameter(EA::ROUTE_PARAMS, $routeParameters);
 
@@ -196,7 +196,7 @@ final class AdminUrlGenerator implements \Stringable, AdminUrlGeneratorInterface
         }
 
         if (null !== $routeName = $this->get(EA::ROUTE_NAME)) {
-            $adminRoutes = $this->cache->getItem(AdminRouteGenerator::CACHE_KEY_ROUTE_TO_FQCN)->get();
+            $adminRoutes = $this->cache->getItem(CacheKey::ROUTE_NAME_TO_ATTRIBUTES)->get();
             if (null !== $adminRoutes && \array_key_exists($routeName, $adminRoutes)) {
                 return $this->urlGenerator->generate($routeName, $canonicalRouteParameters[EA::ROUTE_PARAMS] ?? [], $urlType);
             }

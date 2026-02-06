@@ -9,6 +9,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\I18nContext;
 use EasyCorp\Bundle\EasyAdminBundle\Context\RequestContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MenuItemDto;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\MenuFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
@@ -34,13 +35,15 @@ class MenuFactoryTest extends TestCase
         $this->logoutUrlGenerator = $this->createMock(LogoutUrlGenerator::class);
         $this->adminUrlGenerator = $this->createMock(AdminUrlGeneratorInterface::class);
         $this->menuItemMatcher = $this->createMock(MenuItemMatcherInterface::class);
+        $entityTranslationIdGenerator = $this->createMock(EntityTranslationIdGeneratorInterface::class);
 
         $this->menuFactory = new MenuFactory(
             $this->adminContextProvider,
             $this->authChecker,
             $this->logoutUrlGenerator,
             $this->adminUrlGenerator,
-            $this->menuItemMatcher
+            $this->menuItemMatcher,
+            $entityTranslationIdGenerator,
         );
     }
 

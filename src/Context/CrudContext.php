@@ -6,6 +6,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 /**
  * Encapsulates CRUD operation-related data for the admin context.
@@ -52,7 +53,7 @@ final class CrudContext
         ?SearchDto $searchDto = null,
         ?AdminControllerRegistry $adminControllers = null,
     ): self {
-        $adminControllers ??= new AdminControllerRegistry('', [], []);
+        $adminControllers ??= new AdminControllerRegistry(new ArrayAdapter());
 
         return new self(
             $crudDto ?? new CrudDto(),

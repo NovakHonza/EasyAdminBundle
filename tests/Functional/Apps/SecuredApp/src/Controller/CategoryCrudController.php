@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\SecuredApp\Controller;
 
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -51,6 +52,7 @@ class CategoryCrudController extends AbstractCrudController
             ->setPermission(self::ACTION_ADMIN_ONLY, 'ROLE_ADMIN');
     }
 
+    #[AdminRoute]
     public function adminOnly(AdminContext $context): Response
     {
         // check role directly for global actions (setPermission configures ROLE_ADMIN for this action)
