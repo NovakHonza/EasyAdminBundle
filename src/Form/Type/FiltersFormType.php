@@ -29,7 +29,7 @@ class FiltersFormType extends AbstractType
         $resolver->setDefaults([
             'allow_extra_fields' => true,
             'csrf_protection' => false,
-            'ea_filters' => FilterCollection::new(),
+            'ea_filters' => new FilterCollection(),
         ]);
     }
 

@@ -55,7 +55,7 @@ class AssociationConfiguratorTest extends AbstractFieldTest
     {
         $field = AssociationField::new('leadDeveloper');
         $entityDto = new EntityDto(Project::class, $this->createStub(ClassMetadata::class));
-        $entityDto->setFields(FieldCollection::new([$field]));
+        $entityDto->setFields(new FieldCollection([$field]));
 
         $field->getAsDto()->setDoctrineMetadata((array) $this->projectDto->getClassMetadata()->getAssociationMapping($field->getAsDto()->getProperty()));
         $field->setCustomOption(AssociationField::OPTION_EMBEDDED_CRUD_FORM_CONTROLLER, DeveloperCrudController::class);

@@ -174,7 +174,7 @@ class FormFactoryTest extends TestCase
 
     public function testCreateFiltersFormReturnsHandledForm(): void
     {
-        $filters = FilterCollection::new();
+        $filters = new FilterCollection();
         $request = new Request(['filters' => ['name' => 'test']]);
 
         $form = $this->createMock(FormInterface::class);
@@ -204,7 +204,7 @@ class FormFactoryTest extends TestCase
 
     public function testCreateFiltersFormPreservesQueryParameters(): void
     {
-        $filters = FilterCollection::new();
+        $filters = new FilterCollection();
         $request = new Request(['crudAction' => 'index', 'page' => 2]);
 
         $form = $this->createMock(FormInterface::class);
