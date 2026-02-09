@@ -287,6 +287,20 @@ final class FormLayoutFactory
         }
     }
 
+    private function createCloseField(string $propertyName, string $formTypeFqcn, ?FieldDto $openedDto): FieldDto
+    {
+        $field = Field::new($propertyName)
+            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
+            ->setFormType($formTypeFqcn)
+            ->setFormTypeOptions(['mapped' => false, 'required' => false]);
+        $block_prefix = $openedDto?->getFormTypeOption('block_prefix');
+        if (null !== $block_prefix) {
+            $field->setFormTypeOption('block_prefix', $block_prefix.'_close');
+        }
+
+        return $field->getAsDto();
+    }
+
     private function createColumnGroupOpenField(bool $formUsesTabs): FieldDto
     {
         return Field::new('ea_form_column_group_open')
@@ -298,20 +312,15 @@ final class FormLayoutFactory
 
     private function createColumnGroupCloseField(bool $formUsesTabs, ?FieldDto $openedDto): FieldDto
     {
-        return Field::new('ea_form_column_group_close')
-            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
-            ->setFormType(EaFormColumnGroupCloseType::class)
-            ->setFormTypeOptions(['mapped' => false, 'required' => false, 'ea_is_inside_tab' => $formUsesTabs])
-            ->getAsDto();
+        $fieldDto = $this->createCloseField('ea_form_column_group_close', EaFormColumnGroupCloseType::class, $openedDto);
+        $fieldDto->setFormTypeOption('ea_is_inside_tab', $formUsesTabs);
+
+        return $fieldDto;
     }
 
     private function createColumnCloseField(?FieldDto $openedDto): FieldDto
     {
-        return Field::new('ea_form_column_close')
-            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
-            ->setFormType(EaFormColumnCloseType::class)
-            ->setFormTypeOptions(['mapped' => false, 'required' => false])
-            ->getAsDto();
+        return $this->createCloseField('ea_form_column_close', EaFormColumnCloseType::class, $openedDto);
     }
 
     private function createFieldsetOpenField(): FieldDto
@@ -323,11 +332,7 @@ final class FormLayoutFactory
 
     private function createFieldsetCloseField(?FieldDto $openedDto): FieldDto
     {
-        return Field::new('ea_form_fieldset_close')
-            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
-            ->setFormType(EaFormFieldsetCloseType::class)
-            ->setFormTypeOptions(['mapped' => false, 'required' => false])
-            ->getAsDto();
+        return $this->createCloseField('ea_form_fieldset_close', EaFormFieldsetCloseType::class, $openedDto);
     }
 
     private function createTabPaneGroupOpenField(): FieldDto
@@ -341,11 +346,7 @@ final class FormLayoutFactory
 
     private function createTabPaneGroupCloseField(?FieldDto $openedDto): FieldDto
     {
-        return Field::new('ea_form_tabpane_group_close')
-            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
-            ->setFormType(EaFormTabPaneGroupCloseType::class)
-            ->setFormTypeOptions(['mapped' => false, 'required' => false])
-            ->getAsDto();
+        return $this->createCloseField('ea_form_tabpane_group_close', EaFormTabPaneGroupCloseType::class, $openedDto);
     }
 
     /**
@@ -363,11 +364,7 @@ final class FormLayoutFactory
 
     private function createTabPaneCloseField(?FieldDto $openedDto): FieldDto
     {
-        return Field::new('ea_form_tabpane_close')
-            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
-            ->setFormType(EaFormTabPaneCloseType::class)
-            ->setFormTypeOptions(['mapped' => false, 'required' => false])
-            ->getAsDto();
+        return $this->createCloseField('ea_form_tabpane_close', EaFormTabPaneCloseType::class, $openedDto);
     }
 
     public static function createFromFieldDtos(?FieldCollection $fieldDtos): FieldLayoutDto
