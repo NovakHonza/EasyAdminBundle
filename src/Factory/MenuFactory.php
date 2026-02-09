@@ -109,10 +109,14 @@ final class MenuFactory implements MenuFactoryInterface
     {
         if (!$menuItemDto->getLabel() instanceof TranslatableInterface) {
             $label = $menuItemDto->getLabel();
-            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType() && $isUseEntityTranslations) {
-                $label = Action::INDEX === $menuItemDto->getRouteParameters()[EA::CRUD_ACTION]
-                    ? $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], false)
-                    : $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], true);
+            if (null === $label && MenuItemDto::TYPE_CRUD === $menuItemDto->getType()) {
+                if ($isUseEntityTranslations) {
+                    $label = Action::INDEX === $menuItemDto->getRouteParameters()[EA::CRUD_ACTION]
+                        ? $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], false)
+                        : $this->entityTranslationIdGenerator->generateForEntity($menuItemDto->getRouteParameters()[EA::ENTITY_FQCN], true);
+                } else {
+                    $label = basename(str_replace('\\', '/', $menuItemDto->getRouteParameters()[EA::ENTITY_FQCN]));
+                }
             } else {
                 $label = '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain);
             }
