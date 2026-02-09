@@ -211,7 +211,7 @@ final class EntityRepository implements EntityRepositoryInterface
         foreach ($filtersForm as $filterForm) {
             $propertyName = $filterForm->getName();
 
-            $filter = $configuredFilters->get($propertyName);
+            $filter = $configuredFilters->get(str_replace(':', '.', $propertyName));
             // this filter is not defined or not applied
             if (null === $filter || !isset($appliedFilters[$propertyName])) {
                 continue;
