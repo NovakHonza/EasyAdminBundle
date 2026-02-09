@@ -287,20 +287,6 @@ final class FormLayoutFactory
         }
     }
 
-    private function createCloseField(string $propertyName, string $formTypeFqcn, ?FieldDto $openedDto): FieldDto
-    {
-        $field = Field::new($propertyName)
-            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
-            ->setFormType($formTypeFqcn)
-            ->setFormTypeOptions(['mapped' => false, 'required' => false]);
-        $block_prefix = $openedDto?->getFormTypeOption('block_prefix');
-        if (null !== $block_prefix) {
-            $field->setFormTypeOption('block_prefix', $block_prefix.'_close');
-        }
-
-        return $field->getAsDto();
-    }
-
     private function createColumnGroupOpenField(bool $formUsesTabs): FieldDto
     {
         return Field::new('ea_form_column_group_open')
@@ -365,6 +351,20 @@ final class FormLayoutFactory
     private function createTabPaneCloseField(?FieldDto $openedDto): FieldDto
     {
         return $this->createCloseField('ea_form_tabpane_close', EaFormTabPaneCloseType::class, $openedDto);
+    }
+
+    private function createCloseField(string $propertyName, string $formTypeFqcn, ?FieldDto $openedDto): FieldDto
+    {
+        $field = Field::new($propertyName)
+            ->setPropertySuffix($openedDto?->getPropertyNameSuffix() ?? Ulid::generate())
+            ->setFormType($formTypeFqcn)
+            ->setFormTypeOptions(['mapped' => false, 'required' => false]);
+
+        if (null !== $block_prefix = $openedDto?->getFormTypeOption('block_prefix')) {
+            $field->setFormTypeOption('block_prefix', $block_prefix.'_close');
+        }
+
+        return $field->getAsDto();
     }
 
     public static function createFromFieldDtos(?FieldCollection $fieldDtos): FieldLayoutDto
