@@ -60,7 +60,7 @@ final class KeyValueStore
             return $this->map[$key];
         }
 
-        if (!str_contains($key, '.')) {
+        if (null !== $this->delimiter && !str_contains($key, $this->delimiter)) {
             return $default;
         }
 

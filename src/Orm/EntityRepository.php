@@ -22,6 +22,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\FormFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Form\Type\ComparisonType;
+use EasyCorp\Bundle\EasyAdminBundle\Form\Type\FiltersFormType;
 use Symfony\Component\Uid\Ulid;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
@@ -210,8 +211,9 @@ final class EntityRepository implements EntityRepositoryInterface
         $i = 0;
         foreach ($filtersForm as $filterForm) {
             $propertyName = $filterForm->getName();
+            $originalPropertyName = str_replace(FiltersFormType::EMBEDDED_PROPERTY_SEPARATOR, '.', $propertyName);
 
-            $filter = $configuredFilters->get(str_replace(':', '.', $propertyName));
+            $filter = $configuredFilters->get($originalPropertyName);
             // this filter is not defined or not applied
             if (null === $filter || !isset($appliedFilters[$propertyName])) {
                 continue;
@@ -234,7 +236,7 @@ final class EntityRepository implements EntityRepositoryInterface
             $rootAlias = current($queryBuilder->getRootAliases());
 
             $filterDataDto = FilterDataDto::new($i, $filter, $rootAlias, $submittedData);
-            $filter->apply($queryBuilder, $filterDataDto, $fields->getByProperty($propertyName), $entityDto);
+            $filter->apply($queryBuilder, $filterDataDto, $fields->getByProperty($originalPropertyName), $entityDto);
 
             ++$i;
         }
