@@ -3,12 +3,12 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Config;
 
 use EasyCorp\Bundle\EasyAdminBundle\Dto\ActionDto;
+use EasyCorp\Bundle\EasyAdminBundle\Intl\PropertyNameHumanizer;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonElement;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonStyle;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonType;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonVariant;
 use Symfony\Contracts\Translation\TranslatableInterface;
-use function Symfony\Component\String\u;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
@@ -67,7 +67,7 @@ final class Action implements \Stringable
         $dto = new ActionDto();
         $dto->setType(self::TYPE_ENTITY);
         $dto->setName($name);
-        $dto->setLabel($label ?? self::humanizeString($name));
+        $dto->setLabel($label ?? PropertyNameHumanizer::humanize($name));
         $dto->setIcon($icon);
         $dto->setHtmlElement(ButtonElement::A);
         $dto->setHtmlAttributes([]);
@@ -111,7 +111,7 @@ final class Action implements \Stringable
             );
         }
 
-        $this->dto->setLabel($label ?? self::humanizeString($this->dto->getName()));
+        $this->dto->setLabel($label ?? PropertyNameHumanizer::humanize($this->dto->getName()));
 
         return $this;
     }
@@ -413,25 +413,5 @@ final class Action implements \Stringable
         }
 
         return $this->dto;
-    }
-
-    private static function humanizeString(string $string): string
-    {
-        $uString = u($string);
-        $upperString = $uString->upper()->toString();
-
-        // this prevents humanizing all-uppercase labels (e.g. 'UUID' -> 'U u i d')
-        // and other special labels which look better in uppercase
-        if ($uString->toString() === $upperString) {
-            return $upperString;
-        }
-
-        return $uString
-            ->replaceMatches('/([A-Z])/', '_$1')
-            ->replaceMatches('/[_\s]+/', ' ')
-            ->trim()
-            ->lower()
-            ->title(true)
-            ->toString();
     }
 }
