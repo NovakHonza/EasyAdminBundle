@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Autocomplete;
 
+use Doctrine\DBAL\Platforms\PostgreSQLPlatform;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Test\AbstractCrudTestCase;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DashboardController;
@@ -61,7 +62,7 @@ class AutocompleteCustomizationTest extends AbstractCrudTestCase
     public function testAutocompleteWithFieldLevelCallback(): void
     {
         // Create a test project
-        $project = $this->createProject('Test Project Alpha');
+        $project = $this->createProject('Unicorn Sparkle');
 
         $this->entityManager->persist($project);
         $this->entityManager->flush();
@@ -72,6 +73,7 @@ class AutocompleteCustomizationTest extends AbstractCrudTestCase
             ->setController(ProjectCrudController::class)
             ->setAction('autocomplete')
             ->set('page', 1)
+            ->set('query', 'Unicorn Sparkle')
             ->set('autocompleteContext', [
                 'crudControllerFqcn' => ProjectIssueWithAutocompleteCrudController::class,
                 'propertyName' => 'project',
@@ -92,7 +94,7 @@ class AutocompleteCustomizationTest extends AbstractCrudTestCase
         // The field-level callback should format as "Project: {name} (ID: {id})"
         $firstResult = $data['results'][0]['entityAsString'];
         $this->assertStringContainsString('Project:', $firstResult);
-        $this->assertStringContainsString('Test Project Alpha', $firstResult);
+        $this->assertStringContainsString('Unicorn Sparkle', $firstResult);
         $this->assertStringContainsString('(ID:', $firstResult);
     }
 
@@ -175,6 +177,10 @@ class AutocompleteCustomizationTest extends AbstractCrudTestCase
 
     public function testAutocompleteReturnsValidJsonStructure(): void
     {
+        if (!class_exists(PostgreSQLPlatform::class)) {
+            $this->markTestSkipped('Doctrine DBAL 3.x+ is required.');
+        }
+
         $project = $this->createProject('JSON Test Project');
 
         $this->entityManager->persist($project);

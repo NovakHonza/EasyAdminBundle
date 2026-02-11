@@ -8,7 +8,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Bill
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\BlogPost;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Customer;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\EntityFactory\Address;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Page;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\ProjectDomain\Developer;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\ProjectDomain\Money;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\ProjectDomain\Project;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\ProjectDomain\ProjectRelease;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\ProjectDomain\ProjectReleaseCategory;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Synthetic\ActionTestEntity;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Synthetic\BatchActionTestEntity;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Synthetic\DefaultCrudTestEntity;
@@ -79,6 +85,8 @@ class AppFixtures extends Fixture
         $this->addSearchTestFixtures($manager);
 
         $this->addActionTestFixtures($manager);
+
+        $this->addProjectDomainSearchFixtures($manager);
 
         $manager->flush();
     }
@@ -604,16 +612,17 @@ class AppFixtures extends Fixture
         // create authors first
         $authors = [];
         $authorData = [
-            ['name' => 'John Smith', 'email' => 'john.smith@example.com'],
-            ['name' => 'Jane Doe', 'email' => 'jane.doe@example.com'],
-            ['name' => 'Alice Johnson', 'email' => 'alice@company.org'],
-            ['name' => 'Bob Williams', 'email' => 'bob.williams@test.net'],
+            ['name' => 'John Smith', 'email' => 'john.smith@example.com', 'addressStreet' => 10, 'addressCity' => 'New York'],
+            ['name' => 'Jane Doe', 'email' => 'jane.doe@example.com', 'addressStreet' => 20, 'addressCity' => 'London'],
+            ['name' => 'Alice Johnson', 'email' => 'alice@company.org', 'addressStreet' => 30, 'addressCity' => 'New York'],
+            ['name' => 'Bob Williams', 'email' => 'bob.williams@test.net', 'addressStreet' => 40, 'addressCity' => 'Paris'],
         ];
 
         foreach ($authorData as $index => $data) {
             $author = new SearchTestAuthor();
             $author->setName($data['name']);
             $author->setEmail($data['email']);
+            $author->setAddress((new Address())->setStreet($data['addressStreet'])->setCity($data['addressCity']));
             $manager->persist($author);
             $authors[$index] = $author;
             $this->addReference('searchAuthor'.$index, $author);
@@ -719,6 +728,84 @@ class AppFixtures extends Fixture
 
             $manager->persist($entity);
             $this->addReference('actionTest'.$index, $entity);
+        }
+    }
+
+    private function addProjectDomainSearchFixtures(ObjectManager $manager): void
+    {
+        // create release categories (separate entities because ProjectRelease→category is OneToOne)
+        $categoryNames = ['Major', 'Minor', 'Major'];
+        $categories = [];
+        foreach ($categoryNames as $index => $name) {
+            $category = new ProjectReleaseCategory();
+            $category->setName($name);
+            $manager->persist($category);
+            $categories[$index] = $category;
+        }
+
+        // create releases
+        $releaseData = [
+            ['name' => 'v1.0', 'categoryIndex' => 0],
+            ['name' => 'v1.1', 'categoryIndex' => 1],
+            ['name' => 'v2.0', 'categoryIndex' => 2],
+        ];
+        $releases = [];
+        foreach ($releaseData as $index => $data) {
+            $release = new ProjectRelease();
+            $release->setName($data['name']);
+            $release->setCategory($categories[$data['categoryIndex']]);
+            $manager->persist($release);
+            $releases[$index] = $release;
+        }
+
+        // create developers
+        $developerNames = ['Alice Dev', 'Bob Dev', 'Carol Dev'];
+        $developers = [];
+        foreach ($developerNames as $index => $name) {
+            $developer = new Developer();
+            $developer->setName($name);
+            $manager->persist($developer);
+            $developers[$index] = $developer;
+        }
+
+        // create projects
+        $defaultDate = new \DateTime('2024-01-01 10:00:00');
+        $defaultDateImmutable = new \DateTimeImmutable('2024-01-01 10:00:00');
+        $defaultTime = new \DateTime('10:00:00');
+        $defaultTimeImmutable = new \DateTimeImmutable('10:00:00');
+
+        $projectData = [
+            ['name' => 'Alpha Project', 'amount' => 1000, 'currency' => 'USD', 'developerIndex' => 0, 'releaseIndex' => 0],
+            ['name' => 'Beta Project', 'amount' => 2000, 'currency' => 'EUR', 'developerIndex' => 1, 'releaseIndex' => 1],
+            ['name' => 'Gamma Project', 'amount' => 3000, 'currency' => 'USD', 'developerIndex' => 2, 'releaseIndex' => 2],
+            ['name' => 'Delta Project', 'amount' => 500, 'currency' => 'GBP', 'developerIndex' => 0, 'releaseIndex' => null],
+        ];
+
+        foreach ($projectData as $data) {
+            $project = new Project();
+            $project->setName($data['name']);
+            $project->setPrice((new Money())->setAmount($data['amount'])->setCurrency($data['currency']));
+            $project->setLeadDeveloper($developers[$data['developerIndex']]);
+            $project->setDescription('Test project '.$data['name']);
+            $project->setStartDateMutable(clone $defaultDate);
+            $project->setStartDateImmutable($defaultDateImmutable);
+            $project->setStartDateTimeMutable(clone $defaultDate);
+            $project->setStartDateTimeImmutable($defaultDateImmutable);
+            $project->setStartDateTimeTzMutable(clone $defaultDate);
+            $project->setStartDateTimeTzImmutable($defaultDateImmutable);
+            $project->setCountInteger(1);
+            $project->setCountSmallint(1);
+            $project->setPriceDecimal('100');
+            $project->setPriceFloat(100.0);
+            $project->setStartTimeMutable(clone $defaultTime);
+            $project->setStartTimeImmutable($defaultTimeImmutable);
+            $project->setStatesSimpleArray(['active']);
+
+            if (null !== $data['releaseIndex']) {
+                $project->setLatestRelease($releases[$data['releaseIndex']]);
+            }
+
+            $manager->persist($project);
         }
     }
 }
