@@ -117,12 +117,6 @@ You can also customize the path and/or route name of CRUD controllers using the
 * ``name``: the value that represents the controller in the full route name
   (e.g. a ``foo_bar`` name here will result in a route named``admin_`` + ``foo_bar`` + ``_<action>``).
 
-.. deprecated:: 4.25.0
-
-    In EasyAdmin versions prior to 4.25.0, instead of ``#[AdminRoute]`` you
-    had to use the ``#[AdminCrud]`` attribute, which is now deprecated and will
-    be removed in EasyAdmin 5.0.0.
-
 Using the same example as above, you can configure the route names and paths of
 the controller as follows::
 
@@ -175,12 +169,6 @@ will be ``admin_product_latest`` and the path will be ``/admin/product/latest-pr
 
     You can combine the ``#[AdminDashboard]``, and ``#[AdminRoute]``
     attributes to customize some or all route names and paths.
-
-.. deprecated:: 4.25.0
-
-    In EasyAdmin versions prior to 4.25.0, instead of ``#[AdminRoute]`` you
-    had to use the ``#[AdminAction]`` attribute, which is now deprecated and
-    will be removed in EasyAdmin 5.0.0.
 
 Page Names and Constants
 ~~~~~~~~~~~~~~~~~~~~~~~~

@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Factory;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -16,7 +17,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\MenuItemDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Http\Logout\LogoutUrlGenerator;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -33,7 +33,6 @@ final readonly class MenuFactory implements MenuFactoryInterface
         private LogoutUrlGenerator $logoutUrlGenerator,
         private AdminUrlGeneratorInterface $adminUrlGenerator,
         private MenuItemMatcherInterface $menuItemMatcher,
-        private CacheItemPoolInterface $cache,
         private ?EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator = null,
     ) {
     }

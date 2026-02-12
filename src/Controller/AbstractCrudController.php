@@ -233,11 +233,7 @@ abstract class AbstractCrudController extends AbstractController implements Crud
             }
 
             if (!$this->isCsrfTokenValid(BooleanField::CSRF_TOKEN_NAME, $context->getRequest()->query->get('csrfToken'))) {
-                if (class_exists(InvalidCsrfTokenException::class)) {
-                    throw new InvalidCsrfTokenException();
-                }
-
-                return new Response('Invalid CSRF token.', 400);
+                throw new InvalidCsrfTokenException();
             }
 
             $fieldName = $context->getRequest()->query->get('fieldName');

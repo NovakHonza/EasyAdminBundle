@@ -37,12 +37,12 @@ final class EntityDto implements \Stringable
 
     public function __toString(): string
     {
-        if (null === $this->instance) {
+        if (null === $this->entityInstance) {
             return '';
         }
 
-        if ($this->instance instanceof \Stringable) {
-            return (string) $this->instance;
+        if ($this->entityInstance instanceof \Stringable) {
+            return (string) $this->entityInstance;
         }
 
         return sprintf('%s #%s', $this->getName(), substr($this->getPrimaryKeyValueAsString(), 0, 16));

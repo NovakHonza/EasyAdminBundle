@@ -5,7 +5,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Router;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Cache;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\CacheKey;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
@@ -17,11 +17,11 @@ use Symfony\Component\Routing\RouteCollection;
 final class AdminRouteGenerator implements AdminRouteGeneratorInterface
 {
     /** @deprecated
-     * @see Cache::ROUTE_NAME_TO_ATTRIBUTES
+     * @see CacheKey::ROUTE_NAME_TO_ATTRIBUTES
      */
     public const CACHE_KEY_ROUTE_TO_FQCN = 'easyadmin.routes.route_to_fqcn';
     /** @deprecated
-     * @see Cache::ROUTE_ATTRIBUTES_TO_NAME
+     * @see CacheKey::ROUTE_ATTRIBUTES_TO_NAME
      */
     public const CACHE_KEY_FQCN_TO_ROUTE = 'easyadmin.routes.fqcn_to_route';
 
@@ -119,7 +119,7 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
 
     public function findRouteName(?string $dashboardFqcn = null, ?string $crudControllerFqcn = null, ?string $actionName = null): ?string
     {
-        $routeAttributesToRouteName = $this->cache->getItem(Cache::ROUTE_ATTRIBUTES_TO_NAME)->get();
+        $routeAttributesToRouteName = $this->cache->getItem(CacheKey::ROUTE_ATTRIBUTES_TO_NAME)->get();
 
         if (null === $dashboardFqcn) {
             $dashboardControllers = iterator_to_array($this->dashboardControllers);
@@ -134,7 +134,7 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
      */
     public function getDashboardRoutes(): array
     {
-        return $this->cache->getItem(Cache::DASHBOARD_FQCN_TO_ROUTE)->get() ?? [];
+        return $this->cache->getItem(CacheKey::DASHBOARD_FQCN_TO_ROUTE)->get() ?? [];
     }
 
     /**
@@ -793,7 +793,7 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
             $dashboardFqcnToRouteName[$dashboardFqcn] = $dashboardRouteConfig['routeName'];
         }
 
-        $dashboardFqcnToRouteNameItem = $this->cache->getItem(Cache::DASHBOARD_FQCN_TO_ROUTE);
+        $dashboardFqcnToRouteNameItem = $this->cache->getItem(CacheKey::DASHBOARD_FQCN_TO_ROUTE);
         $dashboardFqcnToRouteNameItem->set($dashboardFqcnToRouteName);
         $this->cache->save($dashboardFqcnToRouteNameItem);
 
@@ -810,11 +810,11 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
             $routeFqcnToRouteName[$route->getDefault(EA::DASHBOARD_CONTROLLER_FQCN)][$route->getDefault(EA::CRUD_CONTROLLER_FQCN) ?? ''][$route->getDefault(EA::CRUD_ACTION) ?? ''] = $routeName;
         }
 
-        $routeNameToFqcnItem = $this->cache->getItem(Cache::ROUTE_NAME_TO_ATTRIBUTES);
+        $routeNameToFqcnItem = $this->cache->getItem(CacheKey::ROUTE_NAME_TO_ATTRIBUTES);
         $routeNameToFqcnItem->set($routeNameToRouteAttributes);
         $this->cache->save($routeNameToFqcnItem);
 
-        $fqcnToRouteNameItem = $this->cache->getItem(Cache::ROUTE_ATTRIBUTES_TO_NAME);
+        $fqcnToRouteNameItem = $this->cache->getItem(CacheKey::ROUTE_ATTRIBUTES_TO_NAME);
         $fqcnToRouteNameItem->set($routeFqcnToRouteName);
         $this->cache->save($fqcnToRouteNameItem);
     }
@@ -840,11 +840,11 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
             $entityToCrudMap[$entityFqcn][] = $crudController::class;
         }
 
-        $crudToEntityCacheItem = $this->cache->getItem(Cache::CRUD_FQCN_TO_ENTITY_FQCN);
+        $crudToEntityCacheItem = $this->cache->getItem(CacheKey::CRUD_FQCN_TO_ENTITY_FQCN);
         $crudToEntityCacheItem->set($crudToEntityMap);
         $this->cache->save($crudToEntityCacheItem);
 
-        $entityToCrudCacheItem = $this->cache->getItem(Cache::ENTITY_FQCN_TO_CRUD_FQCN);
+        $entityToCrudCacheItem = $this->cache->getItem(CacheKey::ENTITY_FQCN_TO_CRUD_FQCN);
         $entityToCrudCacheItem->set($entityToCrudMap);
         $this->cache->save($entityToCrudCacheItem);
     }

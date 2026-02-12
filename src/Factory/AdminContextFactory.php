@@ -26,11 +26,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\I18nDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\TemplateRegistry;
-use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
+use Symfony\Contracts\Translation\TranslatorInterface;
 use function Symfony\Component\String\u;
 use function Symfony\Component\Translation\t;
 
@@ -47,7 +47,7 @@ final readonly class AdminContextFactory
         private AdminRouteGeneratorInterface $adminRouteGenerator,
         private ActionFactory $actionFactory,
         private ?EntityTranslationIdGeneratorInterface $entityTranslationIdGenerator,
-        private CacheItemPoolInterface $cache,
+        private TranslatorInterface $translator,
     ) {
     }
 
@@ -73,7 +73,7 @@ final readonly class AdminContextFactory
 
         // build sub-contexts
         $requestContext = new RequestContext($request, $user);
-        $crudContext = new CrudContext($crudDto, $entityDto, $searchDto, $this->adminControllers, $this->crudControllers);
+        $crudContext = new CrudContext($crudDto, $entityDto, $searchDto, $this->adminControllers);
         $dashboardContext = new DashboardContext($dashboardDto, $dashboardController::class, $assetDto);
         $i18nContext = new I18nContext($i18nDto, $templateRegistry);
 
@@ -191,7 +191,7 @@ final readonly class AdminContextFactory
         $translationParameters = [];
         if (null !== $crudDto) {
             $translationParameters['%entity_name%'] = basename(str_replace('\\', '/', $crudDto->getEntityFqcn()));
-            $translationParameters['%entity_as_string%'] = null === $entityDto ? '' : $entityDto->toString();
+            $translationParameters['%entity_as_string%'] = null === $entityDto ? '' : (string) $entityDto;
             $translationParameters['%entity_id%'] = $entityId = $request->attributes->get(EA::ENTITY_ID);
             $translationParameters['%entity_short_id%'] = null === $entityId ? null : u($entityId)->truncate(7)->toString();
 
@@ -219,8 +219,8 @@ final readonly class AdminContextFactory
             $crudDto->setEntityLabelInSingular($singularLabel);
             $crudDto->setEntityLabelInPlural($pluralLabel);
 
-            $translationParameters['%entity_label_singular%'] = $singularLabel;
-            $translationParameters['%entity_label_plural%'] = $pluralLabel;
+            $translationParameters['%entity_label_singular%'] = $singularLabel->trans($this->translator, $locale);
+            $translationParameters['%entity_label_plural%'] = $pluralLabel->trans($this->translator, $locale);
         }
 
         return new I18nDto($locale, $textDirection, $translationDomain, $translationParameters);

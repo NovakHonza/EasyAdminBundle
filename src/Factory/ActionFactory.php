@@ -344,12 +344,15 @@ final readonly class ActionFactory
     private function processActionLabel(ActionDto $actionDto, ?EntityDto $entityDto, string $translationDomain, array $defaultTranslationParameters): void
     {
         $label = $actionDto->getLabel();
-        $htmlTitle = trim($actionDto->getHtmlAttributes()['title'] ?? '');
+        $htmlTitle = $actionDto->getHtmlAttributes()['title'] ?? null;
+        $hasHtmlTitle = \is_string($htmlTitle)
+            ? '' !== trim($htmlTitle)
+            : null !== $htmlTitle;
 
         // FALSE means that action doesn't show a visible label in the interface;
         // add an HTML 'title' attribute (unless the user defined one explicitly) to
         // improve accessibility and show the action name on mouse hover
-        if (false === $label && '' === $htmlTitle) {
+        if (false === $label && !$hasHtmlTitle) {
             $actionDto->setHtmlAttribute('title', $actionDto->getName());
 
             return;

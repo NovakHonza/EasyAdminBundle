@@ -188,7 +188,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(4, service(AdminRouteGenerator::class))
             ->arg(5, service(ActionFactory::class))
             ->arg(6, service(EntityTranslationIdGeneratorInterface::class))
-            ->arg(7, service('cache.easyadmin'))
+            ->arg(7, service('translator'))
 
         ->set(AdminUrlGenerator::class)
             // I don't know if we truly need the share() method to get a new instance of the
@@ -210,9 +210,7 @@ return static function (ContainerConfigurator $container) {
             ->tag('cache.pool')
 
         ->set(AdminControllerRegistry::class)
-            ->arg(0, '%kernel.build_dir%')
-            ->arg(1, abstract_arg('CRUD controller FQCN to Entity FQCN map'))
-            ->arg(2, abstract_arg('Dashboard controller FQCNs'))
+            ->arg(0, service('cache.easyadmin'))
 
         ->set(AdminRouteGenerator::class)
             ->arg(0, tagged_iterator(EasyAdminExtension::TAG_DASHBOARD_CONTROLLER))
@@ -231,8 +229,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(2, service('security.logout_url_generator'))
             ->arg(3, service(AdminUrlGenerator::class))
             ->arg(4, service(MenuItemMatcherInterface::class))
-            ->arg(5, service('cache.easyadmin'))
-            ->arg(6, service(EntityTranslationIdGeneratorInterface::class))
+            ->arg(5, service(EntityTranslationIdGeneratorInterface::class))
 
         ->set(MenuItemMatcher::class)
             ->arg(0, service(AdminUrlGenerator::class))
@@ -411,7 +408,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(1, service(EntityFactory::class))
             ->arg(2, service(ControllerFactory::class))
             ->arg(3, new Reference(FieldFactory::class))
-            ->arg(4, service('cache.easyadmin'))
+            ->arg(4, service(AdminContextProvider::class))
 
         ->set(SlugConfigurator::class)
 
