@@ -1,22 +1,23 @@
 <?php
 
-namespace EasyCorp\Bundle\EasyAdminBundle\Intl;
+namespace EasyCorp\Bundle\EasyAdminBundle\Generator;
 
 use function Symfony\Component\String\u;
 
 /**
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
-final class PropertyNameHumanizer
+final class LabelGenerator
 {
     /**
-     * Converts property names from camelCase to a human-readable format.
+     * Converts a given string into another string ready to be used as a label for the public UI.
      * Examples:
-     *   - 'name' -> 'Name'
-     *   - 'firstName' -> 'First Name'
-     *   - 'projectManager' -> 'Project Manager'
-     *   - 'address.city' -> 'Address City'
-     *   - 'id' -> 'ID'.
+     *
+     *     'name' -> 'Name'
+     *     'firstName' -> 'First Name'
+     *     'projectManager' -> 'Project Manager'
+     *     'address.city' -> 'Address City'
+     *     'id' -> 'ID'
      */
     public static function humanize(string $string): string
     {

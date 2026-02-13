@@ -3,7 +3,7 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Config;
 
 use EasyCorp\Bundle\EasyAdminBundle\Dto\ActionDto;
-use EasyCorp\Bundle\EasyAdminBundle\Intl\PropertyNameHumanizer;
+use EasyCorp\Bundle\EasyAdminBundle\Generator\LabelGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonElement;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonStyle;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonType;
@@ -67,7 +67,7 @@ final class Action implements \Stringable
         $dto = new ActionDto();
         $dto->setType(self::TYPE_ENTITY);
         $dto->setName($name);
-        $dto->setLabel($label ?? PropertyNameHumanizer::humanize($name));
+        $dto->setLabel($label ?? LabelGenerator::humanize($name));
         $dto->setIcon($icon);
         $dto->setHtmlElement(ButtonElement::A);
         $dto->setHtmlAttributes([]);
@@ -111,7 +111,7 @@ final class Action implements \Stringable
             );
         }
 
-        $this->dto->setLabel($label ?? PropertyNameHumanizer::humanize($this->dto->getName()));
+        $this->dto->setLabel($label ?? LabelGenerator::humanize($this->dto->getName()));
 
         return $this;
     }

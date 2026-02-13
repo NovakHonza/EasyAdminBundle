@@ -3,7 +3,7 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Config;
 
 use EasyCorp\Bundle\EasyAdminBundle\Dto\ActionGroupDto;
-use EasyCorp\Bundle\EasyAdminBundle\Intl\PropertyNameHumanizer;
+use EasyCorp\Bundle\EasyAdminBundle\Generator\LabelGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Twig\Component\Option\ButtonVariant;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
@@ -36,7 +36,7 @@ final class ActionGroup implements \Stringable
         $dto = new ActionGroupDto();
         $dto->setType(self::TYPE_ENTITY);
         $dto->setName($name);
-        $dto->setLabel($label ?? PropertyNameHumanizer::humanize($name));
+        $dto->setLabel($label ?? LabelGenerator::humanize($name));
         $dto->setIcon($icon);
         $dto->setCssClass('');
         $dto->setActions([]);
@@ -82,7 +82,7 @@ final class ActionGroup implements \Stringable
      */
     public function setLabel(TranslatableInterface|string|false|null $label): self
     {
-        $this->dto->setLabel($label ?? PropertyNameHumanizer::humanize($this->dto->getName()));
+        $this->dto->setLabel($label ?? LabelGenerator::humanize($this->dto->getName()));
 
         return $this;
     }

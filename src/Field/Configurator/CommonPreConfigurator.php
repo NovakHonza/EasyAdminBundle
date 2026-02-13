@@ -15,7 +15,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
-use EasyCorp\Bundle\EasyAdminBundle\Intl\PropertyNameHumanizer;
+use EasyCorp\Bundle\EasyAdminBundle\Generator\LabelGenerator;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
@@ -145,7 +145,7 @@ final class CommonPreConfigurator implements FieldConfiguratorInterface
         if (null === $label = $field->getLabel()) {
             $label = $useEntityTranslations
                 ? $this->entityTranslationIdGenerator->generateForProperty($entityDto->getFqcn(), $field->getProperty())
-                : PropertyNameHumanizer::humanize($field->getProperty());
+                : LabelGenerator::humanize($field->getProperty());
         }
 
         if ('' === $label || false === $label) {
