@@ -300,7 +300,7 @@ class FormLayoutFactoryTest extends TestCase
      */
     public function testTabLabelTranslation(TranslatableInterface|string $label, string $expectedTabId): void
     {
-        $fields = FieldCollection::new([
+        $fields = new FieldCollection([
             FormField::addTab($label),
             TextField::new('some_field'),
         ]);
@@ -362,7 +362,7 @@ class FormLayoutFactoryTest extends TestCase
 
     private function createFormFieldsFromConfig(array $fieldDefinition): FieldCollection
     {
-        return FieldCollection::new($this->doCreateFormFields($fieldDefinition));
+        return new FieldCollection($this->doCreateFormFields($fieldDefinition));
     }
 
     private function createFormFieldsFromLayout(string $layoutDescription): FieldCollection

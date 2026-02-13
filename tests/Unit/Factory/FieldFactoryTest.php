@@ -41,7 +41,7 @@ class FieldFactoryTest extends KernelTestCase
 
     public function testEmpty(): void
     {
-        $fieldCollection = FieldCollection::new([]);
+        $fieldCollection = new FieldCollection([]);
 
         $this->fieldFactory->processFields($this->projectDto, $fieldCollection, Crud::PAGE_INDEX);
 
@@ -53,7 +53,7 @@ class FieldFactoryTest extends KernelTestCase
      */
     public function testRemovesFieldsOnPage(string $pageName, FieldInterface $field): void
     {
-        $fieldCollection = FieldCollection::new([$field]);
+        $fieldCollection = new FieldCollection([$field]);
 
         $this->fieldFactory->processFields($this->projectDto, $fieldCollection, $pageName);
 
@@ -89,7 +89,7 @@ class FieldFactoryTest extends KernelTestCase
      */
     public function testKeepsFieldsOnPage(string $pageName, FieldInterface $field): void
     {
-        $fieldCollection = FieldCollection::new([$field]);
+        $fieldCollection = new FieldCollection([$field]);
 
         $this->fieldFactory->processFields($this->projectDto, $fieldCollection, $pageName);
 
@@ -136,7 +136,7 @@ class FieldFactoryTest extends KernelTestCase
      */
     public function testStringNamesAreTurnedIntoFields(string $property, string $expectedField): void
     {
-        $fieldCollection = FieldCollection::new([$property]);
+        $fieldCollection = new FieldCollection([$property]);
 
         $this->fieldFactory->processFields($this->projectDto, $fieldCollection, Crud::PAGE_INDEX);
 
