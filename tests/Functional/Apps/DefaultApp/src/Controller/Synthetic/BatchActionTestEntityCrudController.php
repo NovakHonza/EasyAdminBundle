@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\Synthetic;
 
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
@@ -55,6 +56,7 @@ class BatchActionTestEntityCrudController extends AbstractCrudController
             ->addBatchAction($batchDeactivate);
     }
 
+    #[AdminRoute('/batch-activate', 'batch_activate', options: ['methods' => ['POST']])]
     public function batchActivate(AdminContext $context, BatchActionDto $batchActionDto): Response
     {
         $entityManager = $this->container->get('doctrine')->getManagerForClass($batchActionDto->getEntityFqcn());
@@ -75,6 +77,7 @@ class BatchActionTestEntityCrudController extends AbstractCrudController
         return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());
     }
 
+    #[AdminRoute('/batch-deactivate', 'batch_deactivate', options: ['methods' => ['POST']])]
     public function batchDeactivate(AdminContext $context, BatchActionDto $batchActionDto): Response
     {
         $entityManager = $this->container->get('doctrine')->getManagerForClass($batchActionDto->getEntityFqcn());

@@ -44,4 +44,10 @@ if (EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\AdminRouteApp\Kernel::
     $configuration['uid']['time_based_uuid_version'] = 1;
 }
 
+if (Symfony\Component\HttpKernel\Kernel::VERSION_ID >= 70300) {
+    $configuration['property_info'] = [
+        'with_constructor_extractor' => true,
+    ];
+}
+
 $container->loadFromExtension('framework', $configuration);

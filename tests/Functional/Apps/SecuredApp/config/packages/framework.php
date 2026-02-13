@@ -20,5 +20,10 @@ $configuration = [
 if (Kernel::MAJOR_VERSION >= 6) {
     $configuration['handle_all_throwables'] = true;
 }
+if (Symfony\Component\HttpKernel\Kernel::VERSION_ID >= 70300) {
+    $configuration['property_info'] = [
+        'with_constructor_extractor' => true,
+    ];
+}
 
 $container->loadFromExtension('framework', $configuration);

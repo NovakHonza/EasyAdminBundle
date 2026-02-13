@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\Synthetic;
 
+use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminRoute;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
@@ -145,6 +146,7 @@ class ActionTestEntityCrudController extends AbstractCrudController
         return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());
     }
 
+    #[AdminRoute('/{entityId}/activate-entity', 'activate_entity')]
     public function activateEntity(AdminContext $context): Response
     {
         /** @var ActionTestEntity $entity */
@@ -159,6 +161,7 @@ class ActionTestEntityCrudController extends AbstractCrudController
         return $this->redirect($this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl());
     }
 
+    #[AdminRoute('/{entityId}/deactivate-entity', 'deactivate_entity')]
     public function deactivateEntity(AdminContext $context): Response
     {
         /** @var ActionTestEntity $entity */
