@@ -4,6 +4,9 @@ on:
         branches:
             - "5.x"
     pull_request:
+    schedule:
+        - cron: '15 3 * * *'
+    workflow_dispatch:
 
 concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
@@ -26,6 +29,17 @@ jobs:
                   coverage: none
                   tools: composer:2.8
 
+            - name: Get Composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Composer dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: phpstan-${{ runner.os }}-php84-${{ hashFiles('composer.json') }}
+                  restore-keys: phpstan-${{ runner.os }}-php84-
+
             - name: Install dependencies
               run: |
                   composer install --no-interaction --no-progress --prefer-dist
@@ -40,16 +54,7 @@ jobs:
             fail-fast: false
             matrix:
                 include:
-                    # Latest Symfony version support
-                    - os: macos-latest
-                      php_version: "8.4"
-                      symfony_version: "8.0.*"
-                      stability: "stable"
-                    - os: windows-latest
-                      php_version: "8.4"
-                      symfony_version: "8.0.*"
-                      stability: "stable"
-                    # LTS Symfony version support
+                    # LTS Symfony version on macOS and Windows (platform-specific issues)
                     - os: macos-latest
                       php_version: "8.4"
                       symfony_version: "7.4.*"
@@ -109,6 +114,18 @@ jobs:
                   ini-values: date.timezone=UTC
                   tools: composer:2.8
 
+            - name: Get Composer cache directory
+              id: composer-cache
+              shell: bash
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Composer dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: phpunit-${{ runner.os }}-php${{ matrix.php_version }}-${{ matrix.symfony_version || 'default' }}-${{ matrix.composer_args || 'normal' }}-${{ matrix.stability }}-${{ hashFiles('composer.json') }}
+                  restore-keys: phpunit-${{ runner.os }}-php${{ matrix.php_version }}-
+
             - name: symfony/flex is required to install the correct symfony version
               if: ${{ matrix.symfony_version }}
               run: |
@@ -142,7 +159,15 @@ jobs:
 
             - name: Run tests (Windows)
               if: ${{ runner.os == 'Windows' }}
-              run: vendor/bin/simple-phpunit
+              shell: pwsh
+              run: |
+                  $cacheDir = php -r "echo sys_get_temp_dir();"
+                  $cacheDir = Join-Path $cacheDir "com.github.easycorp.easyadmin/tests/var/test/cache"
+                  if (Test-Path $cacheDir) { Remove-Item -Recurse -Force $cacheDir }
+                  if (-not $env:SYMFONY_DEPRECATIONS_HELPER) { $env:SYMFONY_DEPRECATIONS_HELPER = "ignoreFile=./tests/baseline-ignore.txt" }
+                  php vendor/bin/simple-phpunit -v
+              env:
+                  SYMFONY_DEPRECATIONS_HELPER: ${{ matrix.symfony_deprecations_helper || '' }}
 
     php-linter:
         runs-on: ubuntu-latest
@@ -182,6 +207,17 @@ jobs:
                   coverage: none
                   tools: composer:2.8
 
+            - name: Get Composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Composer dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: css-${{ runner.os }}-${{ hashFiles('composer.json') }}
+                  restore-keys: css-${{ runner.os }}-
+
             - name: Install dependencies
               run: |
                   composer install --no-interaction --no-progress --prefer-dist
@@ -203,6 +239,17 @@ jobs:
                   coverage: none
                   tools: composer:2.8
 
+            - name: Get Composer cache directory
+              id: composer-cache
+              run: echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+            - name: Cache Composer dependencies
+              uses: actions/cache@v4
+              with:
+                  path: ${{ steps.composer-cache.outputs.dir }}
+                  key: twig-${{ runner.os }}-${{ hashFiles('composer.json') }}
+                  restore-keys: twig-${{ runner.os }}-
+
             - name: Install dependencies
               run: |
                   composer install --no-interaction --no-progress --prefer-dist
@@ -216,9 +263,10 @@ jobs:
         timeout-minutes: 10
         steps:
             - uses: actions/checkout@v6
-            - run: npm i -g corepack && corepack enable
+            - run: corepack enable
             - uses: actions/setup-node@v6
               with:
                   cache: 'yarn'
+                  cache-dependency-path: 'yarn.lock'
             - run: yarn --immutable
             - run: yarn ci
