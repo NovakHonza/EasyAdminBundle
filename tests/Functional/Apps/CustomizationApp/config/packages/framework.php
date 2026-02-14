@@ -25,7 +25,6 @@ $configuration = [
     'profiler' => [
         'enabled' => true,
         'collect' => false,
-        'collect_serializer_data' => true,
     ],
 ];
 
@@ -37,16 +36,6 @@ if (Symfony\Component\HttpKernel\Kernel::VERSION_ID >= 70300) {
     $configuration['property_info'] = [
         'with_constructor_extractor' => true,
     ];
-}
-
-if (Symfony\Component\HttpKernel\Kernel::VERSION_ID >= 70300) {
-    $configuration['property_info'] = [
-        'with_constructor_extractor' => true,
-    ];
-}
-
-if (Symfony\Component\HttpKernel\Kernel::VERSION_ID < 60000) {
-    unset($configuration['profiler']['collect_serializer_data']);
 }
 
 $container->loadFromExtension('framework', $configuration);
