@@ -2,7 +2,10 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\AdminRoute;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Menu\CrudMenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\AdminRouteApp\Entity\Product;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\AdminRouteApp\Kernel;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Filesystem\Filesystem;
@@ -600,6 +603,13 @@ class AdminRouteTest extends WebTestCase
         $client->request('GET', '/admin/legacy-crud/export');
         $this->assertResponseIsSuccessful();
         $this->assertSame('Legacy export action', $client->getResponse()->getContent());
+    }
+
+    public function testLegacyLinkToCrudMenuItemStillWorks(): void
+    {
+        $menuItem = MenuItem::linkToCrud('Products', 'fas fa-box', Product::class);
+
+        $this->assertInstanceOf(CrudMenuItem::class, $menuItem);
     }
 
     public function testAdminDashboardAdvancedRouteOptions(): void

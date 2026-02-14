@@ -6,7 +6,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -37,7 +37,7 @@ class SecondDashboardController extends AbstractDashboardController
         yield MenuItem::section('Second Dashboard Content');
 
         // only Categories, not Blog Posts
-        yield MenuItem::linkToCrud('Manage Categories', 'fas fa-folder', Category::class);
+        yield MenuItem::linkTo(CategoryCrudController::class, 'Manage Categories', 'fas fa-folder');
 
         // different external links
         yield MenuItem::section('Links');

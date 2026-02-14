@@ -9,7 +9,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ColorScheme;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\CustomizationApp\Controller\DemoEntityCrudController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\CustomizationApp\Entity\DemoEntity;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -37,6 +36,6 @@ class ColorSchemeTestDashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linktoDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Demo', 'fas fa-list', DemoEntity::class);
+        yield MenuItem::linkTo(DemoEntityCrudController::class, 'Demo', 'fas fa-list');
     }
 }

@@ -6,6 +6,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Factory\MenuFactoryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
@@ -117,6 +119,18 @@ final class MenuFactory implements MenuFactoryInterface
                 } else {
                     $label = basename(str_replace('\\', '/', $menuItemDto->getRouteParameters()[EA::ENTITY_FQCN]));
                 }
+            } elseif (null === $label && MenuItemDto::TYPE_CONTROLLER === $menuItemDto->getType()) {
+                $controllerFqcn = $menuItemDto->getRouteParameters()[EA::CRUD_CONTROLLER_FQCN];
+                if ($isUseEntityTranslations && is_a($controllerFqcn, CrudControllerInterface::class, true)) {
+                    $entityFqcn = $controllerFqcn::getEntityFqcn();
+                    $action = $menuItemDto->getRouteParameters()[EA::CRUD_ACTION] ?? Action::INDEX;
+                    $label = Action::INDEX === $action
+                        ? $this->entityTranslationIdGenerator->generateForEntity($entityFqcn, false)
+                        : $this->entityTranslationIdGenerator->generateForEntity($entityFqcn, true);
+                } else {
+                    $label = basename(str_replace('\\', '/', $controllerFqcn));
+                    $label = preg_replace('/(Crud)?Controller$/', '', $label);
+                }
             } else {
                 $label = '' === $label ? $label : t($label, $menuItemDto->getTranslationParameters(), $translationDomain);
             }
@@ -169,6 +183,42 @@ final class MenuFactory implements MenuFactoryInterface
 
                 $this->adminUrlGenerator->setController($controllerFqcn);
                 $this->adminUrlGenerator->unset(EA::ENTITY_FQCN);
+            }
+
+            return $this->adminUrlGenerator->generateUrl();
+        }
+
+        if (MenuItemDto::TYPE_CONTROLLER === $menuItemType) {
+            $routeParameters = $menuItemDto->getRouteParameters();
+            $controllerFqcn = $routeParameters[EA::CRUD_CONTROLLER_FQCN];
+
+            $this->adminUrlGenerator->unsetAll();
+
+            if (is_a($controllerFqcn, DashboardControllerInterface::class, true)) {
+                return $this->adminUrlGenerator
+                    ->setDashboard($controllerFqcn)
+                    ->generateUrl();
+            }
+
+            $action = $routeParameters[EA::CRUD_ACTION] ?? null;
+            if (null === $action) {
+                if (is_a($controllerFqcn, CrudControllerInterface::class, true)) {
+                    $action = Action::INDEX;
+                } elseif (method_exists($controllerFqcn, '__invoke')) {
+                    $action = '__invoke';
+                } else {
+                    throw new \RuntimeException(sprintf('The menu item that links to the "%s" controller must call "->setAction()" to specify which action to link to, because the controller defines multiple actions and is not invokable.', $controllerFqcn));
+                }
+            }
+
+            $this->adminUrlGenerator->setController($controllerFqcn);
+            $this->adminUrlGenerator->setAction($action);
+
+            if (null !== ($routeParameters[EA::ENTITY_ID] ?? null)) {
+                $this->adminUrlGenerator->setEntityId($routeParameters[EA::ENTITY_ID]);
+            }
+            if (isset($routeParameters[EA::SORT])) {
+                $this->adminUrlGenerator->set(EA::SORT, $routeParameters[EA::SORT]);
             }
 
             return $this->adminUrlGenerator->generateUrl();

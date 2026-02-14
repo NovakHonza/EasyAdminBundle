@@ -6,7 +6,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
 use Symfony\Component\HttpFoundation\Response;
 
 #[AdminDashboard('/admin', 'secured_admin')]
@@ -26,7 +25,6 @@ class SecuredDashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
-        yield MenuItem::linkToCrud('Categories', 'fas fa-tags', Category::class)
-            ->setController(CategoryCrudController::class);
+        yield MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fas fa-tags');
     }
 }
