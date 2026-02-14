@@ -25,16 +25,6 @@ final class ActionCollection implements \ArrayAccess, \Countable, \IteratorAggre
     }
 
     /**
-     * @deprecated since 4.28.2 and removed in 5.0.0, use FilterCollection::__construct() instead.
-     *
-     * @param array<string, ActionDto|ActionGroupDto> $actions
-     */
-    public static function new(array $actions): self
-    {
-        return new self($actions);
-    }
-
-    /**
      * @return array<string, ActionDto|ActionGroupDto>
      */
     public function all(): array
