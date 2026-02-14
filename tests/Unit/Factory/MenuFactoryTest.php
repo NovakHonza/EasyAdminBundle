@@ -2,7 +2,9 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Unit\Factory;
 
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Config\UserMenu;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Context\I18nContext;
@@ -27,6 +29,7 @@ class MenuFactoryTest extends TestCase
     private AdminUrlGeneratorInterface $adminUrlGenerator;
     private MenuItemMatcherInterface $menuItemMatcher;
     private MenuFactory $menuFactory;
+    private EntityTranslationIdGeneratorInterface $translationIdGenerator;
 
     protected function setUp(): void
     {
@@ -35,7 +38,7 @@ class MenuFactoryTest extends TestCase
         $this->logoutUrlGenerator = $this->createMock(LogoutUrlGenerator::class);
         $this->adminUrlGenerator = $this->createMock(AdminUrlGeneratorInterface::class);
         $this->menuItemMatcher = $this->createMock(MenuItemMatcherInterface::class);
-        $entityTranslationIdGenerator = $this->createMock(EntityTranslationIdGeneratorInterface::class);
+        $this->translationIdGenerator = $this->createMock(EntityTranslationIdGeneratorInterface::class);
 
         $this->menuFactory = new MenuFactory(
             $this->adminContextProvider,
@@ -43,7 +46,7 @@ class MenuFactoryTest extends TestCase
             $this->logoutUrlGenerator,
             $this->adminUrlGenerator,
             $this->menuItemMatcher,
-            $entityTranslationIdGenerator,
+            $this->translationIdGenerator,
         );
     }
 
@@ -244,6 +247,112 @@ class MenuFactoryTest extends TestCase
         $this->assertTrue($result->isNameDisplayed());
     }
 
+    public function testCreateMainMenuGeneratesUrlsForControllerTypeCrud(): void
+    {
+        $this->setupAdminContext();
+        $this->authChecker->method('isGranted')->willReturn(true);
+        $this->adminUrlGenerator->method('unsetAll')->willReturnSelf();
+        $this->adminUrlGenerator->method('setController')->willReturnSelf();
+        $this->adminUrlGenerator->method('setAction')->willReturnSelf();
+        $this->adminUrlGenerator->method('generateUrl')->willReturn('/admin/category');
+        $this->menuItemMatcher->method('markSelectedMenuItem')->willReturnArgument(0);
+
+        $menuItem = $this->createControllerMenuItem(
+            'EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController',
+            'Categories',
+        );
+
+        $result = $this->menuFactory->createMainMenu([$menuItem]);
+
+        $items = $result->getItems();
+        $this->assertSame('/admin/category', $items[0]->getLinkUrl());
+    }
+
+    public function testCreateMainMenuGeneratesUrlsForControllerTypeDashboard(): void
+    {
+        $this->setupAdminContext();
+        $this->authChecker->method('isGranted')->willReturn(true);
+        $this->adminUrlGenerator->method('unsetAll')->willReturnSelf();
+        $this->adminUrlGenerator->method('setDashboard')->willReturnSelf();
+        $this->adminUrlGenerator->method('generateUrl')->willReturn('/admin');
+        $this->menuItemMatcher->method('markSelectedMenuItem')->willReturnArgument(0);
+
+        $menuItem = $this->createControllerMenuItem(
+            'EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DashboardController',
+            'Dashboard',
+        );
+
+        $result = $this->menuFactory->createMainMenu([$menuItem]);
+
+        $items = $result->getItems();
+        $this->assertSame('/admin', $items[0]->getLinkUrl());
+    }
+
+    public function testCreateMainMenuGeneratesUrlsForControllerTypeWithExplicitAction(): void
+    {
+        $this->setupAdminContext();
+        $this->authChecker->method('isGranted')->willReturn(true);
+        $this->adminUrlGenerator->method('unsetAll')->willReturnSelf();
+        $this->adminUrlGenerator->method('setController')->willReturnSelf();
+        $this->adminUrlGenerator->method('setAction')->willReturnSelf();
+        $this->adminUrlGenerator->method('generateUrl')->willReturn('/admin/category/new');
+        $this->menuItemMatcher->method('markSelectedMenuItem')->willReturnArgument(0);
+
+        $menuItem = $this->createControllerMenuItem(
+            'EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController',
+            'New Category',
+            Action::NEW,
+        );
+
+        $result = $this->menuFactory->createMainMenu([$menuItem]);
+
+        $items = $result->getItems();
+        $this->assertSame('/admin/category/new', $items[0]->getLinkUrl());
+    }
+
+    public function testCreateMainMenuGeneratesUrlsForControllerTypeWithEntityId(): void
+    {
+        $this->setupAdminContext();
+        $this->authChecker->method('isGranted')->willReturn(true);
+        $this->adminUrlGenerator->method('unsetAll')->willReturnSelf();
+        $this->adminUrlGenerator->method('setController')->willReturnSelf();
+        $this->adminUrlGenerator->method('setAction')->willReturnSelf();
+        $this->adminUrlGenerator->method('setEntityId')->willReturnSelf();
+        $this->adminUrlGenerator->method('generateUrl')->willReturn('/admin/category/42/edit');
+        $this->menuItemMatcher->method('markSelectedMenuItem')->willReturnArgument(0);
+
+        $menuItem = $this->createControllerMenuItemWithEntityId(
+            'EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController',
+            'Edit Category',
+            Action::EDIT,
+            42,
+        );
+
+        $result = $this->menuFactory->createMainMenu([$menuItem]);
+
+        $items = $result->getItems();
+        $this->assertSame('/admin/category/42/edit', $items[0]->getLinkUrl());
+    }
+
+    public function testControllerTypeThrowsForMultiActionNonInvokableController(): void
+    {
+        $this->setupAdminContext();
+        $this->authChecker->method('isGranted')->willReturn(true);
+        $this->adminUrlGenerator->method('unsetAll')->willReturnSelf();
+        $this->menuItemMatcher->method('markSelectedMenuItem')->willReturnArgument(0);
+
+        // Use a class that is not a CRUD controller, not a Dashboard, and not invokable
+        $menuItem = $this->createControllerMenuItem(
+            self::class,
+            'Bad Item',
+        );
+
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('must call "->setAction()"');
+
+        $this->menuFactory->createMainMenu([$menuItem]);
+    }
+
     private function setupAdminContext(): void
     {
         $request = new Request();
@@ -322,6 +431,34 @@ class MenuFactoryTest extends TestCase
         $item->setType(MenuItemDto::TYPE_SUBMENU);
         $item->setLabel($label);
         $item->setSubItems($subItems);
+
+        return $item;
+    }
+
+    private function createControllerMenuItem(string $controllerFqcn, string $label, ?string $action = null): MenuItemDto
+    {
+        $item = new MenuItemDto();
+        $item->setType(MenuItemDto::TYPE_CONTROLLER);
+        $item->setLabel($label);
+        $item->setRouteParameters([
+            EA::CRUD_CONTROLLER_FQCN => $controllerFqcn,
+            EA::CRUD_ACTION => $action,
+            EA::ENTITY_ID => null,
+        ]);
+
+        return $item;
+    }
+
+    private function createControllerMenuItemWithEntityId(string $controllerFqcn, string $label, string $action, int|string $entityId): MenuItemDto
+    {
+        $item = new MenuItemDto();
+        $item->setType(MenuItemDto::TYPE_CONTROLLER);
+        $item->setLabel($label);
+        $item->setRouteParameters([
+            EA::CRUD_CONTROLLER_FQCN => $controllerFqcn,
+            EA::CRUD_ACTION => $action,
+            EA::ENTITY_ID => $entityId,
+        ]);
 
         return $item;
     }

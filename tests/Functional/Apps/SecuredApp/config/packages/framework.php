@@ -32,5 +32,10 @@ if (Symfony\Component\HttpKernel\Kernel::VERSION_ID >= 70300) {
         'with_constructor_extractor' => true,
     ];
 }
+if (Symfony\Component\HttpKernel\Kernel::VERSION_ID >= 70300) {
+    $configuration['property_info'] = [
+        'with_constructor_extractor' => true,
+    ];
+}
 
 $container->loadFromExtension('framework', $configuration);

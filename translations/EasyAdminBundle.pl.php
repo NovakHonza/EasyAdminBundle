@@ -74,7 +74,7 @@ return [
     ],
 
     'action_confirmation_modal' => [
-        'title' => 'Czy na pewno chcesz %action_name%?',
+        'title' => 'Czy na pewno chcesz wykonać akcję "%action_name%"?',
         'action' => 'Potwierdź',
     ],
 

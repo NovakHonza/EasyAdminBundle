@@ -39,7 +39,7 @@ class FilterFactoryTest extends TestCase
         $filterConfig->addFilter(TextFilter::new('name'));
 
         $entityDto = $this->createEntityDto(['name' => Types::STRING]);
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $result = $this->filterFactory->create($filterConfig, $fields, $entityDto);
 
@@ -59,7 +59,7 @@ class FilterFactoryTest extends TestCase
         $filterConfig->addFilter($propertyName);
 
         $entityDto = $this->createEntityDto([$propertyName => $doctrineType]);
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $result = $this->filterFactory->create($filterConfig, $fields, $entityDto);
 
@@ -105,7 +105,7 @@ class FilterFactoryTest extends TestCase
         $filterConfig->addFilter('category');
 
         $entityDto = $this->createEntityDtoWithAssociation('category', 'App\Entity\Category');
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $result = $this->filterFactory->create($filterConfig, $fields, $entityDto);
 
@@ -127,7 +127,7 @@ class FilterFactoryTest extends TestCase
             'isActive' => Types::BOOLEAN,
             'createdAt' => Types::DATETIME_MUTABLE,
         ]);
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $result = $this->filterFactory->create($filterConfig, $fields, $entityDto);
 
@@ -149,7 +149,7 @@ class FilterFactoryTest extends TestCase
         $filterConfig->addFilter(TextFilter::new('name'));
 
         $entityDto = $this->createEntityDto(['name' => Types::STRING]);
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $this->filterFactory->create($filterConfig, $fields, $entityDto);
     }
@@ -166,7 +166,7 @@ class FilterFactoryTest extends TestCase
         $filterConfig->addFilter(TextFilter::new('name'));
 
         $entityDto = $this->createEntityDto(['name' => Types::STRING]);
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $this->filterFactory->create($filterConfig, $fields, $entityDto);
     }
@@ -177,7 +177,7 @@ class FilterFactoryTest extends TestCase
 
         $filterConfig = new FilterConfigDto();
         $entityDto = $this->createEntityDto([]);
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $result = $this->filterFactory->create($filterConfig, $fields, $entityDto);
 
@@ -192,7 +192,7 @@ class FilterFactoryTest extends TestCase
         $filterConfig->addFilter('address');
 
         $entityDto = $this->createEntityDtoWithEmbedded('address');
-        $fields = FieldCollection::new([]);
+        $fields = new FieldCollection([]);
 
         $result = $this->filterFactory->create($filterConfig, $fields, $entityDto);
 

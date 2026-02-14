@@ -37,11 +37,11 @@ class CrudFormTypeTest extends TypeTestCase
 
         if ($useLayout) {
             $fieldCollection = (new FormLayoutFactory(new IdentityTranslator()))->createLayout(
-                FieldCollection::new([$field]),
+                new FieldCollection([$field]),
                 Crud::PAGE_NEW,
             );
         } else {
-            $fieldCollection = FieldCollection::new([$field]);
+            $fieldCollection = new FieldCollection([$field]);
         }
 
         $form = $this->factory->create(CrudFormType::class, null, [
@@ -74,11 +74,11 @@ class CrudFormTypeTest extends TypeTestCase
     {
         if ($useLayout) {
             $fieldCollection = (new FormLayoutFactory(new IdentityTranslator()))->createLayout(
-                FieldCollection::new([$field]),
+                new FieldCollection([$field]),
                 Crud::PAGE_NEW,
             );
         } else {
-            $fieldCollection = FieldCollection::new([$field]);
+            $fieldCollection = new FieldCollection([$field]);
         }
 
         $form = $this->factory->create(CrudFormType::class, null, [

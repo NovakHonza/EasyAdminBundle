@@ -49,8 +49,8 @@ class EntityRepositoryTest extends TestCase
     {
         $searchDto = $this->createSearchDto();
         $entityDto = $this->createEntityDto();
-        $fields = FieldCollection::new([]);
-        $filters = FilterCollection::new();
+        $fields = new FieldCollection([]);
+        $filters = new FilterCollection();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('select')->willReturnSelf();
@@ -76,8 +76,8 @@ class EntityRepositoryTest extends TestCase
     {
         $searchDto = $this->createSearchDto();
         $entityDto = $this->createEntityDto();
-        $fields = FieldCollection::new([]);
-        $filters = FilterCollection::new();
+        $fields = new FieldCollection([]);
+        $filters = new FilterCollection();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('select')->willReturnSelf();
@@ -100,8 +100,8 @@ class EntityRepositoryTest extends TestCase
     {
         $searchDto = $this->createSearchDto('', ['name' => 'ASC']);
         $entityDto = $this->createEntityDto();
-        $fields = FieldCollection::new([]);
-        $filters = FilterCollection::new();
+        $fields = new FieldCollection([]);
+        $filters = new FilterCollection();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('select')->willReturnSelf();
@@ -126,8 +126,8 @@ class EntityRepositoryTest extends TestCase
     {
         $searchDto = $this->createSearchDto('', ['name' => 'ASC', 'createdAt' => 'DESC']);
         $entityDto = $this->createEntityDto();
-        $fields = FieldCollection::new([]);
-        $filters = FilterCollection::new();
+        $fields = new FieldCollection([]);
+        $filters = new FilterCollection();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('select')->willReturnSelf();
@@ -152,8 +152,8 @@ class EntityRepositoryTest extends TestCase
     {
         $searchDto = $this->createSearchDto('', [], null);
         $entityDto = $this->createEntityDto();
-        $fields = FieldCollection::new([]);
-        $filters = FilterCollection::new();
+        $fields = new FieldCollection([]);
+        $filters = new FilterCollection();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('select')->willReturnSelf();
@@ -176,8 +176,8 @@ class EntityRepositoryTest extends TestCase
     {
         $searchDto = $this->createSearchDto();
         $entityDto = $this->createEntityDto();
-        $fields = FieldCollection::new([]);
-        $filters = FilterCollection::new();
+        $fields = new FieldCollection([]);
+        $filters = new FilterCollection();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('select')->willReturnSelf();
@@ -199,8 +199,8 @@ class EntityRepositoryTest extends TestCase
     {
         $searchDto = $this->createSearchDto('test search');
         $entityDto = $this->createEntityDto();
-        $fields = FieldCollection::new([]);
-        $filters = FilterCollection::new();
+        $fields = new FieldCollection([]);
+        $filters = new FilterCollection();
 
         $queryBuilder = $this->createMock(QueryBuilder::class);
         $queryBuilder->method('select')->willReturnSelf();

@@ -6,8 +6,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\BlogPost;
-use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\BlogPostCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController;
 use Symfony\Component\HttpFoundation\Response;
 
 /**
@@ -40,12 +40,17 @@ class MenuDashboardController extends AbstractDashboardController
         // section header
         yield MenuItem::section('Content Management');
 
-        // regular CRUD links
-        yield MenuItem::linkToCrud('Categories', 'fas fa-tags', Category::class);
-        yield MenuItem::linkToCrud('Blog Posts', 'fas fa-newspaper', BlogPost::class)
+        // regular CRUD link using linkTo()
+        yield MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fas fa-tags');
+
+        // CRUD link using linkTo() with explicit label and icon
+        yield MenuItem::linkTo(BlogPostCrudController::class, 'Blog Posts', 'fas fa-newspaper')
             ->setBadge('New', 'success');
 
-        // section with submenu
+        // CRUD link using linkTo() with auto-derived label (no label/icon)
+        yield MenuItem::linkTo(CategoryCrudController::class);
+
+        // section with submenu, including a linkTo() submenu item
         yield MenuItem::section('Advanced');
 
         // submenu with nested items

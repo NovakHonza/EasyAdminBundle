@@ -3,6 +3,7 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Synthetic;
 
 use Doctrine\ORM\Mapping as ORM;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\EntityFactory\Address;
 
 /**
  * Author entity for SearchTestEntity relationship testing.
@@ -20,6 +21,14 @@ class SearchTestAuthor
 
     #[ORM\Column(length: 255)]
     private ?string $email = null;
+
+    #[ORM\Embedded]
+    private Address $address;
+
+    public function __construct()
+    {
+        $this->address = new Address();
+    }
 
     public function getId(): ?int
     {
@@ -46,6 +55,18 @@ class SearchTestAuthor
     public function setEmail(string $email): self
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    public function getAddress(): Address
+    {
+        return $this->address;
+    }
+
+    public function setAddress(Address $address): self
+    {
+        $this->address = $address;
 
         return $this;
     }

@@ -192,4 +192,22 @@ class KeyValueStoreTest extends TestCase
         $this->assertNull($store->get('k2.k2.k1'));
         $this->assertSame([], $store->get('k2.k2'));
     }
+
+    public function testNullDelimiter(): void
+    {
+        $store = KeyValueStore::new([], null);
+
+        $store->set('a.b', 'value');
+        $this->assertSame('value', $store->get('a.b'), 'Dotted key is stored and retrieved as a flat key');
+
+        $this->assertTrue($store->has('a.b'), 'Flat dotted key exists');
+        $this->assertFalse($store->has('a'), 'Parent key does not exist because the key was not split');
+
+        $this->assertSame(['a.b' => 'value'], $store->all(), 'All returns flat structure, not nested');
+
+        $this->assertNull($store->get('nonexistent.key'), 'Nonexistent dotted key returns null without nested traversal');
+
+        $store->delete('a.b');
+        $this->assertNull($store->get('a.b'), 'Deleted flat dotted key returns null');
+    }
 }

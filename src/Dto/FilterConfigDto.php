@@ -14,7 +14,7 @@ final readonly class FilterConfigDto
 
     public function __construct()
     {
-        $this->filters = KeyValueStore::new();
+        $this->filters = KeyValueStore::new(delimiter: null);
     }
 
     public function addFilter(FilterInterface|string $filterNameOrConfig): void

@@ -99,7 +99,7 @@ final readonly class ActionFactory
             $processedItems = $this->sortActionsByPriority($processedItems);
         }
 
-        $entityDto->setActions(ActionCollection::new($processedItems));
+        $entityDto->setActions(new ActionCollection($processedItems));
         $entityDto->setDefaultActionUrl($this->resolveDefaultActionUrl($processedItems));
     }
 
@@ -223,7 +223,7 @@ final readonly class ActionFactory
             $processedItems = $this->sortActionsByPriority($processedItems);
         }
 
-        return ActionCollection::new($processedItems);
+        return new ActionCollection($processedItems);
     }
 
     public function processGlobalActionsAndEntityActionsForAll(EntityCollection $entityDtos, ActionConfigDto $actionConfigDto): ActionCollection

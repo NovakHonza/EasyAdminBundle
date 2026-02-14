@@ -319,10 +319,10 @@ The main menu is a collection of objects implementing
 ``EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemInterface`` that configure
 the look and behavior of each menu item::
 
-    use App\Entity\BlogPost;
-    use App\Entity\Category;
-    use App\Entity\Comment;
-    use App\Entity\User;
+    use App\Controller\Admin\BlogPostCrudController;
+    use App\Controller\Admin\CategoryCrudController;
+    use App\Controller\Admin\CommentCrudController;
+    use App\Controller\Admin\UserCrudController;
     use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
     use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
     use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -338,12 +338,12 @@ the look and behavior of each menu item::
                 MenuItem::linkToDashboard('Dashboard', 'fa fa-home'),
 
                 MenuItem::section('Blog'),
-                MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class),
-                MenuItem::linkToCrud('Blog Posts', 'fa fa-file-text', BlogPost::class),
+                MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fa fa-tags'),
+                MenuItem::linkTo(BlogPostCrudController::class, 'Blog Posts', 'fa fa-file-text'),
 
                 MenuItem::section('Users'),
-                MenuItem::linkToCrud('Comments', 'fa fa-comment', Comment::class),
-                MenuItem::linkToCrud('Users', 'fa fa-user', User::class),
+                MenuItem::linkTo(CommentCrudController::class, 'Comments', 'fa fa-comment'),
+                MenuItem::linkTo(UserCrudController::class, 'Users', 'fa fa-user'),
             ];
         }
     }
@@ -390,13 +390,73 @@ The rest of options depend on each menu item type, as explained in the next sect
 Menu Item Types
 ~~~~~~~~~~~~~~~
 
+Controller Menu Item
+....................
+
+This is the most common menu item type. Use ``MenuItem::linkTo()`` to link to
+any admin controller: CRUD controllers, Dashboard controllers, or custom
+controllers with the ``#[AdminRoute]`` attribute.
+
+The first argument is the FQCN *(fully-qualified class name)* of the controller.
+The label and icon are optional (when linking to a CRUD controller without a
+label, EasyAdmin derives it automatically from the entity name)::
+
+    use App\Controller\Admin\CategoryCrudController;
+    use App\Controller\Admin\LegacyCategoryCrudController;
+    use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+    use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
+
+    public function configureMenuItems(): iterable
+    {
+        return [
+            // ...
+
+            // links to the 'index' action of the Category CRUD controller
+            // the label is auto-derived from the entity name (e.g. "Categories")
+            MenuItem::linkTo(CategoryCrudController::class),
+
+            // you can pass an explicit label and icon
+            MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fa fa-tags'),
+
+            // links to a different CRUD action
+            MenuItem::linkTo(CategoryCrudController::class, 'Add Category', 'fa fa-tags')
+                ->setAction(Action::NEW),
+
+            MenuItem::linkTo(CategoryCrudController::class, 'Show Main Category', 'fa fa-tags')
+                ->setAction(Action::DETAIL)
+                ->setEntityId(40585),
+
+            // uses custom sorting options for the listing
+            MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fa fa-tags')
+                ->setDefaultSort(['createdAt' => 'DESC']),
+        ];
+    }
+
+You can also link to your own Symfony controllers if they use the
+``#[AdminRoute]`` attribute to integrate them in EasyAdmin::
+
+    use App\Controller\Admin\AnalyticsDashboardController;
+
+    MenuItem::linkTo(AnalyticsDashboardController::class, 'Analytics', 'fa fa-chart-line');
+
+If the controller is invokable (has a ``__invoke()`` method), the action is
+detected automatically. Otherwise, call ``->setAction('theActionName')`` to
+specify which action to link to.
+
 CRUD Menu Item
 ..............
 
-This is the most common menu item type and it links to some action of some
-:doc:`CRUD controller </crud>`. Instead of passing the FQCN *(fully-qualified
-class name)* of the CRUD controller, you must pass the FQCN of the Doctrine
-entity associated to the CRUD controller::
+.. note::
+
+    ``MenuItem::linkToCrud()`` is still fully supported, but ``MenuItem::linkTo()``
+    (explained above) is now the recommended way to create menu items that link to
+    CRUD controllers. ``linkTo()`` provides a unified API that works with any type
+    of admin controller and puts the controller class first, making the code
+    easier to navigate and refactor.
+
+``MenuItem::linkToCrud()`` links to some action of some :doc:`CRUD controller </crud>`.
+Instead of passing the FQCN of the CRUD controller, you pass the FQCN of the
+Doctrine entity associated to the CRUD controller::
 
     use App\Entity\Category;
     use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
@@ -445,6 +505,16 @@ have to specify the route name (it's found automatically)::
             // ...
         ];
     }
+
+.. tip::
+
+    You can also use ``MenuItem::linkTo()`` to link to a dashboard. This is
+    especially useful when you have multiple dashboards and want to link to a
+    *different* one::
+
+        use App\Controller\Admin\AnalyticsDashboardController;
+
+        MenuItem::linkTo(AnalyticsDashboardController::class, 'Analytics', 'fa fa-chart-line');
 
 Route Menu Item
 ...............
@@ -558,15 +628,18 @@ Submenus
 The main menu can display up to two level nested menus. Submenus are defined
 using the ``subMenu()`` item type::
 
+    use App\Controller\Admin\BlogPostCrudController;
+    use App\Controller\Admin\CategoryCrudController;
+    use App\Controller\Admin\CommentCrudController;
     use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 
     public function configureMenuItems(): iterable
     {
         return [
             MenuItem::subMenu('Blog', 'fa fa-article')->setSubItems([
-                MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class),
-                MenuItem::linkToCrud('Posts', 'fa fa-file-text', BlogPost::class),
-                MenuItem::linkToCrud('Comments', 'fa fa-comment', Comment::class),
+                MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fa fa-tags'),
+                MenuItem::linkTo(BlogPostCrudController::class, 'Posts', 'fa fa-file-text'),
+                MenuItem::linkTo(CommentCrudController::class, 'Comments', 'fa fa-comment'),
             ]),
             // ...
         ];
@@ -591,8 +664,8 @@ generator to return the menu items::
 
         if ('... some complex expression ...') {
             yield MenuItem::section('Blog');
-            yield MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class);
-            yield MenuItem::linkToCrud('Blog Posts', 'fa fa-file-text', BlogPost::class);
+            yield MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fa fa-tags');
+            yield MenuItem::linkTo(BlogPostCrudController::class, 'Blog Posts', 'fa fa-file-text');
         }
 
         // ...

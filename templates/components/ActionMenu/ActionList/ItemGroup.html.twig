@@ -26,8 +26,8 @@
                 {% elseif showBlankIcons or group.hasAnyActionWithIcon %}
                     <twig:ea:Icon name="internal:blank" />
                 {% endif %}
-                {# don't use 'label is not empty' here; it'll trigger deprecation messages: Method TranslatableMessage::__toString() is deprecated #}
-                {% if group.mainAction.label is not same as(false) and group.mainAction.label is not null and group.mainAction.label is not same as('') %}
+                    {# don't use 'label is not empty' here; it'll trigger deprecation messages: Method TranslatableMessage::__toString() is deprecated #}
+                    {% if group.mainAction.label is not same as(false) and group.mainAction.label is not null and group.mainAction.label is not same as('') %}
                     <span>{{ group.mainAction.label|trans }}</span>
                 {% endif %}
             </a>

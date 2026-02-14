@@ -57,7 +57,7 @@ final readonly class EntityFactory
             $entityDtos[$newEntityId] = $newEntityDto;
         }
 
-        return EntityCollection::new($entityDtos);
+        return new EntityCollection($entityDtos);
     }
 
     /**

@@ -15,11 +15,11 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\FieldDto;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\EntityFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AvatarField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\FormField;
+use EasyCorp\Bundle\EasyAdminBundle\Generator\LabelGenerator;
 use Symfony\Component\PropertyAccess\Exception\AccessException;
 use Symfony\Component\PropertyAccess\Exception\UnexpectedTypeException;
 use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 use Symfony\Contracts\Translation\TranslatableInterface;
-use function Symfony\Component\String\u;
 use function Symfony\Component\Translation\t;
 
 /**
@@ -137,7 +137,7 @@ final readonly class CommonPreConfigurator implements FieldConfiguratorInterface
         if (null === $label = $field->getLabel()) {
             $label = $useEntityTranslations
                 ? $this->entityTranslationIdGenerator->generateForProperty($entityDto->getFqcn(), $field->getProperty())
-                : $this->humanizeString($field->getProperty());
+                : LabelGenerator::humanize($field->getProperty());
         }
 
         if ('' === $label || false === $label) {
@@ -243,25 +243,5 @@ final readonly class CommonPreConfigurator implements FieldConfiguratorInterface
         $nullable = \is_array($fieldMapping) ? ($fieldMapping['nullable'] ?? null) : $fieldMapping->nullable;
 
         return false === $nullable || null === $nullable;
-    }
-
-    private function humanizeString(string $string): string
-    {
-        $uString = u($string);
-        $upperString = $uString->upper()->toString();
-
-        // this prevents humanizing all-uppercase labels (e.g. 'UUID' -> 'U u i d')
-        // and other special labels which look better in uppercase
-        if ($uString->toString() === $upperString || \in_array($upperString, ['ID', 'URL'], true)) {
-            return $upperString;
-        }
-
-        return $uString
-            ->replaceMatches('/([A-Z])/', '_$1')
-            ->replaceMatches('/[_\s]+/', ' ')
-            ->trim()
-            ->lower()
-            ->title(true)
-            ->toString();
     }
 }

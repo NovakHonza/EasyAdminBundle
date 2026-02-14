@@ -91,10 +91,47 @@ class MenuTest extends AbstractCrudTestCase
 
         static::assertResponseIsSuccessful();
 
-        // cRUD menu items should be present
         $html = $crawler->html();
         static::assertStringContainsString('Categories', $html);
         static::assertStringContainsString('Blog Posts', $html);
+    }
+
+    public function testLinkToMenuItemsAreRendered(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateIndexUrl());
+
+        static::assertResponseIsSuccessful();
+
+        // the linkTo(BlogPostCrudController::class, 'Blog Posts', ...) item should render
+        $html = $crawler->html();
+        static::assertStringContainsString('Blog Posts', $html);
+
+        // the linkTo(CategoryCrudController::class) item (auto-derived label) should also render
+        // and its link should be clickable (have an href)
+        $menuLinks = $crawler->filter('.menu-item a.menu-item-contents:not(.submenu-toggle)');
+        $hasLinkToItem = false;
+        foreach ($menuLinks as $link) {
+            $href = $link->getAttribute('href');
+            if ('' !== $href && '#' !== $href) {
+                $hasLinkToItem = true;
+                break;
+            }
+        }
+        static::assertTrue($hasLinkToItem, 'linkTo() menu items should generate valid URLs');
+    }
+
+    public function testLinkToMenuItemBadgeIsRendered(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateIndexUrl());
+
+        static::assertResponseIsSuccessful();
+
+        // the linkTo() Blog Posts item has a badge with 'New'
+        $badges = $crawler->filter('.menu-item-badge');
+        static::assertGreaterThan(0, $badges->count());
+
+        $html = $crawler->html();
+        static::assertStringContainsString('New', $html);
     }
 
     public function testMenuItemBadgesAreRendered(): void

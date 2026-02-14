@@ -194,7 +194,7 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
                 // it would then be identical to the one used in autocomplete action, but it is a bit complex getting it in here
                 $queryBuilder = $repository->createQueryBuilder('entity');
                 if (null !== $queryBuilderCallable = $field->getCustomOption(AssociationField::OPTION_QUERY_BUILDER_CALLABLE)) {
-                    $queryBuilderCallable($queryBuilder);
+                    $queryBuilder = $queryBuilderCallable($queryBuilder) ?? $queryBuilder;
                 }
 
                 return $queryBuilder;
@@ -376,7 +376,7 @@ final readonly class AssociationConfigurator implements FieldConfiguratorInterfa
 
         $fields = $crudController->configureFields($crudControllerPageName);
 
-        $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
+        $this->fieldFactory->processFields($entityDto, new FieldCollection($fields), $crudPageName);
 
         return $entityDto;
     }

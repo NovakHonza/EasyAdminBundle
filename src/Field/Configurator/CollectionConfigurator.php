@@ -197,7 +197,7 @@ final readonly class CollectionConfigurator implements FieldConfiguratorInterfac
 
         try {
             $fields = $crudController->configureFields($crudControllerPageName);
-            $this->fieldFactory->processFields($entityDto, FieldCollection::new($fields), $crudPageName);
+            $this->fieldFactory->processFields($entityDto, new FieldCollection($fields), $crudPageName);
         } finally {
             // restore the original context
             if ($originalContext instanceof AdminContext && null !== $request) {

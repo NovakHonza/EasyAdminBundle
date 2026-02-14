@@ -4,6 +4,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Form\EventListener;
 
 use Doctrine\ORM\Mapping\FieldMapping;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
+use Symfony\Bridge\Doctrine\Types\UlidType;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Form\FormEvent;
@@ -85,33 +86,33 @@ class CrudAutocompleteSubscriber implements EventSubscriberInterface
                     $data['autocomplete'] = [$data['autocomplete']];
                 }
 
+                // for performance reasons: resolve the Doctrine field type once before mapping values
+                // In Doctrine ORM 3.x, FieldMapping implements \ArrayAccess; in 4.x it's an object with properties
+                $idFieldMapping = $options['em']->getClassMetadata($options['class'])->getFieldMapping($options['id_reader']->getIdField());
+                // In Doctrine ORM 2.x, getFieldMapping() returns an array
+                /** @phpstan-ignore-next-line function.impossibleType */
+                if (\is_array($idFieldMapping)) {
+                    /** @phpstan-ignore-next-line cast.useless */
+                    $idFieldMapping = (object) $idFieldMapping;
+                }
+                /** @phpstan-ignore-next-line function.alreadyNarrowedType */
+                $idFieldType = property_exists($idFieldMapping, 'type') ? $idFieldMapping->type : $idFieldMapping['type'];
+
                 $data['autocomplete'] = array_map(
-                    static function ($v) use ($options) {
-                        if (class_exists(Ulid::class) && Ulid::isValid($v)) {
+                    static function ($v) use ($options, $idFieldType) {
+                        if (UlidType::NAME === $idFieldType && class_exists(Ulid::class) && Ulid::isValid($v)) {
                             return Ulid::fromBase32($v)->toRfc4122();
-                        } elseif (class_exists(Uuid::class) && Uuid::isValid($v)) {
-                            // checking the mapping, as uuid can also be used as simple string
-                            // In Doctrine ORM 3.x, FieldMapping implements \ArrayAccess; in 4.x it's an object with properties
-                            $idFieldMapping = $options['em']->getClassMetadata($options['class'])->getFieldMapping($options['id_reader']->getIdField());
-                            // In Doctrine ORM 2.x, getFieldMapping() returns an array
-                            /** @phpstan-ignore-next-line function.impossibleType */
-                            if (\is_array($idFieldMapping)) {
-                                /** @phpstan-ignore-next-line cast.useless */
-                                $idFieldMapping = (object) $idFieldMapping;
-                            }
-                            /** @phpstan-ignore-next-line function.alreadyNarrowedType */
-                            $idFieldType = property_exists($idFieldMapping, 'type') ? $idFieldMapping->type : $idFieldMapping['type'];
+                        }
 
-                            if (UuidType::NAME === $idFieldType) {
-                                // Use RFC4122 format for platforms with native GUID type (e.g., PostgreSQL),
-                                // and binary format for platforms without native GUID type (e.g., MySQL, SQLite)
-                                $platform = $options['em']->getConnection()->getDatabasePlatform();
-                                $hasNativeGuidType = $platform->getGuidTypeDeclarationSQL([]) !== $platform->getStringTypeDeclarationSQL(['fixed' => true, 'length' => 36]);
+                        if (UuidType::NAME === $idFieldType && class_exists(Uuid::class) && Uuid::isValid($v)) {
+                            // Use RFC4122 format for platforms with native GUID type (e.g., PostgreSQL),
+                            // and binary format for platforms without native GUID type (e.g., MySQL, SQLite)
+                            $platform = $options['em']->getConnection()->getDatabasePlatform();
+                            $hasNativeGuidType = $platform->getGuidTypeDeclarationSQL([]) !== $platform->getStringTypeDeclarationSQL(['fixed' => true, 'length' => 36]);
 
-                                return $hasNativeGuidType
-                                    ? Uuid::fromString($v)->toRfc4122()
-                                    : Uuid::fromString($v)->toBinary();
-                            }
+                            return $hasNativeGuidType
+                                ? Uuid::fromString($v)->toRfc4122()
+                                : Uuid::fromString($v)->toBinary();
                         }
 
                         return $v;
