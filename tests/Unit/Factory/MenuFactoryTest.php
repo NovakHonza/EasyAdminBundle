@@ -252,6 +252,7 @@ class MenuFactoryTest extends TestCase
         $this->setupAdminContext();
         $this->authChecker->method('isGranted')->willReturn(true);
         $this->adminUrlGenerator->method('unsetAll')->willReturnSelf();
+        $this->adminUrlGenerator->method('setAll')->willReturnSelf();
         $this->adminUrlGenerator->method('setController')->willReturnSelf();
         $this->adminUrlGenerator->method('setAction')->willReturnSelf();
         $this->adminUrlGenerator->method('generateUrl')->willReturn('/admin/category');
@@ -266,6 +267,34 @@ class MenuFactoryTest extends TestCase
 
         $items = $result->getItems();
         $this->assertSame('/admin/category', $items[0]->getLinkUrl());
+    }
+
+    public function testCreateMainMenuPassesCustomQueryParametersForControllerType(): void
+    {
+        $this->setupAdminContext();
+        $this->authChecker->method('isGranted')->willReturn(true);
+        $this->adminUrlGenerator->method('unsetAll')->willReturnSelf();
+        $this->adminUrlGenerator->method('setController')->willReturnSelf();
+        $this->adminUrlGenerator->method('setAction')->willReturnSelf();
+        $this->adminUrlGenerator->method('generateUrl')->willReturn('/admin/category');
+        $this->menuItemMatcher->method('markSelectedMenuItem')->willReturnArgument(0);
+
+        $this->adminUrlGenerator->expects($this->once())
+            ->method('setAll')
+            ->with($this->callback(static function (array $params) {
+                return 'value' === ($params['custom'] ?? null)
+                    && 'other' === ($params['foo'] ?? null);
+            }))
+            ->willReturnSelf();
+
+        $menuItem = $this->createControllerMenuItem(
+            'EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\CategoryCrudController',
+            'Categories',
+            null,
+            ['custom' => 'value', 'foo' => 'other'],
+        );
+
+        $this->menuFactory->createMainMenu([$menuItem]);
     }
 
     public function testCreateMainMenuGeneratesUrlsForControllerTypeDashboard(): void
@@ -435,16 +464,16 @@ class MenuFactoryTest extends TestCase
         return $item;
     }
 
-    private function createControllerMenuItem(string $controllerFqcn, string $label, ?string $action = null): MenuItemDto
+    private function createControllerMenuItem(string $controllerFqcn, string $label, ?string $action = null, array $extraQueryParameters = []): MenuItemDto
     {
         $item = new MenuItemDto();
         $item->setType(MenuItemDto::TYPE_CONTROLLER);
         $item->setLabel($label);
-        $item->setRouteParameters([
+        $item->setRouteParameters(array_merge([
             EA::CRUD_CONTROLLER_FQCN => $controllerFqcn,
             EA::CRUD_ACTION => $action,
             EA::ENTITY_ID => null,
-        ]);
+        ], $extraQueryParameters));
 
         return $item;
     }
