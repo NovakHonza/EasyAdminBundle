@@ -40,8 +40,9 @@ class MenuDashboardController extends AbstractDashboardController
         // section header
         yield MenuItem::section('Content Management');
 
-        // regular CRUD link using linkTo()
-        yield MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fas fa-tags');
+        // regular CRUD link using linkTo() with custom query parameter
+        yield MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fas fa-tags')
+            ->setQueryParameter('custom_param', 'custom_value');
 
         // CRUD link using linkTo() with explicit label and icon
         yield MenuItem::linkTo(BlogPostCrudController::class, 'Blog Posts', 'fas fa-newspaper')
