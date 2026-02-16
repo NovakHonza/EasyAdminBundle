@@ -130,6 +130,10 @@ return [
         'entity_remove' => 'Šis elementas negali būti ištrintas, nes nuo jo priklauso kiti elementai.',
         'forbidden_action' => 'Norimas atlikti veiksmas šiam elementui negalimas.',
         'insufficient_entity_permission' => 'Jums trūkstą teisių pasiekti šį elementą.',
+        'general' => 'An error occurred while processing your request.',
+        'general_403' => 'You don\'t have permission to perform this action.',
+        'general_404' => 'The requested page could not be found.',
+        'general_500' => 'An internal error occurred while processing your request.',
     ],
 
     'autocomplete' => [

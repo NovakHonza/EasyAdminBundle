@@ -141,6 +141,10 @@ return [
         'entity_remove' => 'Este item não pode ser excluído porque outros itens dependem dele.',
         'forbidden_action' => 'A ação solicitada não pode ser realizada neste item.',
         'insufficient_entity_permission' => 'Não tem permissão para aceder a este item.',
+        'general' => 'Ocorreu um erro ao processar o seu pedido.',
+        'general_403' => 'Não tem permissão para realizar esta ação.',
+        'general_404' => 'A página solicitada não foi encontrada.',
+        'general_500' => 'Ocorreu um erro interno ao processar o seu pedido.',
     ],
 
     'autocomplete' => [

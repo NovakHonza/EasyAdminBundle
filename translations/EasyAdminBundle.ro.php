@@ -141,6 +141,10 @@ return [
         'entity_remove' => 'Acest item nu poate fi șters deoarece alte iteme depind de acesta.',
         'forbidden_action' => 'Acțiunea solicitată nu poate fi efectuată asupra acestui item.',
         'insufficient_entity_permission' => 'Nu sunteți autorizat să accesați acest item.',
+        'general' => 'A apărut o eroare la procesarea solicitării dumneavoastră.',
+        'general_403' => 'Nu aveți permisiunea de a efectua această acțiune.',
+        'general_404' => 'Pagina solicitată nu a fost găsită.',
+        'general_500' => 'A apărut o eroare internă la procesarea solicitării dumneavoastră.',
     ],
 
     'autocomplete' => [

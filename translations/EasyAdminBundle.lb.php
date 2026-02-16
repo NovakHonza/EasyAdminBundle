@@ -131,6 +131,10 @@ return [
         'entity_remove' => 'Dëst Element kann net geläscht ginn, well aner Elementer dovun ofhänken.',
         'forbidden_action' => 'Déi gewënscht Aktioun ka mat dësem ELement net ausgefouert ginn.',
         'insufficient_entity_permission' => 'Dir hutt keng Berechtegung op dëst Element zouzegräifen.',
+        'general' => 'An error occurred while processing your request.',
+        'general_403' => 'You don\'t have permission to perform this action.',
+        'general_404' => 'The requested page could not be found.',
+        'general_500' => 'An internal error occurred while processing your request.',
     ],
 
     'autocomplete' => [

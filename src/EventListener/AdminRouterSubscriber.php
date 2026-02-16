@@ -7,6 +7,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Exception\BaseException;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\AdminContextFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\ControllerFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
@@ -129,7 +130,26 @@ class AdminRouterSubscriber implements EventSubscriberInterface
             $actionName = $request->attributes->get(EA::CRUD_ACTION);
 
             $crudControllerInstance = $this->controllerFactory->getCrudControllerInstance($crudControllerFqcn, $actionName, $request);
-            $adminContext = $this->adminContextFactory->create($request, $dashboardControllerInstance, $crudControllerInstance, $actionName);
+
+            try {
+                $adminContext = $this->adminContextFactory->create($request, $dashboardControllerInstance, $crudControllerInstance, $actionName);
+            } catch (BaseException $e) {
+                // if context creation fails (e.g. entity not found), create a context
+                // without the entity so the ExceptionListener can still render the
+                // EasyAdmin error page with the proper layout
+                $entityId = $request->attributes->get(EA::ENTITY_ID) ?? $request->query->get(EA::ENTITY_ID);
+                $request->attributes->remove(EA::ENTITY_ID);
+                $request->query->remove(EA::ENTITY_ID);
+
+                $adminContext = $this->adminContextFactory->create($request, $dashboardControllerInstance, $crudControllerInstance, $actionName);
+                $request->attributes->set(EA::CONTEXT_REQUEST_ATTRIBUTE, $adminContext);
+                $this->requestAlreadyProcessedAsPrettyUrl = true;
+
+                // restore the entity ID so the exception message is accurate
+                $request->attributes->set(EA::ENTITY_ID, $entityId);
+
+                throw $e;
+            }
         }
 
         $request->attributes->set(EA::CONTEXT_REQUEST_ATTRIBUTE, $adminContext);

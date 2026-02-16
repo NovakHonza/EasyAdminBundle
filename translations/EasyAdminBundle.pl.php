@@ -141,6 +141,10 @@ return [
         'entity_remove' => 'Ten obiekt nie może być usunięty ponieważ istnieją inne, które są z nim powiązane.',
         'forbidden_action' => 'Na tej pozycji nie można wykonać wybranej akcji.',
         'insufficient_entity_permission' => 'Nie masz uprawnień do tego obiektu.',
+        'general' => 'Wystąpił błąd podczas przetwarzania żądania.',
+        'general_403' => 'Nie masz uprawnień do wykonania tej akcji.',
+        'general_404' => 'Nie znaleziono żądanej strony.',
+        'general_500' => 'Wystąpił wewnętrzny błąd podczas przetwarzania żądania.',
     ],
 
     'autocomplete' => [
