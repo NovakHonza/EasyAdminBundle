@@ -120,6 +120,20 @@ class MenuTest extends AbstractCrudTestCase
         static::assertTrue($hasLinkToItem, 'linkTo() menu items should generate valid URLs');
     }
 
+    public function testLinkToMenuItemKeepsCustomQueryParameters(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateIndexUrl());
+
+        static::assertResponseIsSuccessful();
+
+        // the "Categories" linkTo() menu item has a custom query parameter set via setQueryParameter()
+        $categoriesLink = $crawler->filter('.menu-item a.menu-item-contents')->reduce(
+            static fn ($node) => str_contains($node->text(), 'Categories')
+        );
+        static::assertGreaterThan(0, $categoriesLink->count());
+        static::assertStringContainsString('custom_param=custom_value', $categoriesLink->first()->attr('href'));
+    }
+
     public function testLinkToMenuItemBadgeIsRendered(): void
     {
         $crawler = $this->client->request('GET', $this->generateIndexUrl());

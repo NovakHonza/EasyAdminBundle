@@ -24,9 +24,9 @@ abstract class AbstractCrudTestCase extends WebTestCase
     use CrudTestIndexAsserts;
     use CrudTestUrlGeneration;
 
-    protected ?KernelBrowser $client = null;
-    protected ?AdminUrlGeneratorInterface $adminUrlGenerator = null;
-    protected ?EntityManagerInterface $entityManager = null;
+    protected KernelBrowser $client;
+    protected AdminUrlGeneratorInterface $adminUrlGenerator;
+    protected EntityManagerInterface $entityManager;
 
     protected function setUp(): void
     {
@@ -44,14 +44,12 @@ abstract class AbstractCrudTestCase extends WebTestCase
 
     protected function tearDown(): void
     {
-        if (null !== $this->entityManager && $this->entityManager->isOpen()) {
+        if (isset($this->entityManager) && $this->entityManager->isOpen()) {
             $this->entityManager->clear();
             $this->entityManager->getConnection()->close();
         }
 
-        $this->client = null;
-        $this->entityManager = null;
-        $this->adminUrlGenerator = null;
+        unset($this->client, $this->entityManager, $this->adminUrlGenerator);
 
         parent::tearDown();
     }

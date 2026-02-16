@@ -182,9 +182,14 @@ final readonly class MenuFactory implements MenuFactoryInterface
 
         if (MenuItemDto::TYPE_CONTROLLER === $menuItemType) {
             $routeParameters = $menuItemDto->getRouteParameters();
-            $controllerFqcn = $routeParameters[EA::CRUD_CONTROLLER_FQCN];
 
-            $this->adminUrlGenerator->unsetAll();
+            $this->adminUrlGenerator
+                // remove all existing query params to avoid keeping search queries, filters and pagination
+                ->unsetAll()
+                // set any other parameters defined by the menu item
+                ->setAll($routeParameters);
+
+            $controllerFqcn = $routeParameters[EA::CRUD_CONTROLLER_FQCN];
 
             if (is_a($controllerFqcn, DashboardControllerInterface::class, true)) {
                 return $this->adminUrlGenerator
@@ -205,13 +210,6 @@ final readonly class MenuFactory implements MenuFactoryInterface
 
             $this->adminUrlGenerator->setController($controllerFqcn);
             $this->adminUrlGenerator->setAction($action);
-
-            if (null !== ($routeParameters[EA::ENTITY_ID] ?? null)) {
-                $this->adminUrlGenerator->setEntityId($routeParameters[EA::ENTITY_ID]);
-            }
-            if (isset($routeParameters[EA::SORT])) {
-                $this->adminUrlGenerator->set(EA::SORT, $routeParameters[EA::SORT]);
-            }
 
             return $this->adminUrlGenerator->generateUrl();
         }
