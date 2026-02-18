@@ -141,6 +141,10 @@ return [
         'entity_remove' => 'Este elemento no se puede eliminar porque otros elementos dependen de él.',
         'forbidden_action' => 'No se puede realizar la acción solicitada en este elemento.',
         'insufficient_entity_permission' => 'No tienes permiso para acceder a este elemento.',
+        'general' => 'Se ha producido un error al procesar tu solicitud.',
+        'general_403' => 'No tienes permiso para realizar esta acción.',
+        'general_404' => 'No se ha encontrado la página solicitada.',
+        'general_500' => 'Se ha producido un error interno al procesar tu solicitud.',
     ],
 
     'autocomplete' => [

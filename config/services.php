@@ -127,6 +127,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, '%kernel.debug%')
             ->arg(1, service(AdminContextProvider::class))
             ->arg(2, service('twig'))
+            ->arg(3, service('logger')->nullOnInvalid())
             ->tag('kernel.event_listener', ['event' => 'kernel.exception', 'priority' => -64])
 
         ->set(EasyAdminTwigExtension::class)

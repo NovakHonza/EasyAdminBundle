@@ -312,6 +312,7 @@ class DeleteTest extends AbstractCrudTestCase
         ]);
 
         $this->assertResponseStatusCodeSame(404);
+        $this->assertSelectorTextContains('.error-message', 'This item is no longer available.');
     }
 
     public function testDeleteButtonHasCsrfToken(): void

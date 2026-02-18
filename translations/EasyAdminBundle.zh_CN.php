@@ -141,6 +141,10 @@ return [
         'entity_remove' => '该条记录不可删除，因为有其他记录依赖该条记录。',
         'forbidden_action' => '无权执行该操作',
         'insufficient_entity_permission' => '你没有权限访问该条记录',
+        'general' => '处理请求时发生错误。',
+        'general_403' => '你没有权限执行此操作。',
+        'general_404' => '未找到请求的页面。',
+        'general_500' => '处理请求时发生内部错误。',
     ],
 
     'autocomplete' => [
