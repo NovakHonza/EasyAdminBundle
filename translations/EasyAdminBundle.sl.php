@@ -141,6 +141,10 @@ return [
         'entity_remove' => 'Tega elementac ni mogoče izbrisati, ker so ostali elementi odvisni od njega.',
         'forbidden_action' => 'Zahtevanega dejanja ni mogoče izvršiti na tem elementu.',
         'insufficient_entity_permission' => 'Za dostop do tega elementa nimate ustreznih pravic.',
+        'general' => 'An error occurred while processing your request.',
+        'general_403' => 'You don\'t have permission to perform this action.',
+        'general_404' => 'The requested page could not be found.',
+        'general_500' => 'An internal error occurred while processing your request.',
     ],
 
     'autocomplete' => [

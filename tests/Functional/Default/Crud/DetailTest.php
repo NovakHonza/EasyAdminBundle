@@ -260,6 +260,7 @@ class DetailTest extends AbstractCrudTestCase
         $this->client->request('GET', $this->generateDetailUrl(999999));
 
         $this->assertResponseStatusCodeSame(404);
+        $this->assertSelectorTextContains('.error-message', 'This item is no longer available.');
     }
 
     public function testIdFieldIsDisplayed(): void

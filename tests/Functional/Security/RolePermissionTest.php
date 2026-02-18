@@ -107,6 +107,22 @@ class RolePermissionTest extends AbstractCrudTestCase
         }
     }
 
+    public function testForbiddenActionRendersErrorPage(): void
+    {
+        $this->client->catchExceptions(true);
+
+        $this->client->request(
+            'GET',
+            $this->getCrudUrl(CategoryCrudController::ACTION_ADMIN_ONLY),
+            [],
+            [],
+            ['PHP_AUTH_USER' => 'user', 'PHP_AUTH_PW' => '1234']
+        );
+
+        $this->assertResponseStatusCodeSame(403);
+        $this->assertSelectorTextContains('.error-message', "can't be performed on this item.");
+    }
+
     public static function provideRolesForFieldPermission(): \Generator
     {
         yield 'user cannot see protected field' => ['user', false];

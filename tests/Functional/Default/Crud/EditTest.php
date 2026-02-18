@@ -270,6 +270,7 @@ class EditTest extends AbstractCrudTestCase
         $this->client->request('GET', $this->generateEditFormUrl(999999));
 
         $this->assertResponseStatusCodeSame(404);
+        $this->assertSelectorTextContains('.error-message', 'This item is no longer available.');
     }
 
     public function testEditFormHasFormElements(): void
