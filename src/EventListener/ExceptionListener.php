@@ -9,7 +9,6 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Twig\Environment;
-use Twig\Error\RuntimeError;
 
 /**
  * This listener allows to display customized error pages in the production
@@ -34,12 +33,6 @@ final readonly class ExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
-
-        if ($this->kernelDebug && $exception instanceof RuntimeError && 'Variable "ea" does not exist.' === $exception->getRawMessage()) {
-            $exception->appendMessage($this->getEaVariableExceptionMessage());
-
-            return;
-        }
 
         if ($this->kernelDebug) {
             return;
@@ -73,22 +66,5 @@ final readonly class ExceptionListener
             'exception' => $exception,
             'layout_template_path' => $context->getTemplatePath('layout'),
         ]), $exception->getStatusCode());
-    }
-
-    private function getEaVariableExceptionMessage(): string
-    {
-        return <<<MESSAGE
-
-
-            The "ea" variable stores the admin context (menu items, actions, fields, etc.) and it's created automatically for requests served by EasyAdmin.
-
-            If you are seeing this error, you are trying to use some EasyAdmin features in a request not served by EasyAdmin. For example, some of your custom actions may be trying to render or extend from one of the templates provided EasyAdmin.
-
-            Your request must meet one of these conditions to be served by EasyAdmin (and to have the "ea" variable defined):
-
-            1) It must be run by a controller that implements DashboardControllerInterface. This is done automatically for all actions and CRUD controllers associated to your dashboard.
-
-            2) It must contain an "eaContext" query string parameter that identifies the Dashboard associated to this request (this parameter is automatically added by EasyAdmin when creating menu items that link to custom Symfony routes).
-            MESSAGE;
     }
 }
