@@ -47,6 +47,12 @@ final class DateTimeFilter implements FilterInterface
                 ->setParameter($parameterName, $value)
                 ->setParameter($parameter2Name, $value2);
         } else {
+            if (null === $value && ComparisonType::EQ === $comparison) {
+                $queryBuilder->andWhere(sprintf('%s.%s is null', $alias, $property));
+
+                return;
+            }
+
             $queryBuilder->andWhere(sprintf('%s.%s %s :%s', $alias, $property, $comparison, $parameterName))
                 ->setParameter($parameterName, $value);
         }
