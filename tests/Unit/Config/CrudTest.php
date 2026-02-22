@@ -4,6 +4,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Unit\Config;
 
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ClickTrigger;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Translation\TranslatableMessage;
 
@@ -273,5 +274,38 @@ class CrudTest extends TestCase
 
         $crudConfig = Crud::new();
         $crudConfig->setDefaultRowAction($actionNames);
+    }
+
+    public function testDefaultRowActionDefaultClickTrigger(): void
+    {
+        $crudConfig = Crud::new();
+
+        $this->assertSame(ClickTrigger::SINGLE, $crudConfig->getAsDto()->getDefaultRowActionClickTrigger());
+    }
+
+    /**
+     * @testWith ["single"]
+     *           ["double"]
+     */
+    public function testSetDefaultRowActionDefaultClickTrigger(string $clickTrigger): void
+    {
+        $crudConfig = Crud::new();
+        $crudConfig->setDefaultRowActionClickTrigger($clickTrigger);
+
+        $this->assertSame($clickTrigger, $crudConfig->getAsDto()->getDefaultRowActionClickTrigger());
+    }
+
+    /**
+     * @testWith [""]
+     *           ["   "]
+     *           ["invalid"]
+     */
+    public function testSetDefaultRowActionDefaultClickTriggerWithInvalidString(string $clickTrigger): void
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage(sprintf('The default row action click trigger can be only "single" or "double", "%s" given.', $clickTrigger));
+
+        $crudConfig = Crud::new();
+        $crudConfig->setDefaultRowActionClickTrigger($clickTrigger);
     }
 }

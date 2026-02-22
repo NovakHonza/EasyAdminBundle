@@ -636,6 +636,22 @@ and you can configure it with the ``setDefaultRowAction()`` method::
             ;
         }
 
+.. tip::
+
+    The default row action supports either single or double clicks to trigger its behavior.
+    You can configure this with the ``setDefaultRowActionClickTrigger()`` method::
+
+        public function configureCrud(Crud $crud): Crud
+        {
+            return $crud
+                // this is the default behavior: single click triggers the default row action
+                ->setDefaultRowActionClickTrigger(ClickTrigger::SINGLE)
+
+                // use double click to trigger the default row action
+                ->setDefaultRowActionClickTrigger(ClickTrigger::DOUBLE)
+            ;
+        }
+
 The row click behavior is fully accessible via keyboard (using Enter or Space keys).
 Clicks on checkboxes, buttons, links, or any action elements within the row won't
 trigger the navigation to preserve the expected behavior of those elements.

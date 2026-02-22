@@ -515,8 +515,10 @@ class App {
         };
 
         clickableRows.forEach((row) => {
+            const clickTrigger = row.getAttribute('data-default-action-click-trigger') || 'single';
+
             // handle mouse clicks
-            row.addEventListener('click', (event) => {
+            row.addEventListener(clickTrigger === 'double' ? 'dblclick' : 'click', (event) => {
                 if (isInteractiveElement(event.target)) {
                     return;
                 }

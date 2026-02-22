@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping\FieldMapping;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\ActionCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Collection\FieldCollection;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ClickTrigger;
 use Symfony\Component\ExpressionLanguage\Expression;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
 use Symfony\Component\PropertyAccess\PropertyAccess;
@@ -26,6 +27,7 @@ final class EntityDto implements \Stringable
     private ?FieldCollection $fields = null;
     private ?ActionCollection $actions = null;
     private ?string $defaultActionUrl = null;
+    private string $defaultActionClickTrigger = ClickTrigger::SINGLE;
 
     /**
      * @param class-string<TEntity>  $fqcn
@@ -175,6 +177,16 @@ final class EntityDto implements \Stringable
     public function setDefaultActionUrl(?string $url): void
     {
         $this->defaultActionUrl = $url;
+    }
+
+    public function getDefaultActionClickTrigger(): string
+    {
+        return $this->defaultActionClickTrigger;
+    }
+
+    public function setDefaultActionClickTrigger(string $clickTrigger): void
+    {
+        $this->defaultActionClickTrigger = $clickTrigger;
     }
 
     public function getClassMetadata(): ClassMetadata
