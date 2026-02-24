@@ -228,7 +228,7 @@ final class Action implements \Stringable
     }
 
     /**
-     * @param array<string, string> $attributes
+     * @param array<string, string|TranslatableInterface> $attributes
      */
     public function setHtmlAttributes(array $attributes): self
     {
