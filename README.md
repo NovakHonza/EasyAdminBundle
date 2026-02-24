@@ -1,5 +1,3 @@
-## ⚠️ WARNING: This is the 5.x branch of this bundle, which is still in development. You probably want to check out the [4.x branch](https://github.com/EasyCorp/EasyAdminBundle/tree/4.x)
-
 <p align="center"><a href="https://github.com/EasyCorp/EasyAdminBundle">
     <img src="./assets/images/easyadmin-logo.svg" alt="EasyAdmin Logo" width="280">
 </a></p>
@@ -81,8 +79,8 @@ Visit `/admin` in your browser. That's it!
 
 | Version / Repository Branch | Symfony Compatibility         | PHP Compatibility | Status               | Docs
 | --------------------------- | ----------------------------- | ----------------- | -------------------- | ---
-| `5.x`                       | `6.4`, `7.x` and `8.x`        | `8.1` or higher   | In development | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/5.x/index.html)
-| `4.x`                       | `5.4`, `6.x`, `7.x` and `8.x` | `8.1` or higher   | New features and bug fixes | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/4.x/index.html)
+| `5.x`                       | `6.4`, `7.x` and `8.x`        | `8.2` or higher   | Stable version | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/5.x/index.html)
+| `4.x`                       | `5.4`, `6.x`, `7.x` and `8.x` | `8.1` or higher   | Bug fixes only | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/4.x/index.html)
 | `3.x`                       | `4.4`, and `5.x`              | `7.2.5` or higher | No longer maintained | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/3.x/index.html)
 | `2.x`                       | `4.x`, and `5.x`              | `7.1.3` or higher | No longer maintained | [Read Docs](https://symfony.com/bundles/EasyAdminBundle/2.x/index.html)
 | `1.x`                       | `2.x`, `3.x` and `4.x`        | `5.3.0` or higher | No longer maintained | -

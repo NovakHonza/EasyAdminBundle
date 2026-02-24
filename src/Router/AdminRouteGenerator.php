@@ -16,11 +16,13 @@ use Symfony\Component\Routing\RouteCollection;
 
 final class AdminRouteGenerator implements AdminRouteGeneratorInterface
 {
-    /** @deprecated
+    /**
+     * @deprecated Since easycorp/easyadmin-bundle 5.0.0 and will be removed in EasyAdmin 5.1.0.
      * @see CacheKey::ROUTE_NAME_TO_ATTRIBUTES
      */
     public const CACHE_KEY_ROUTE_TO_FQCN = 'easyadmin.routes.route_to_fqcn';
-    /** @deprecated
+    /**
+     * @deprecated Since easycorp/easyadmin-bundle 5.0.0 and will be removed in EasyAdmin 5.1.0.
      * @see CacheKey::ROUTE_ATTRIBUTES_TO_NAME
      */
     public const CACHE_KEY_FQCN_TO_ROUTE = 'easyadmin.routes.fqcn_to_route';
