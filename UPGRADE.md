@@ -20,41 +20,47 @@ The global `ea` variable injected in all templates is removed in favor of the
 equivalent `ea()` Twig function, which returns the current context of the
 EasyAdmin application:
 
-    // Before (4.x)
-    {{ ea.i18n.translationDomain }}
+```php
+// Before (4.x)
+{{ ea.i18n.translationDomain }}
 
-    // After (5.x)
-    {{ ea().i18n.translationDomain }}
+// After (5.x)
+{{ ea().i18n.translationDomain }}
+```
 
 ## Main Menus
 
 The `linkToCrud()` method used to link to CRUD controllers from the main menu of the
 dashboard was removed in favor of the new `linkTo()` method:
 
-    // Before (4.x)
-    yield MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class);
-    yield MenuItem::linkToCrud('Blog Posts', 'fa fa-file-text', BlogPost::class);
-    yield MenuItem::linkToCrud(null, null, Comment::class);
+```php
+// Before (4.x)
+yield MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class);
+yield MenuItem::linkToCrud('Blog Posts', 'fa fa-file-text', BlogPost::class);
+yield MenuItem::linkToCrud(null, null, Comment::class);
 
-    // After (5.x)
-    yield MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fa fa-tags');
-    yield MenuItem::linkTo(BlogPostCrudController::class, 'Blog Posts', 'fa fa-file-text');
-    yield MenuItem::linkTo(CommentCrudController::class);
+// After (5.x)
+yield MenuItem::linkTo(CategoryCrudController::class, 'Categories', 'fa fa-tags');
+yield MenuItem::linkTo(BlogPostCrudController::class, 'Blog Posts', 'fa fa-file-text');
+yield MenuItem::linkTo(CommentCrudController::class);
+```
 
 ## Actions
 
 Some methods related to actions have been removed in favor of equivalent
 methods with better names:
 
-    // Before (4.x)
-    $action->displayAsLink()->...
-    $action->displayAsButton()->...
-    $action->displayAsForm()->...
+```php
+// Before (4.x)
+$action->displayAsLink()->...
+$action->displayAsButton()->...
+$action->displayAsForm()->...
 
-    // After (5.x)
-    $action->renderAsLink()->...
-    $action->renderAsButton()->...
-    $action->renderAsForm()->...
+// After (5.x)
+$action->renderAsLink()->...
+$action->renderAsButton()->...
+$action->renderAsForm()->...
+```
 
 ## Referrers
 
