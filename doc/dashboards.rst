@@ -35,8 +35,8 @@ class. Run the following command to quickly generate a dashboard controller:
 If you now visit the ``/admin`` URL of your application, you'll see the default
 EasyAdmin Welcome Page:
 
-.. image:: images/easyadmin-welcome-page.jpg
-   :alt: EasyAdmin 4 Welcome Page
+.. image:: images/easyadmin-welcome-page.webp
+   :alt: EasyAdmin 5 Welcome Page
 
 Later in this article you'll learn how to customize that page. If you don't see
 the Welcome Page, you might need to configure the URL of your backend as
