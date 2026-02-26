@@ -192,7 +192,7 @@ final readonly class AdminContextFactory
         if (null !== $crudDto) {
             $translationParameters['%entity_name%'] = basename(str_replace('\\', '/', $crudDto->getEntityFqcn()));
             $translationParameters['%entity_as_string%'] = null === $entityDto ? '' : (string) $entityDto;
-            $translationParameters['%entity_id%'] = $entityId = $request->attributes->get(EA::ENTITY_ID);
+            $translationParameters['%entity_id%'] = $entityId = $request->attributes->get(EA::ENTITY_ID) ?? $request->query->get(EA::ENTITY_ID);
             $translationParameters['%entity_short_id%'] = null === $entityId ? null : u($entityId)->truncate(7)->toString();
 
             $entityInstance = null === $entityDto ? null : $entityDto->getInstance();
@@ -261,7 +261,7 @@ final readonly class AdminContextFactory
             return null;
         }
 
-        $entityId = $request->attributes->get(EA::ENTITY_ID);
+        $entityId = $request->attributes->get(EA::ENTITY_ID) ?? $request->query->get(EA::ENTITY_ID);
 
         return $this->entityFactory->create($crudDto->getEntityFqcn(), $entityId, $crudDto->getEntityPermission());
     }
