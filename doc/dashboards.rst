@@ -443,52 +443,6 @@ If the controller is invokable (has a ``__invoke()`` method), the action is
 detected automatically. Otherwise, call ``->setAction('theActionName')`` to
 specify which action to link to.
 
-CRUD Menu Item
-..............
-
-.. note::
-
-    ``MenuItem::linkToCrud()`` is still fully supported, but ``MenuItem::linkTo()``
-    (explained above) is now the recommended way to create menu items that link to
-    CRUD controllers. ``linkTo()`` provides a unified API that works with any type
-    of admin controller and puts the controller class first, making the code
-    easier to navigate and refactor.
-
-``MenuItem::linkToCrud()`` links to some action of some :doc:`CRUD controller </crud>`.
-Instead of passing the FQCN of the CRUD controller, you pass the FQCN of the
-Doctrine entity associated to the CRUD controller::
-
-    use App\Entity\Category;
-    use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
-    use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
-
-    public function configureMenuItems(): iterable
-    {
-        return [
-            // ...
-
-            // links to the 'index' action of the Category CRUD controller
-            MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class),
-
-            // links to a different CRUD action
-            MenuItem::linkToCrud('Add Category', 'fa fa-tags', Category::class)
-                ->setAction(Action::NEW),
-
-            MenuItem::linkToCrud('Show Main Category', 'fa fa-tags', Category::class)
-                ->setAction(Action::DETAIL)
-                ->setEntityId(1),
-
-            // if the same Doctrine entity is associated to more than one CRUD controller,
-            // use the 'setController()' method to specify which controller to use
-            MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class)
-                ->setController(LegacyCategoryCrudController::class),
-
-            // uses custom sorting options for the listing
-            MenuItem::linkToCrud('Categories', 'fa fa-tags', Category::class)
-                ->setDefaultSort(['createdAt' => 'DESC']),
-        ];
-    }
-
 Dashboard Menu Item
 ...................
 
@@ -926,8 +880,8 @@ When using this feature, you can omit the label when creating CRUD menu items:
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
 
         // no label needed: will use the translated plural label
-        yield MenuItem::linkToCrud(null, 'fa fa-file-text', BlogPost::class);
-        yield MenuItem::linkToCrud(null, 'fa fa-users', User::class);
+        yield MenuItem::linkTo(BlogPostCrudController:::class, 'fa fa-file-text');
+        yield MenuItem::linkTo(UserCrudController::class, 'fa fa-users');
     }
 
 .. note::
