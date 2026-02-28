@@ -245,7 +245,7 @@ like this::
 
     use Symfony\Component\ExpressionLanguage\Expression;
 
-    MenuItem::linkToCrud('Restricted menu-item', null, Example::class)
+    MenuItem::linkTo(ExampleCrudController::class, 'Restricted menu-item')
         ->setPermission(new Expression('"ROLE_DEVELOPER" in role_names and "ROLE_EXTERNAL" not in role_names'));
 
 Expressions enable the definition of much more detailed permissions, based on

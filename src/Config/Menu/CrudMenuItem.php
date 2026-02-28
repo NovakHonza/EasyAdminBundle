@@ -11,7 +11,7 @@ use Symfony\Component\Uid\AbstractUid;
 use Symfony\Contracts\Translation\TranslatableInterface;
 
 /**
- * @see \EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem::linkToCrud()
+ * @see \EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem::linkTo()
  *
  * @author Javier Eguiluz <javier.eguiluz@gmail.com>
  */
