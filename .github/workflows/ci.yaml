@@ -59,49 +59,58 @@ jobs:
                       php_version: "8.4"
                       symfony_version: "7.4.*"
                       stability: "stable"
+                      allow_failure: false
                     - os: windows-latest
                       php_version: "8.4"
                       symfony_version: "7.4.*"
                       stability: "stable"
+                      allow_failure: false
                     # Lowest deps support
                     - os: ubuntu-latest
                       php_version: "8.2"
                       composer_args: "--prefer-lowest"
                       stability: "stable"
                       symfony_deprecations_helper: "disabled"
+                      allow_failure: false
                     # All supported Symfony versions
                     - os: ubuntu-latest
                       php_version: "8.4"
                       symfony_version: "6.4.*"
                       stability: "stable"
+                      allow_failure: false
                     - os: ubuntu-latest
                       php_version: "8.4"
                       symfony_version: "7.1.*"
                       stability: "stable"
                       symfony_deprecations_helper: "disabled"
+                      allow_failure: false
                     - os: ubuntu-latest
                       php_version: "8.4"
                       symfony_version: "7.2.*"
                       stability: "stable"
+                      allow_failure: false
                     - os: ubuntu-latest
                       php_version: "8.4"
                       symfony_version: "7.3.*"
                       stability: "stable"
+                      allow_failure: false
                     - os: ubuntu-latest
                       php_version: "8.4"
                       symfony_version: "7.4.*"
                       stability: "stable"
+                      allow_failure: false
                     - os: ubuntu-latest
                       php_version: "8.4"
                       symfony_version: "8.0.*"
                       stability: "stable"
+                      allow_failure: false
                     # Upcoming Symfony version
                     - os: ubuntu-latest
                       php_version: "8.5"
                       symfony_version: "8.1.*@dev"
                       stability: "dev"
+                      allow_failure: true
         runs-on: ${{ matrix.os }}
-        continue-on-error: ${{ matrix.stability == 'dev' }}
         steps:
             - uses: actions/checkout@v6
 
@@ -153,7 +162,16 @@ jobs:
               if: ${{ runner.os != 'Windows' }}
               shell: bash
               run: |
+                  set +e
                   make tests
+                  exit_code=$?
+
+                  if [ "${{ matrix.allow_failure }}" = "true" ] && [ $exit_code -ne 0 ]; then
+                      echo "::warning::Experimental job failed (php ${{ matrix.php_version }}, symfony ${{ matrix.symfony_version }}), but it's allowed to fail."
+                      exit 0
+                  fi
+
+                  exit $exit_code
               env:
                   SYMFONY_DEPRECATIONS_HELPER: ${{ matrix.symfony_deprecations_helper || '' }}
 
@@ -166,6 +184,14 @@ jobs:
                   if (Test-Path $cacheDir) { Remove-Item -Recurse -Force $cacheDir }
                   if (-not $env:SYMFONY_DEPRECATIONS_HELPER) { $env:SYMFONY_DEPRECATIONS_HELPER = "ignoreFile=./tests/baseline-ignore.txt" }
                   php vendor/bin/simple-phpunit -v
+                  $exitCode = $LASTEXITCODE
+
+                  if ("${{ matrix.allow_failure }}" -eq "true" -and $exitCode -ne 0) {
+                      Write-Output "::warning::Experimental job failed (php ${{ matrix.php_version }}, symfony ${{ matrix.symfony_version }}), but it's allowed to fail."
+                      exit 0
+                  }
+
+                  exit $exitCode
               env:
                   SYMFONY_DEPRECATIONS_HELPER: ${{ matrix.symfony_deprecations_helper || '' }}
 
