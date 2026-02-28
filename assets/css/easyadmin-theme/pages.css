@@ -26,12 +26,13 @@ body.page-login #flash-messages {
     align-items: center;
     display: flex;
     flex-direction: column;
-    margin: 0 auto;
+    margin: 2rem auto;
     max-inline-size: 28rem;
     inline-size: 94%;
 }
 @media (min-width: 992px) {
     .login-wrapper {
+        margin: 0 auto;
         margin-block-start: -225px;
         inline-size: 100%;
     }
