@@ -321,9 +321,9 @@
             <a class="ea-vich-file-name" href="{{ asset_helper is same as(true) ? asset(download_uri) : download_uri }}">
                 <twig:ea:Icon name="internal:file-lines" />
                 {%- if download_label|default(false) -%}
-                    {{ download_label|trans({}, 'VichUploaderBundle') }}
+                    {{ translation_domain is same as(false) ? download_label : download_label|trans({}, translation_domain) }}
                 {%- else -%}
-                    {{ download_uri|split('/')|last ?: 'download'|trans({}, 'VichUploaderBundle') }}
+                    {{ download_uri|split('/')|last ?: 'download'|trans({}, translation_domain) }}
                 {%- endif -%}
             </a>
         {% endif %}
