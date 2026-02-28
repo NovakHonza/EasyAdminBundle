@@ -55,5 +55,20 @@ class NumericFilterTypeTest extends TypeTestCase
             ['comparison' => 'between', 'value' => '23.32', 'value2' => null],
             'Unable to reverse value for property path "ea_numeric_filter": Two values must be provided when "BETWEEN" comparison is selected.',
         ];
+        yield [
+            [],
+            ['comparison' => ComparisonType::EQ, 'value' => null, 'value2' => null],
+            ['comparison' => 'IS NULL', 'value' => null, 'value2' => null],
+        ];
+        yield [
+            [],
+            ['comparison' => ComparisonType::NEQ, 'value' => null, 'value2' => null],
+            ['comparison' => 'IS NOT NULL', 'value' => null, 'value2' => null],
+        ];
+        yield [
+            [],
+            ['comparison' => ComparisonType::GT, 'value' => null, 'value2' => null],
+            ['comparison' => 'IS NOT NULL', 'value' => null, 'value2' => null],
+        ];
     }
 }

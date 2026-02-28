@@ -49,6 +49,7 @@ abstract class AbstractCrudTestCase extends WebTestCase
             $this->entityManager->getConnection()->close();
         }
 
+        // @phpstan-ignore-next-line unset.possiblyHookedProperty
         unset($this->client, $this->entityManager, $this->adminUrlGenerator);
 
         parent::tearDown();
