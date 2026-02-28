@@ -22,7 +22,6 @@ use Twig\Environment;
 final readonly class ExceptionListener
 {
     public function __construct(
-
         private bool $kernelDebug,
         private AdminContextProviderInterface $adminContextProvider,
         private Environment $twig,
