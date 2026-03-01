@@ -276,23 +276,23 @@ class CrudTest extends TestCase
         $crudConfig->setDefaultRowAction($actionNames);
     }
 
-    public function testDefaultRowActionDefaultClickTrigger(): void
+    public function testDefaultRowActionDefaultTrigger(): void
     {
         $crudConfig = Crud::new();
 
-        $this->assertSame(ClickTrigger::SINGLE, $crudConfig->getAsDto()->getDefaultRowActionClickTrigger());
+        $this->assertSame(ClickTrigger::SINGLE, $crudConfig->getAsDto()->getDefaultRowActionTrigger());
     }
 
     /**
      * @testWith ["single"]
      *           ["double"]
      */
-    public function testSetDefaultRowActionDefaultClickTrigger(string $clickTrigger): void
+    public function testSetDefaultRowActionDefaultTrigger(string $clickTrigger): void
     {
         $crudConfig = Crud::new();
-        $crudConfig->setDefaultRowActionClickTrigger($clickTrigger);
+        $crudConfig->setDefaultRowActionTrigger($clickTrigger);
 
-        $this->assertSame($clickTrigger, $crudConfig->getAsDto()->getDefaultRowActionClickTrigger());
+        $this->assertSame($clickTrigger, $crudConfig->getAsDto()->getDefaultRowActionTrigger());
     }
 
     /**
@@ -300,12 +300,12 @@ class CrudTest extends TestCase
      *           ["   "]
      *           ["invalid"]
      */
-    public function testSetDefaultRowActionDefaultClickTriggerWithInvalidString(string $clickTrigger): void
+    public function testSetDefaultRowActionDefaultTriggerWithInvalidString(string $clickTrigger): void
     {
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage(sprintf('The default row action click trigger can be only "single" or "double", "%s" given.', $clickTrigger));
+        $this->expectExceptionMessage(sprintf('The default row action trigger can be only "single" or "double", "%s" given.', $clickTrigger));
 
         $crudConfig = Crud::new();
-        $crudConfig->setDefaultRowActionClickTrigger($clickTrigger);
+        $crudConfig->setDefaultRowActionTrigger($clickTrigger);
     }
 }

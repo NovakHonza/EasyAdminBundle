@@ -638,17 +638,15 @@ and you can configure it with the ``setDefaultRowAction()`` method::
 
 .. tip::
 
-    The default row action supports either single or double clicks to trigger its behavior.
-    You can configure this with the ``setDefaultRowActionClickTrigger()`` method::
+    By default, clicking on a row executes the default row action.
+    If you prefer to require a double click instead, configure this
+    behavior with the ``setDefaultRowActionTrigger()`` method::
 
         public function configureCrud(Crud $crud): Crud
         {
             return $crud
-                // this is the default behavior: single click triggers the default row action
-                ->setDefaultRowActionClickTrigger(ClickTrigger::SINGLE)
-
-                // use double click to trigger the default row action
-                ->setDefaultRowActionClickTrigger(ClickTrigger::DOUBLE)
+                // require a double click to execute the default row action
+                ->setDefaultRowActionTrigger(ClickTrigger::DOUBLE)
             ;
         }
 

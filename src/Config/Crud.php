@@ -501,13 +501,13 @@ class Crud
     /**
      * Sets the click trigger for the default row action in the index page.
      */
-    public function setDefaultRowActionClickTrigger(string $trigger): self
+    public function setDefaultRowActionTrigger(string $trigger): self
     {
         if (!\in_array($trigger, [ClickTrigger::SINGLE, ClickTrigger::DOUBLE], true)) {
-            throw new \InvalidArgumentException(sprintf('The default row action click trigger can be only "%s" or "%s", "%s" given.', ClickTrigger::SINGLE, ClickTrigger::DOUBLE, $trigger));
+            throw new \InvalidArgumentException(sprintf('The default row action trigger can be only "%s" or "%s", "%s" given.', ClickTrigger::SINGLE, ClickTrigger::DOUBLE, $trigger));
         }
 
-        $this->dto->setDefaultRowActionClickTrigger($trigger);
+        $this->dto->setDefaultRowActionTrigger($trigger);
 
         return $this;
     }

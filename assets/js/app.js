@@ -468,7 +468,7 @@ class App {
             return;
         }
 
-        const clickTrigger = clickableRows[0].closest('table')?.getAttribute('data-default-action-click-trigger') || 'single';
+        const clickTrigger = clickableRows[0].closest('table')?.getAttribute('data-default-action-trigger') || 'single';
 
         const interactiveSelectors = [
             'a',

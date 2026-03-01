@@ -51,7 +51,7 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
         static::assertStringContainsString('/edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
 
         $table = $crawler->filter('table.datagrid');
-        static::assertEquals('single', $table->attr('data-default-action-click-trigger'), 'Click trigger should be single by default');
+        static::assertEquals('single', $table->attr('data-default-action-trigger'), 'Click trigger should be single by default');
     }
 
     public function testDefaultRowActionWithDetailAction(): void
@@ -147,6 +147,6 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
         static::assertStringContainsString('/edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
 
         $table = $crawler->filter('table.datagrid');
-        static::assertEquals('double', $table->attr('data-default-action-click-trigger'), 'Click trigger should be double');
+        static::assertEquals('double', $table->attr('data-default-action-trigger'), 'Click trigger should be double');
     }
 }

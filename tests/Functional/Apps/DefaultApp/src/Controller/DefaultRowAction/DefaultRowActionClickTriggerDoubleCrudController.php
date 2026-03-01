@@ -11,7 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Category;
 
 /**
- * Tests the setDefaultRowActionClickTrigger() method with ClickTrigger::DOUBLE.
+ * Tests the setDefaultRowActionTrigger() method with ClickTrigger::DOUBLE.
  *
  * @extends AbstractCrudController<Category>
  */
@@ -31,7 +31,7 @@ class DefaultRowActionClickTriggerDoubleCrudController extends AbstractCrudContr
 
     public function configureCrud(Crud $crud): Crud
     {
-        return $crud->setDefaultRowActionClickTrigger(ClickTrigger::DOUBLE);
+        return $crud->setDefaultRowActionTrigger(ClickTrigger::DOUBLE);
     }
 
     public function configureActions(Actions $actions): Actions
