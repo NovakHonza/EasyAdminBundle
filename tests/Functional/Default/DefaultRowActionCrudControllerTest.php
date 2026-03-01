@@ -5,6 +5,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Default;
 use Doctrine\ORM\EntityRepository;
 use EasyCorp\Bundle\EasyAdminBundle\Test\AbstractCrudTestCase;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DashboardController;
+use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionClickTriggerDoubleCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionDetailCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Controller\DefaultRowAction\DefaultRowActionDisabledCrudController;
@@ -46,8 +47,10 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
 
         $firstRow = $rows->first();
         static::assertNotNull($firstRow->attr('data-default-action-url'), 'Row should have data-default-action-url attribute');
+        static::assertNotNull($firstRow->attr('data-default-action-click-trigger'), 'Row should have data-default-action-click-trigger attribute');
         static::assertStringContainsString('ea-clickable-row', $firstRow->attr('class'), 'Row should have ea-clickable-row class');
         static::assertStringContainsString('/edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
+        static::assertEquals('single', $firstRow->attr('data-default-action-click-trigger'), 'Click trigger should be single by default');
     }
 
     public function testDefaultRowActionWithDetailAction(): void
@@ -127,5 +130,21 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
 
         // verify all entity IDs are unique
         static::assertCount(\count(array_unique($entityIds)), $entityIds, 'Each row should have a unique entity ID');
+    }
+
+    public function testDefaultRowActionWithDoubleClickTrigger(): void
+    {
+        // use a different controller that sets Action::DETAIL as default
+        $crawler = $this->client->request('GET', $this->generateIndexUrl(null, null, DefaultRowActionClickTriggerDoubleCrudController::class));
+
+        $rows = $crawler->filter('table.datagrid tbody tr[data-id]');
+        static::assertGreaterThan(0, $rows->count(), 'There should be at least one row in the table');
+
+        $firstRow = $rows->first();
+        static::assertNotNull($firstRow->attr('data-default-action-url'), 'Row should have data-default-action-url attribute');
+        static::assertNotNull($firstRow->attr('data-default-action-click-trigger'), 'Row should have data-default-action-click-trigger attribute');
+        static::assertStringContainsString('ea-clickable-row', $firstRow->attr('class'), 'Row should have ea-clickable-row class');
+        static::assertStringContainsString('/edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
+        static::assertEquals('double', $firstRow->attr('data-default-action-click-trigger'), 'Click trigger should be single by default');
     }
 }
