@@ -9,7 +9,7 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
  */
 class EasyAdminBundle extends Bundle
 {
-    public const VERSION = '5.0.0';
+    public const VERSION = '5.0.1';
 
     public function getPath(): string
     {
