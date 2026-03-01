@@ -96,7 +96,7 @@
     {% set has_filters = filters|length > 0 %}
     {% set num_results = entities|length %}
 
-    <table class="table datagrid {{ entities is empty ? 'datagrid-empty' }}">
+    <table class="table datagrid {{ entities is empty ? 'datagrid-empty' }}" data-default-action-trigger="{{ ea.crud.defaultRowActionTrigger }}">
         {% if num_results > 0 %}
             <thead>
             {% block table_head %}

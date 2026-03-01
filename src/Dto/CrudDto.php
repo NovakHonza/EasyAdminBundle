@@ -5,6 +5,7 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Dto;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Option\ClickTrigger;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\SearchMode;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
@@ -82,6 +83,7 @@ final class CrudDto
     private bool|string|TranslatableInterface $askConfirmationOnBatchActions = true;
     /** @var string|string[]|null Action name(s) to try when clicking a row. Array = fallback chain, null = disabled */
     private string|array|null $defaultRowAction = [Action::EDIT, Action::DETAIL];
+    private string $defaultRowActionTrigger = ClickTrigger::SINGLE;
     /** @var callable|null */
     private $autocompleteCallback;
     private ?string $autocompleteTemplate = null;
@@ -573,6 +575,16 @@ final class CrudDto
     public function setDefaultRowAction(string|array|null $actionName): void
     {
         $this->defaultRowAction = $actionName;
+    }
+
+    public function getDefaultRowActionTrigger(): string
+    {
+        return $this->defaultRowActionTrigger;
+    }
+
+    public function setDefaultRowActionTrigger(string $clickTrigger): void
+    {
+        $this->defaultRowActionTrigger = $clickTrigger;
     }
 
     public function getAutocompleteCallback(): ?callable
