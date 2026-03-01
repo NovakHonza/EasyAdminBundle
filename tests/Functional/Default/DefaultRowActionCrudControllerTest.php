@@ -47,10 +47,11 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
 
         $firstRow = $rows->first();
         static::assertNotNull($firstRow->attr('data-default-action-url'), 'Row should have data-default-action-url attribute');
-        static::assertNotNull($firstRow->attr('data-default-action-click-trigger'), 'Row should have data-default-action-click-trigger attribute');
         static::assertStringContainsString('ea-clickable-row', $firstRow->attr('class'), 'Row should have ea-clickable-row class');
         static::assertStringContainsString('/edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
-        static::assertEquals('single', $firstRow->attr('data-default-action-click-trigger'), 'Click trigger should be single by default');
+
+        $table = $crawler->filter('table.datagrid');
+        static::assertEquals('single', $table->attr('data-default-action-click-trigger'), 'Click trigger should be single by default');
     }
 
     public function testDefaultRowActionWithDetailAction(): void
@@ -142,9 +143,10 @@ class DefaultRowActionCrudControllerTest extends AbstractCrudTestCase
 
         $firstRow = $rows->first();
         static::assertNotNull($firstRow->attr('data-default-action-url'), 'Row should have data-default-action-url attribute');
-        static::assertNotNull($firstRow->attr('data-default-action-click-trigger'), 'Row should have data-default-action-click-trigger attribute');
         static::assertStringContainsString('ea-clickable-row', $firstRow->attr('class'), 'Row should have ea-clickable-row class');
         static::assertStringContainsString('/edit', $firstRow->attr('data-default-action-url'), 'URL should contain edit action');
-        static::assertEquals('double', $firstRow->attr('data-default-action-click-trigger'), 'Click trigger should be single by default');
+
+        $table = $crawler->filter('table.datagrid');
+        static::assertEquals('double', $table->attr('data-default-action-click-trigger'), 'Click trigger should be double');
     }
 }

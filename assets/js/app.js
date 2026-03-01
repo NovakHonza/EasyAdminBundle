@@ -464,6 +464,11 @@ class App {
 
     #createDefaultRowAction() {
         const clickableRows = document.querySelectorAll('tr.ea-clickable-row[data-default-action-url]');
+        if (0 === clickableRows.length) {
+            return;
+        }
+
+        const clickTrigger = clickableRows[0].closest('table')?.getAttribute('data-default-action-click-trigger') || 'single';
 
         const interactiveSelectors = [
             'a',
@@ -515,8 +520,6 @@ class App {
         };
 
         clickableRows.forEach((row) => {
-            const clickTrigger = row.getAttribute('data-default-action-click-trigger') || 'single';
-
             // handle mouse clicks
             row.addEventListener(clickTrigger === 'double' ? 'dblclick' : 'click', (event) => {
                 if (isInteractiveElement(event.target)) {

@@ -101,7 +101,6 @@ final class ActionFactory
 
         $entityDto->setActions(new ActionCollection($processedItems));
         $entityDto->setDefaultActionUrl($this->resolveDefaultActionUrl($processedItems));
-        $entityDto->setDefaultActionClickTrigger($this->adminContextProvider->getContext()->getCrud()->getDefaultRowActionClickTrigger());
     }
 
     /**
