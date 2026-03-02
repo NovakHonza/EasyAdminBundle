@@ -111,6 +111,16 @@ public function getAdminControllers(): AdminControllerRegistry;
 
 The `getSignedUrls()` and `getReferrer()` methods are removed.
 
+### `Contracts\Controller\CrudControllerInterface`
+
+```php
+// Before (4.x)
+public function createEntity(string $entityFqcn);
+
+// After (5.x)
+public function createEntity(string $entityFqcn): object;
+```
+
 ### `Contracts\Orm\EntityPaginatorInterface`
 
 ```php
