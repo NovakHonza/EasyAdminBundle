@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Context;
 
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Registry\AdminControllerRegistryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
@@ -20,7 +21,7 @@ final class CrudContext
         private readonly ?CrudDto $crudDto,
         private readonly ?EntityDto $entityDto,
         private readonly ?SearchDto $searchDto,
-        private readonly AdminControllerRegistry $adminControllers,
+        private readonly AdminControllerRegistryInterface $adminControllers,
         private readonly ?CrudControllerRegistry $crudControllers = null,
     ) {
     }
@@ -49,7 +50,7 @@ final class CrudContext
         return $this->crudControllers;
     }
 
-    public function getAdminControllers(): AdminControllerRegistry
+    public function getAdminControllers(): AdminControllerRegistryInterface
     {
         return $this->adminControllers;
     }
@@ -61,7 +62,7 @@ final class CrudContext
         ?CrudDto $crudDto = null,
         ?EntityDto $entityDto = null,
         ?SearchDto $searchDto = null,
-        ?AdminControllerRegistry $adminControllers = null,
+        ?AdminControllerRegistryInterface $adminControllers = null,
         ?CrudControllerRegistry $crudControllers = null,
     ): self {
         $adminControllers ??= new AdminControllerRegistry('', [], []);
