@@ -496,8 +496,13 @@ label.form-check-label {
     overflow: clip;
 }
 
-/* allow contents (e.g. dropdowns) to overflow when fieldset is expanded */
-.form-fieldset-body.show:not(.collapsing),
+/* allow contents (e.g. dropdowns) to overflow when fieldset is expanded;
+   use overflow-inline to prevent content from spilling into neighboring fieldsets
+   in multi-column layouts, while overflow-block lets dropdowns extend downward */
+.form-fieldset-body.show:not(.collapsing) {
+    overflow-inline: clip;
+    overflow-block: visible;
+}
 .form-fieldset-body.show:not(.collapsing) > .row {
     overflow: visible;
 }
