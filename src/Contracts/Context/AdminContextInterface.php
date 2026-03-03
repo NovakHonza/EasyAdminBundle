@@ -2,6 +2,7 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\Contracts\Context;
 
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Registry\AdminControllerRegistryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\AssetsDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\CrudDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -10,7 +11,6 @@ use EasyCorp\Bundle\EasyAdminBundle\Dto\LocaleDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\MainMenuDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\SearchDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\UserMenuDto;
-use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Security\Core\User\UserInterface;
 
@@ -23,7 +23,7 @@ interface AdminContextInterface
 
     public function getI18n(): I18nDto;
 
-    public function getAdminControllers(): AdminControllerRegistry;
+    public function getAdminControllers(): AdminControllerRegistryInterface;
 
     /**
      * @return EntityDto<TEntity>

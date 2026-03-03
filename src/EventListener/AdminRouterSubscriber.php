@@ -5,6 +5,8 @@ namespace EasyCorp\Bundle\EasyAdminBundle\EventListener;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\CacheKey;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Registry\AdminControllerRegistryInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Exception\BaseException;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\AdminContextFactory;
 use EasyCorp\Bundle\EasyAdminBundle\Factory\ControllerFactory;
@@ -40,7 +42,7 @@ readonly class AdminRouterSubscriber implements EventSubscriberInterface
         private UrlGeneratorInterface $urlGenerator,
         private RequestMatcherInterface $requestMatcher,
         private CacheItemPoolInterface $cache,
-        private AdminRouteGenerator $adminRouteGenerator,
+        private AdminRouteGeneratorInterface $adminRouteGenerator,
     ) {
     }
 

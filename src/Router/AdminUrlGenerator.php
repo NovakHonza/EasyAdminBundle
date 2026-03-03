@@ -7,9 +7,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Option\CacheKey;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Registry\AdminControllerRegistryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
-use EasyCorp\Bundle\EasyAdminBundle\Registry\AdminControllerRegistry;
 use Psr\Cache\CacheItemPoolInterface;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
@@ -26,7 +26,7 @@ final class AdminUrlGenerator implements \Stringable, AdminUrlGeneratorInterface
     public function __construct(
         private readonly AdminContextProviderInterface $adminContextProvider,
         private readonly UrlGeneratorInterface $urlGenerator,
-        private readonly AdminControllerRegistry $adminControllers,
+        private readonly AdminControllerRegistryInterface $adminControllers,
         private readonly AdminRouteGeneratorInterface $adminRouteGenerator,
         private readonly CacheItemPoolInterface $cache,
     ) {

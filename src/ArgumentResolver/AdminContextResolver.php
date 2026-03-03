@@ -2,7 +2,6 @@
 
 namespace EasyCorp\Bundle\EasyAdminBundle\ArgumentResolver;
 
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Controller\ValueResolverInterface;
@@ -19,7 +18,7 @@ final readonly class AdminContextResolver implements ValueResolverInterface
 
     public function resolve(Request $request, ArgumentMetadata $argument): iterable
     {
-        if (AdminContext::class !== $argument->getType()) {
+        if (!is_a($argument->getType(), AdminContextProviderInterface::class, true)) {
             return [];
         }
 

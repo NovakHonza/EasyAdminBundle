@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Context\RequestContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\DashboardControllerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Factory\MenuFactoryInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Registry\AdminControllerRegistryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Router\AdminRouteGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\ActionConfigDto;
@@ -42,7 +43,7 @@ final readonly class AdminContextFactory
     public function __construct(
         private ?TokenStorageInterface $tokenStorage,
         private MenuFactoryInterface $menuFactory,
-        private AdminControllerRegistry $adminControllers,
+        private AdminControllerRegistryInterface $adminControllers,
         private EntityFactory $entityFactory,
         private AdminRouteGeneratorInterface $adminRouteGenerator,
         private ActionFactory $actionFactory,
@@ -131,7 +132,7 @@ final readonly class AdminContextFactory
         return $crudController->configureAssets($defaultAssets)->getAsDto()->loadedOn($pageName);
     }
 
-    private function getCrudDto(AdminControllerRegistry $adminControllers, DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ActionConfigDto $actionConfigDto, FilterConfigDto $filters, ?string $crudAction, ?string $pageName): ?CrudDto
+    private function getCrudDto(AdminControllerRegistryInterface $adminControllers, DashboardControllerInterface $dashboardController, ?CrudControllerInterface $crudController, ActionConfigDto $actionConfigDto, FilterConfigDto $filters, ?string $crudAction, ?string $pageName): ?CrudDto
     {
         if (null === $crudController) {
             return null;

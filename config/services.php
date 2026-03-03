@@ -11,6 +11,10 @@ use EasyCorp\Bundle\EasyAdminBundle\Contracts\Field\FieldConfiguratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Filter\FilterConfiguratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Menu\MenuItemMatcherInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityPaginatorInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityRepositoryInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityUpdaterInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Registry\AdminControllerRegistryInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Translation\EntityTranslationIdGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\DataCollector\EasyAdminDataCollector;
 use EasyCorp\Bundle\EasyAdminBundle\DependencyInjection\EasyAdminExtension;
@@ -154,6 +158,8 @@ return static function (ContainerConfigurator $container) {
         ->set(AdminContextProvider::class)
             ->arg(0, service('request_stack'))
 
+        ->alias(AdminContextProviderInterface::class, AdminContextProvider::class)
+
         ->set(AdminContextResolver::class)
             ->arg(0, service(AdminContextProvider::class))
             ->tag('controller.argument_value_resolver')
@@ -202,8 +208,13 @@ return static function (ContainerConfigurator $container) {
             ->arg(3, service(AdminRouteGenerator::class))
             ->arg(4, service('cache.easyadmin'))
 
+        ->alias(AdminUrlGeneratorInterface::class, AdminUrlGenerator::class)
+
         ->set('service_locator_'.AdminUrlGenerator::class, ServiceLocator::class)
-            ->args([[AdminUrlGenerator::class => service(AdminUrlGenerator::class)]])
+            ->args([[
+                AdminUrlGeneratorInterface::class => service(AdminUrlGenerator::class),
+                AdminUrlGenerator::class => service(AdminUrlGenerator::class),
+            ]])
             ->tag('container.service_locator')
 
         ->set('cache.easyadmin')
@@ -238,6 +249,8 @@ return static function (ContainerConfigurator $container) {
 
         ->alias(MenuItemMatcherInterface::class, MenuItemMatcher::class)
 
+        ->alias(AdminControllerRegistryInterface::class, AdminControllerRegistry::class)
+
         ->set(EntityRepository::class)
             ->arg(0, service(AdminContextProvider::class))
             ->arg(1, service('doctrine'))
@@ -258,9 +271,13 @@ return static function (ContainerConfigurator $container) {
 
         ->alias(EntityPaginatorInterface::class, EntityPaginator::class)
 
+        ->alias(EntityRepositoryInterface::class, EntityRepository::class)
+
         ->set(EntityUpdater::class)
             ->arg(0, service('property_accessor'))
             ->arg(1, service('validator'))
+
+        ->alias(EntityUpdaterInterface::class, EntityUpdater::class)
 
         ->set(PaginatorFactory::class)
             ->arg(0, service(AdminContextProvider::class))

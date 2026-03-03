@@ -4,7 +4,6 @@ namespace EasyCorp\Bundle\EasyAdminBundle\Twig;
 
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Context\AdminContextInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
-use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
 use Symfony\Component\DependencyInjection\ServiceLocator;
 use Symfony\Contracts\Translation\TranslatableInterface;
@@ -190,6 +189,6 @@ class EasyAdminTwigExtension extends AbstractExtension implements GlobalsInterfa
      */
     public function getAdminUrlGenerator(array $queryParameters = []): AdminUrlGeneratorInterface
     {
-        return $this->serviceLocator->get(AdminUrlGenerator::class)->setAll($queryParameters);
+        return $this->serviceLocator->get(AdminUrlGeneratorInterface::class)->setAll($queryParameters);
     }
 }

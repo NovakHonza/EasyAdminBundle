@@ -17,6 +17,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\KeyValueStore;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Option\EA;
 use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Contracts\Controller\CrudControllerInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityRepositoryInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Orm\EntityUpdaterInterface;
+use EasyCorp\Bundle\EasyAdminBundle\Contracts\Provider\AdminContextProviderInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\AssetsDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\BatchActionDto;
 use EasyCorp\Bundle\EasyAdminBundle\Dto\EntityDto;
@@ -50,6 +53,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Orm\EntityUpdater;
 use EasyCorp\Bundle\EasyAdminBundle\Provider\AdminContextProvider;
 use EasyCorp\Bundle\EasyAdminBundle\Provider\FieldProvider;
 use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGenerator;
+use EasyCorp\Bundle\EasyAdminBundle\Router\AdminUrlGeneratorInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Security\Permission;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -106,17 +110,22 @@ abstract class AbstractCrudController extends AbstractController implements Crud
             'doctrine' => '?'.ManagerRegistry::class,
             'event_dispatcher' => '?'.EventDispatcherInterface::class,
             ActionFactory::class => '?'.ActionFactory::class,
-            AdminContextProvider::class => '?'.AdminContextProvider::class,
-            AdminUrlGenerator::class => '?'.AdminUrlGenerator::class,
+            AdminContextProviderInterface::class => '?'.AdminContextProviderInterface::class,
+            AdminUrlGeneratorInterface::class => '?'.AdminUrlGeneratorInterface::class,
             ControllerFactory::class => '?'.ControllerFactory::class,
             EntityFactory::class => '?'.EntityFactory::class,
-            EntityRepository::class => '?'.EntityRepository::class,
-            EntityUpdater::class => '?'.EntityUpdater::class,
+            EntityRepositoryInterface::class => '?'.EntityRepositoryInterface::class,
+            EntityUpdaterInterface::class => '?'.EntityUpdaterInterface::class,
             FieldProvider::class => '?'.FieldProvider::class,
             FilterFactory::class => '?'.FilterFactory::class,
             FormFactory::class => '?'.FormFactory::class,
             PaginatorFactory::class => '?'.PaginatorFactory::class,
             FieldFactory::class => '?'.FieldFactory::class,
+            // the following keys are kept for BC reasons (they were replaced by the corresponding interfaces)
+            AdminContextProvider::class => '?'.AdminContextProviderInterface::class,
+            AdminUrlGenerator::class => '?'.AdminUrlGeneratorInterface::class,
+            EntityRepository::class => '?'.EntityRepositoryInterface::class,
+            EntityUpdater::class => '?'.EntityUpdaterInterface::class,
         ]);
     }
 
@@ -140,7 +149,7 @@ abstract class AbstractCrudController extends AbstractController implements Crud
         // this can happen after deleting some items and trying to return
         // to a 'index' page that no longer exists. Redirect to the last page instead
         if ($paginator->isOutOfRange()) {
-            return $this->redirect($this->container->get(AdminUrlGenerator::class)
+            return $this->redirect($this->container->get(AdminUrlGeneratorInterface::class)
                 ->set(EA::PAGE, $paginator->getLastPage())
                 ->generateUrl());
         }
@@ -396,7 +405,7 @@ abstract class AbstractCrudController extends AbstractController implements Crud
             return $event->getResponse();
         }
 
-        return $this->redirect($this->container->get(AdminUrlGenerator::class)->setController($context->getCrud()->getControllerFqcn())->setAction(Action::INDEX)->unset(EA::ENTITY_ID)->generateUrl());
+        return $this->redirect($this->container->get(AdminUrlGeneratorInterface::class)->setController($context->getCrud()->getControllerFqcn())->setAction(Action::INDEX)->unset(EA::ENTITY_ID)->generateUrl());
     }
 
     /**
@@ -459,7 +468,7 @@ abstract class AbstractCrudController extends AbstractController implements Crud
             return $event->getResponse();
         }
 
-        $redirectUrl = $this->container->get(AdminUrlGenerator::class)
+        $redirectUrl = $this->container->get(AdminUrlGeneratorInterface::class)
             // reset the page number to avoid confusing elements after the page reload
             // (we're deleting items, so the original listing pages will change)
             ->unset(EA::PAGE)
@@ -524,7 +533,7 @@ abstract class AbstractCrudController extends AbstractController implements Crud
 
     public function createIndexQueryBuilder(SearchDto $searchDto, EntityDto $entityDto, FieldCollection $fields, FilterCollection $filters): QueryBuilder
     {
-        return $this->container->get(EntityRepository::class)->createQueryBuilder($searchDto, $entityDto, $fields, $filters);
+        return $this->container->get(EntityRepositoryInterface::class)->createQueryBuilder($searchDto, $entityDto, $fields, $filters);
     }
 
     public function renderFilters(AdminContext $context): KeyValueStore
@@ -602,7 +611,7 @@ abstract class AbstractCrudController extends AbstractController implements Crud
 
     protected function getContext(): ?AdminContext
     {
-        return $this->container->get(AdminContextProvider::class)->getContext();
+        return $this->container->get(AdminContextProviderInterface::class)->getContext();
     }
 
     /**
@@ -615,7 +624,7 @@ abstract class AbstractCrudController extends AbstractController implements Crud
             throw new AccessDeniedException(sprintf('The field "%s" does not exist or it\'s configured as disabled, so it can\'t be modified.', $propertyName));
         }
 
-        $this->container->get(EntityUpdater::class)->updateProperty($entityDto, $propertyName, $newValue);
+        $this->container->get(EntityUpdaterInterface::class)->updateProperty($entityDto, $propertyName, $newValue);
 
         /** @var TEntity $entityInstance */
         $entityInstance = $entityDto->getInstance();
@@ -686,12 +695,12 @@ abstract class AbstractCrudController extends AbstractController implements Crud
         $submitButtonName = $context->getRequest()->request->all()['ea']['newForm']['btn'] ?? null;
 
         $url = match ($submitButtonName) {
-            Action::SAVE_AND_CONTINUE => $this->container->get(AdminUrlGenerator::class)
+            Action::SAVE_AND_CONTINUE => $this->container->get(AdminUrlGeneratorInterface::class)
                 ->setAction(Action::EDIT)
                 ->setEntityId($context->getEntity()->getPrimaryKeyValue())
                 ->generateUrl(),
-            Action::SAVE_AND_RETURN => $this->container->get(AdminUrlGenerator::class)->setAction(Action::INDEX)->generateUrl(),
-            Action::SAVE_AND_ADD_ANOTHER => $this->container->get(AdminUrlGenerator::class)->setAction(Action::NEW)->generateUrl(),
+            Action::SAVE_AND_RETURN => $this->container->get(AdminUrlGeneratorInterface::class)->setAction(Action::INDEX)->generateUrl(),
+            Action::SAVE_AND_ADD_ANOTHER => $this->container->get(AdminUrlGeneratorInterface::class)->setAction(Action::NEW)->generateUrl(),
             default => $this->generateUrl($context->getDashboardRouteName()),
         };
 
