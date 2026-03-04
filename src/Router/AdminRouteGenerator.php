@@ -752,7 +752,7 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
      */
     private function transformCrudControllerNameToKebabCase(string $crudControllerFqcn): string
     {
-        $cleanShortName = str_replace(['CrudController', 'Controller'], '', (new \ReflectionClass($crudControllerFqcn))->getShortName());
+        $cleanShortName = preg_replace('/(?:Crud)?Controller$/', '', (new \ReflectionClass($crudControllerFqcn))->getShortName());
         $snakeCaseName = strtolower(preg_replace('/(?<!^)[A-Z]/', '-$0', $cleanShortName));
 
         return $snakeCaseName;
@@ -765,7 +765,7 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
      */
     private function transformCrudControllerNameToSnakeCase(string $crudControllerFqcn): string
     {
-        $shortName = str_replace(['CrudController', 'Controller'], '', (new \ReflectionClass($crudControllerFqcn))->getShortName());
+        $shortName = preg_replace('/(?:Crud)?Controller$/', '', (new \ReflectionClass($crudControllerFqcn))->getShortName());
 
         return strtolower(preg_replace('/(?<!^)[A-Z]/', '_$0', $shortName));
     }
