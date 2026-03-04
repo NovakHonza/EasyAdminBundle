@@ -612,6 +612,26 @@ class AdminRouteTest extends WebTestCase
         $this->assertInstanceOf(CrudMenuItem::class, $menuItem);
     }
 
+    public function testCrudControllerNamedController(): void
+    {
+        $client = static::createClient();
+        $router = $client->getContainer()->get('router');
+
+        // test that ControllerCrudController generates routes with "controller" as the path segment
+        // (this was previously broken because str_replace removed "Controller" from the middle of the name)
+        $indexRoute = $router->getRouteCollection()->get('admin_controller_index');
+        $this->assertNotNull($indexRoute, 'Route "admin_controller_index" should exist');
+        $this->assertSame('/admin/controller', $indexRoute->getPath());
+
+        $detailRoute = $router->getRouteCollection()->get('admin_controller_detail');
+        $this->assertNotNull($detailRoute, 'Route "admin_controller_detail" should exist');
+        $this->assertSame('/admin/controller/{entityId}', $detailRoute->getPath());
+
+        // test that routes also exist for the second dashboard
+        $this->assertNotNull($router->getRouteCollection()->get('second_admin_controller_index'));
+        $this->assertNotNull($router->getRouteCollection()->get('second_admin_controller_detail'));
+    }
+
     public function testAdminDashboardAdvancedRouteOptions(): void
     {
         $client = static::createClient();
