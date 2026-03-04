@@ -51,6 +51,14 @@ final readonly class MenuFactory implements MenuFactoryInterface
     {
         $userMenuDto = $userMenu->getAsDto();
         $builtUserMenuItems = $this->buildMenuItems($userMenuDto->getItems());
+
+        if ($userMenuDto->isLogoutLinkDisabled()) {
+            $builtUserMenuItems = array_values(array_filter(
+                $builtUserMenuItems,
+                static fn (MenuItemDto $item): bool => MenuItemDto::TYPE_LOGOUT !== $item->getType()
+            ));
+        }
+
         $userMenuDto->setItems($builtUserMenuItems);
 
         return $userMenuDto;

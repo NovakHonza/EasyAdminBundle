@@ -36,6 +36,13 @@ final readonly class UserMenu
         return $this;
     }
 
+    public function disableLogoutLink(bool $disable = true): self
+    {
+        $this->dto->setLogoutLinkDisabled($disable);
+
+        return $this;
+    }
+
     public function setName(?string $name): self
     {
         $this->dto->setName($name);

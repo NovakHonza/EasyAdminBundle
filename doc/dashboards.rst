@@ -668,6 +668,10 @@ current user object. The user avatar is a generic avatar icon. Use the
                 // you can also pass an email address to use gravatar's service
                 ->setGravatarEmail($user->getMainEmailAddress())
 
+                // you can hide the "Sign out" link from the user menu (e.g. when using
+                // authentication methods like HTTP Basic or OAuth that don't support logout)
+                ->disableLogoutLink()
+
                 // you can use any type of menu item, except submenus
                 ->addMenuItems([
                     MenuItem::linkToRoute('My Profile', 'fa fa-id-card', '...', ['...' => '...']),

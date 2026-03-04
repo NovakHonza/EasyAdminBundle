@@ -11,6 +11,7 @@ final class UserMenuDto
 {
     private bool $displayName = true;
     private bool $displayAvatar = true;
+    private bool $logoutLinkDisabled = false;
     private ?string $name = null;
     private ?string $avatarUrl = null;
     /** @var array<MenuItemDto> */
@@ -34,6 +35,16 @@ final class UserMenuDto
     public function setDisplayAvatar(bool $isDisplayed): void
     {
         $this->displayAvatar = $isDisplayed;
+    }
+
+    public function isLogoutLinkDisabled(): bool
+    {
+        return $this->logoutLinkDisabled;
+    }
+
+    public function setLogoutLinkDisabled(bool $disabled): void
+    {
+        $this->logoutLinkDisabled = $disabled;
     }
 
     public function getName(): ?string
