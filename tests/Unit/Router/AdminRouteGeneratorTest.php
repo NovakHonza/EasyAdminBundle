@@ -64,7 +64,6 @@ class AdminRouteGeneratorTest extends KernelTestCase
             $cacheMock,
             new Filesystem(),
             self::$kernel->getBuildDir(),
-            'en',
         );
 
         $routeName = $adminRouteGenerator->findRouteName($dashboardControllerFqcn, $crudControllerFqcn, $action);
