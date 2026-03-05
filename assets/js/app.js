@@ -440,20 +440,33 @@ class App {
                 modalButton.addEventListener(
                     'click',
                     () => {
-                        // check if this is a POST action (like DELETE with formaction) or GET (link href)
+                        // Case 1: POST action with formaction (like DELETE with CSRF token)
                         const formAction = actionElement.getAttribute('formaction');
-
                         if (formAction) {
-                            // POST action: use the hidden form with CSRF token (like DELETE)
                             const form = document.querySelector('#action-confirmation-form');
                             form.setAttribute('action', formAction);
                             form.submit();
-                        } else {
-                            // GET action: navigate to the href URL
-                            const href = actionElement.getAttribute('href');
-                            if (href) {
-                                window.location.href = href;
-                            }
+                            return;
+                        }
+
+                        // Case 2: dropdown action rendered as form (data-ea-action-form-id)
+                        const actionFormId = actionElement.getAttribute('data-ea-action-form-id');
+                        if (actionFormId) {
+                            document.getElementById(actionFormId).submit();
+                            return;
+                        }
+
+                        // Case 3: standalone button inside a <form> (renderAsForm)
+                        const parentForm = actionElement.closest('form');
+                        if (parentForm && parentForm.hasAttribute('action')) {
+                            parentForm.submit();
+                            return;
+                        }
+
+                        // Case 4: GET action with href
+                        const href = actionElement.getAttribute('href');
+                        if (href) {
+                            window.location.href = href;
                         }
                     },
                     { once: true }
@@ -609,8 +622,12 @@ class App {
 
     #createActionHandlers() {
         // handle form submissions via data attribute (replaces inline onclick handlers)
+        // skip elements with confirmation modals (handled by #createActionConfirmationModals)
         document.querySelectorAll('[data-ea-action-form-id]').forEach((element) => {
             element.addEventListener('click', (event) => {
+                if (element.hasAttribute('data-action-confirmation')) {
+                    return;
+                }
                 event.preventDefault();
                 const formId = element.getAttribute('data-ea-action-form-id');
                 document.getElementById(formId).submit();
@@ -618,8 +635,12 @@ class App {
         });
 
         // handle navigation via data attribute (replaces inline onclick handlers)
+        // skip elements with confirmation modals (handled by #createActionConfirmationModals)
         document.querySelectorAll('[data-ea-action-url]').forEach((element) => {
             element.addEventListener('click', (event) => {
+                if (element.hasAttribute('data-action-confirmation')) {
+                    return;
+                }
                 event.preventDefault();
                 window.location = element.getAttribute('data-ea-action-url');
             });
