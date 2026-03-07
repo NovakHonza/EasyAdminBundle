@@ -472,6 +472,16 @@ label.form-check-label {
     margin-block-start: 6px;
 }
 
+.form-fieldset-title-content .badge-danger {
+    margin-inline-start: 8px;
+}
+
+.form-fieldset.has-fieldset-error {
+    border: 1px solid var(--form-input-error-border-color);
+    border-radius: var(--border-radius);
+    box-shadow: var(--form-input-error-shadow);
+}
+
 /* using CSS Grid is needed for a smooth collapse animation */
 .form-fieldset-body {
     display: grid;

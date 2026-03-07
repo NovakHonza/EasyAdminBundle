@@ -14,6 +14,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\IntegerField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextareaField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Synthetic\FormTestEntity;
+use Symfony\Component\Validator\Constraints\NotNull;
 
 /**
  * CrudController for testing validation error handling with complex layouts.
@@ -57,7 +58,9 @@ class FormLayoutValidationErrorsCrudController extends AbstractCrudController
         yield FormField::addFieldset('Status Settings')
             ->renderCollapsed();
         yield BooleanField::new('isActive');
-        yield IntegerField::new('priority')->setRequired(true); // REQUIRED - inside collapsed fieldset!
+        yield IntegerField::new('priority')
+            ->setRequired(true)
+            ->setFormTypeOption('constraints', [new NotNull()]);
 
         // fieldset: "Metadata"
         yield FormField::addFieldset('Metadata');
