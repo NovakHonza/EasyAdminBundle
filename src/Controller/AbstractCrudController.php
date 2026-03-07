@@ -276,7 +276,11 @@ abstract class AbstractCrudController extends AbstractController implements Crud
 
             $this->updateEntity($this->container->get('doctrine')->getManagerForClass($context->getEntity()->getFqcn()), $entityInstance);
 
-            $this->container->get('event_dispatcher')->dispatch(new AfterEntityUpdatedEvent($entityInstance));
+            $event = new AfterEntityUpdatedEvent($entityInstance);
+            $this->container->get('event_dispatcher')->dispatch($event);
+            if ($event->isPropagationStopped()) {
+                return $event->getResponse();
+            }
 
             return $this->getRedirectResponseAfterSave($context, Action::EDIT);
         }
@@ -336,8 +340,12 @@ abstract class AbstractCrudController extends AbstractController implements Crud
 
             $this->persistEntity($this->container->get('doctrine')->getManagerForClass($context->getEntity()->getFqcn()), $entityInstance);
 
-            $this->container->get('event_dispatcher')->dispatch(new AfterEntityPersistedEvent($entityInstance));
+            $event = new AfterEntityPersistedEvent($entityInstance);
+            $this->container->get('event_dispatcher')->dispatch($event);
             $context->getEntity()->setInstance($entityInstance);
+            if ($event->isPropagationStopped()) {
+                return $event->getResponse();
+            }
 
             return $this->getRedirectResponseAfterSave($context, Action::NEW);
         }
@@ -397,7 +405,11 @@ abstract class AbstractCrudController extends AbstractController implements Crud
             throw new EntityRemoveException(['entity_name' => $context->getEntity()->getName(), 'message' => $e->getMessage()], $e);
         }
 
-        $this->container->get('event_dispatcher')->dispatch(new AfterEntityDeletedEvent($entityInstance));
+        $event = new AfterEntityDeletedEvent($entityInstance);
+        $this->container->get('event_dispatcher')->dispatch($event);
+        if ($event->isPropagationStopped()) {
+            return $event->getResponse();
+        }
 
         $responseParameters = $this->configureResponseParameters(KeyValueStore::new([
             'entity' => $context->getEntity(),
@@ -458,7 +470,11 @@ abstract class AbstractCrudController extends AbstractController implements Crud
                 throw new EntityRemoveException(['entity_name' => (string) $entityDto, 'message' => $e->getMessage()], $e);
             }
 
-            $this->container->get('event_dispatcher')->dispatch(new AfterEntityDeletedEvent($entityInstance));
+            $event = new AfterEntityDeletedEvent($entityInstance);
+            $this->container->get('event_dispatcher')->dispatch($event);
+            if ($event->isPropagationStopped()) {
+                return $event->getResponse();
+            }
         }
 
         $responseParameters = $this->configureResponseParameters(KeyValueStore::new([
