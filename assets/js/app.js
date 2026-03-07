@@ -458,7 +458,7 @@ class App {
 
                         // Case 3: standalone button inside a <form> (renderAsForm)
                         const parentForm = actionElement.closest('form');
-                        if (parentForm && parentForm.hasAttribute('action')) {
+                        if (parentForm?.hasAttribute('action')) {
                             parentForm.submit();
                             return;
                         }
