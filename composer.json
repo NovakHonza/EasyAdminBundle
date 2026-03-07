@@ -46,6 +46,7 @@
     "require-dev": {
         "dama/doctrine-test-bundle": "^8.2",
         "doctrine/doctrine-fixtures-bundle": "^3.4|3.5.x-dev|^4.0",
+        "moneyphp/money": "^4.8",
         "phpstan/extension-installer": "^1.4",
         "phpstan/phpstan": "^2.0",
         "phpstan/phpstan-phpunit": "^2.0",
