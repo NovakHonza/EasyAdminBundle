@@ -87,7 +87,6 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
         private readonly iterable $dashboardControllers,
         private readonly iterable $crudControllers,
         private readonly CacheItemPoolInterface $cache,
-        private readonly string $defaultLocale,
         private readonly iterable $adminRouteControllers = [],
     ) {
     }
@@ -226,7 +225,6 @@ final class AdminRouteGenerator implements AdminRouteGeneratorInterface
                     }
 
                     $defaults = [
-                        '_locale' => $this->defaultLocale,
                         '_controller' => $crudControllerFqcn.'::'.$actionRouteConfig['actionName'],
                         EA::ROUTE_CREATED_BY_EASYADMIN => true,
                         EA::DASHBOARD_CONTROLLER_FQCN => $dashboardFqcn,

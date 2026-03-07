@@ -537,6 +537,24 @@ class AdminRouteTest extends WebTestCase
         $this->assertNotNull($router->getRouteCollection()->get('second_admin_built_in_action_delete'));
     }
 
+    public function testCrudRoutesDoNotSetLocaleDefault(): void
+    {
+        $client = static::createClient();
+        $router = $client->getContainer()->get('router');
+
+        // CRUD routes should NOT have '_locale' in defaults (regression test for #6842)
+        $crudRoute = $router->getRouteCollection()->get('admin_built_in_action_list');
+        $this->assertNotNull($crudRoute);
+        $this->assertArrayNotHasKey('_locale', $crudRoute->getDefaults(),
+            'CRUD routes must not set _locale in defaults, otherwise i18n prefix routing breaks');
+
+        // but routes with explicit '_locale' via #[AdminRoute] options should still have it
+        $invokableRoute = $router->getRouteCollection()->get('admin_custom_invokable');
+        $this->assertNotNull($invokableRoute);
+        $this->assertSame('en', $invokableRoute->getDefault('_locale'),
+            'Routes with explicit _locale in #[AdminRoute] options should keep it');
+    }
+
     public function testCrudControllerNamedController(): void
     {
         $client = static::createClient();

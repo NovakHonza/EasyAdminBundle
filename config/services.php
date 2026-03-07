@@ -229,8 +229,7 @@ return static function (ContainerConfigurator $container) {
             ->arg(0, tagged_iterator(EasyAdminExtension::TAG_DASHBOARD_CONTROLLER))
             ->arg(1, tagged_iterator(EasyAdminExtension::TAG_CRUD_CONTROLLER))
             ->arg(2, service('cache.easyadmin'))
-            ->arg(3, '%kernel.default_locale%')
-            ->arg(4, tagged_iterator(EasyAdminExtension::TAG_ADMIN_ROUTE_CONTROLLER))
+            ->arg(3, tagged_iterator(EasyAdminExtension::TAG_ADMIN_ROUTE_CONTROLLER))
 
         ->set(AdminRouteLoader::class)
             ->arg(0, service(AdminRouteGenerator::class))
