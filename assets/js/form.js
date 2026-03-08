@@ -85,12 +85,17 @@ class Form {
                     button.addEventListener('click', function onSubmitButtonsClick(clickEvent) {
                         let formHasErrors = false;
 
-                        // Remove all error counter badges
+                        // remove all error counter badges (tabs and fieldsets)
                         document
-                            .querySelectorAll('.form-tabs-tablist .nav-item .badge-danger.badge')
+                            .querySelectorAll(
+                                '.form-tabs-tablist .nav-item .badge-danger.badge, .form-fieldset-title-content .badge-danger.badge'
+                            )
                             .forEach((badge) => {
                                 badge.parentElement.removeChild(badge);
                             });
+                        document.querySelectorAll('.form-fieldset.has-fieldset-error').forEach((fieldset) => {
+                            fieldset.classList.remove('has-fieldset-error');
+                        });
 
                         if (null !== form.getAttribute('novalidate')) {
                             return;
@@ -100,11 +105,10 @@ class Form {
                             if (!input.disabled && !input.validity.valid) {
                                 formHasErrors = true;
 
-                                // Visual feedback for tabs
-                                // Adding a badge with a error count next to the tab label
+                                // visual feedback for tabs: adding a badge with a error count next to the tab label
                                 const formTab = input.closest('div.tab-pane');
                                 if (formTab) {
-                                    // Match tab link either by "data-bs-target" attribute or by href linking to the id anchor
+                                    // match tab link either by "data-bs-target" attribute or by href linking to the id anchor
                                     const navLinkTab = document.querySelector(
                                         `[data-bs-target="#${formTab.id}"], a[href="#${formTab.id}"]`
                                     );
@@ -114,10 +118,10 @@ class Form {
 
                                         const badge = navLinkTab.querySelector('.badge');
                                         if (badge) {
-                                            // Increment number of error
+                                            // increment number of error
                                             badge.textContent = (Number.parseInt(badge.textContent) + 1).toString();
                                         } else {
-                                            // Create a new badge
+                                            // create a new badge
                                             const newErrorBadge = document.createElement('span');
                                             newErrorBadge.classList.add('badge', 'badge-danger');
                                             newErrorBadge.textContent = '1';
@@ -126,7 +130,28 @@ class Form {
                                     }
                                 }
 
-                                // Visual feedback for group
+                                // visual feedback for fieldsets
+                                const formFieldset = input.closest('div.form-fieldset');
+                                if (formFieldset) {
+                                    const fieldsetTitleContent =
+                                        formFieldset.querySelector('.form-fieldset-title-content');
+
+                                    formFieldset.classList.add('has-fieldset-error');
+
+                                    if (fieldsetTitleContent) {
+                                        const badge = fieldsetTitleContent.querySelector('.badge');
+                                        if (badge) {
+                                            badge.textContent = (Number.parseInt(badge.textContent) + 1).toString();
+                                        } else {
+                                            const newErrorBadge = document.createElement('span');
+                                            newErrorBadge.classList.add('badge', 'badge-danger');
+                                            newErrorBadge.textContent = '1';
+                                            fieldsetTitleContent.appendChild(newErrorBadge);
+                                        }
+                                    }
+                                }
+
+                                // visual feedback for group
                                 const formGroup = input.closest('div.form-group');
                                 formGroup.classList.add('has-error');
 
@@ -148,6 +173,25 @@ class Form {
                             if (null !== firstTabWithErrors) {
                                 that.#setTabAsActive(firstTabWithErrors.id);
                             }
+
+                            // auto-expand all collapsed fieldsets with errors
+                            document
+                                .querySelectorAll('.form-fieldset.has-fieldset-error')
+                                .forEach((fieldsetWithErrors) => {
+                                    const collapsedBody = fieldsetWithErrors.querySelector(
+                                        '.form-fieldset-body.collapse:not(.show)'
+                                    );
+                                    if (collapsedBody) {
+                                        const Collapse = bootstrap.Collapse;
+                                        new Collapse(collapsedBody, { toggle: true });
+                                        const collapseToggle =
+                                            fieldsetWithErrors.querySelector('.form-fieldset-collapse');
+                                        if (collapseToggle) {
+                                            collapseToggle.classList.remove('collapsed');
+                                            collapseToggle.setAttribute('aria-expanded', 'true');
+                                        }
+                                    }
+                                });
 
                             document.dispatchEvent(
                                 new CustomEvent('ea.form.error', {

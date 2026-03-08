@@ -24,6 +24,7 @@ final class FormField implements FieldInterface
     public const OPTION_TAB_ID = 'tabId';
     public const OPTION_TAB_IS_ACTIVE = 'tabIsActive';
     public const OPTION_TAB_ERROR_COUNT = 'tabErrorCount';
+    public const OPTION_FIELDSET_ERROR_COUNT = 'fieldsetErrorCount';
 
     /**
      * @internal Use the other named constructors instead (addFieldset(), etc.)
@@ -53,6 +54,7 @@ final class FormField implements FieldInterface
             ->setCustomOption(self::OPTION_ICON, $icon)
             ->setCustomOption(self::OPTION_COLLAPSIBLE, false)
             ->setCustomOption(self::OPTION_COLLAPSED, false)
+            ->setCustomOption(self::OPTION_FIELDSET_ERROR_COUNT, 0)
             ->setValue(true);
     }
 

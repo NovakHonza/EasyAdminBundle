@@ -503,18 +503,32 @@
 {% block ea_form_fieldset_open_label %}
     {# don't use 'ea_help is not empty' here; it'll trigger deprecation messages: Method TranslatableMessage::__toString() is deprecated #}
     {% set has_help = ea_help is not same as(false) and ea_help is not null and ea_help is not same as('') %}
+    {% set collapsed_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_COLLAPSED') %}
+    {% set fieldset_error_count_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_FIELDSET_ERROR_COUNT') %}
+    {% set fieldset_error_count = form.vars.ea_vars.field.getCustomOption(fieldset_error_count_option_name)|default(0) %}
+    {% set is_collapsed = form.vars.ea_vars.field.getCustomOption(collapsed_option_name)|default(false) %}
 
     <div class="form-fieldset-header {{ ea_is_collapsible ? 'collapsible' }} {{ has_help ? 'with-help' }}">
         <div class="form-fieldset-title">
             {% if ea_is_collapsible %}
                 <a href="#content-{{ form.vars.name }}" data-bs-toggle="collapse"
-                   class="form-fieldset-title-content form-fieldset-collapse {{ ea_is_collapsed ? 'collapsed' }}"
-                   aria-expanded="{{ ea_is_collapsed ? 'false' : 'true' }}" aria-controls="content-{{ form.vars.name }}">
+                   class="form-fieldset-title-content form-fieldset-collapse {{ is_collapsed ? 'collapsed' }}"
+                   aria-expanded="{{ is_collapsed ? 'false' : 'true' }}" aria-controls="content-{{ form.vars.name }}">
                     {{ ea_form_ealabel(form) }}
+                    {%- if fieldset_error_count > 0 -%}
+                        <span class="badge badge-danger" title="{{ 'form.tab.error_badge_title'|trans({'%count%': fieldset_error_count}, 'EasyAdminBundle') }}">
+                            {{- fieldset_error_count -}}
+                        </span>
+                    {%- endif -%}
                 </a>
             {% else %}
                 <span class="not-collapsible form-fieldset-title-content">
                     {{ ea_form_ealabel(form) }}
+                    {%- if fieldset_error_count > 0 -%}
+                        <span class="badge badge-danger" title="{{ 'form.tab.error_badge_title'|trans({'%count%': fieldset_error_count}, 'EasyAdminBundle') }}">
+                            {{- fieldset_error_count -}}
+                        </span>
+                    {%- endif -%}
                 </span>
             {% endif %}
 
@@ -531,14 +545,18 @@
     {# don't use 'form.vars.label is not empty' here; it'll trigger deprecation messages: Method TranslatableMessage::__toString() is deprecated #}
     {% set has_label = form.vars.label is not same as(false) and form.vars.label is not null and form.vars.label is not same as('') %}
     {% set fieldset_has_header = has_label or ea_icon or has_help %}
+    {% set collapsed_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_COLLAPSED') %}
+    {% set fieldset_error_count_option_name = constant('EasyCorp\\Bundle\\EasyAdminBundle\\Field\\FormField::OPTION_FIELDSET_ERROR_COUNT') %}
+    {% set fieldset_has_errors = form.vars.ea_vars.field.getCustomOption(fieldset_error_count_option_name)|default(0) > 0 %}
+    {% set is_collapsed = form.vars.ea_vars.field.getCustomOption(collapsed_option_name)|default(false) %}
 
-    <div class="form-fieldset {{ not fieldset_has_header ? 'form-fieldset-no-header' }} {{ ea_css_class }}">
+    <div class="form-fieldset {{ not fieldset_has_header ? 'form-fieldset-no-header' }} {{ fieldset_has_errors ? 'has-fieldset-error' }} {{ ea_css_class }}">
         <fieldset>
             {% if fieldset_has_header %}
                 {{ form_label(form) }}
             {% endif %}
 
-            <div id="content-{{ form.vars.name }}" class="form-fieldset-body {{ not fieldset_has_header ? 'without-header' }} {{ ea_is_collapsible ? 'collapse' }} {{ not ea_is_collapsed ? 'show' }}">
+            <div id="content-{{ form.vars.name }}" class="form-fieldset-body {{ not fieldset_has_header ? 'without-header' }} {{ ea_is_collapsible ? 'collapse' }} {{ not is_collapsed ? 'show' }}">
                 <div class="row">
 {% endblock ea_form_fieldset_open_row %}
 
