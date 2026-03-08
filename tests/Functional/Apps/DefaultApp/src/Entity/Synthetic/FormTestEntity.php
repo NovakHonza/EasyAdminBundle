@@ -3,6 +3,7 @@
 namespace EasyCorp\Bundle\EasyAdminBundle\Tests\Functional\Apps\DefaultApp\Entity\Synthetic;
 
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 /**
  * Entity for testing form layout features (tabs, columns, fieldsets, rows).
@@ -16,6 +17,7 @@ class FormTestEntity
     private ?int $id = null;
 
     // basic info fields (for first tab/fieldset)
+    #[Assert\NotBlank]
     #[ORM\Column(length: 255)]
     private ?string $name = null;
 

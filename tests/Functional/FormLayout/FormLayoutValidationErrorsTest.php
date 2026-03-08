@@ -188,6 +188,131 @@ class FormLayoutValidationErrorsTest extends AbstractCrudTestCase
         static::assertSame(3, $entity->getPriority(), 'Priority from collapsed fieldset should be saved');
     }
 
+    public function testFieldsetErrorBadgeOnValidationErrors(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateNewFormUrl());
+
+        $form = $crawler->filter('form.ea-new-form')->form();
+
+        // fill all required fields EXCEPT name (NotBlank) and priority (NotNull, inside collapsed fieldset)
+        $form['FormTestEntity[email]'] = 'test@test.com';
+        $form['FormTestEntity[street]'] = '123 Street';
+        $form['FormTestEntity[city]'] = 'City';
+        $form['FormTestEntity[country]'] = 'US';
+
+        $this->client->followRedirects(false);
+        $crawler = $this->client->submit($form);
+
+        // form should be re-displayed with validation errors (422 in Symfony 6.2+)
+        $statusCode = $this->client->getResponse()->getStatusCode();
+        static::assertTrue(422 === $statusCode || 200 === $statusCode, 'Form should be re-displayed with validation errors');
+
+        // the collapsed "Status Settings" fieldset should have the error badge
+        $statusFieldset = $crawler->filter('.form-fieldset:contains("Status Settings")');
+        static::assertGreaterThan(0, $statusFieldset->count(), 'Status Settings fieldset should be present');
+        static::assertCount(1, $statusFieldset->filter('.badge-danger'), 'Collapsed fieldset with errors should show an error badge');
+    }
+
+    public function testCollapsedFieldsetAutoExpandsOnValidationErrors(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateNewFormUrl());
+
+        $form = $crawler->filter('form.ea-new-form')->form();
+
+        // submit without the priority field (NotNull, inside collapsed fieldset)
+        $form['FormTestEntity[name]'] = 'Test';
+        $form['FormTestEntity[email]'] = 'test@test.com';
+        $form['FormTestEntity[street]'] = '123 Street';
+        $form['FormTestEntity[city]'] = 'City';
+        $form['FormTestEntity[country]'] = 'US';
+
+        $this->client->followRedirects(false);
+        $crawler = $this->client->submit($form);
+
+        $statusCode = $this->client->getResponse()->getStatusCode();
+        static::assertTrue(422 === $statusCode || 200 === $statusCode, 'Form should be re-displayed with validation errors');
+
+        // the collapsed "Status Settings" fieldset should be auto-expanded (body has 'show' class)
+        $statusFieldset = $crawler->filter('.form-fieldset:contains("Status Settings")');
+        static::assertCount(1, $statusFieldset->filter('.form-fieldset-body.show'), 'Collapsed fieldset with errors should be auto-expanded');
+
+        // the collapse toggle should not have the 'collapsed' class
+        static::assertCount(0, $statusFieldset->filter('.form-fieldset-collapse.collapsed'), 'Auto-expanded fieldset toggle should not have collapsed class');
+    }
+
+    public function testFieldsetWithoutErrorsHasNoBadge(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateNewFormUrl());
+
+        $form = $crawler->filter('form.ea-new-form')->form();
+
+        // submit without name to trigger a validation error on tab 1 only
+        $form['FormTestEntity[email]'] = 'test@test.com';
+        $form['FormTestEntity[street]'] = '123 Street';
+        $form['FormTestEntity[city]'] = 'City';
+        $form['FormTestEntity[country]'] = 'US';
+        $form['FormTestEntity[priority]'] = '5';
+
+        $this->client->followRedirects(false);
+        $crawler = $this->client->submit($form);
+
+        $statusCode = $this->client->getResponse()->getStatusCode();
+        static::assertTrue(422 === $statusCode || 200 === $statusCode, 'Form should be re-displayed with validation errors');
+
+        // the "Metadata" fieldset (no errors) should NOT have an error badge
+        $metadataFieldset = $crawler->filter('.form-fieldset:contains("Metadata")');
+        static::assertCount(0, $metadataFieldset->filter('.badge-danger'), 'Fieldset without errors should not show an error badge');
+    }
+
+    public function testFieldsetErrorBadgeShowsCorrectCount(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateNewFormUrl());
+
+        $form = $crawler->filter('form.ea-new-form')->form();
+
+        // submit without priority (1 error in "Status Settings" fieldset)
+        $form['FormTestEntity[name]'] = 'Test';
+        $form['FormTestEntity[email]'] = 'test@test.com';
+        $form['FormTestEntity[street]'] = '123 Street';
+        $form['FormTestEntity[city]'] = 'City';
+        $form['FormTestEntity[country]'] = 'US';
+
+        $this->client->followRedirects(false);
+        $crawler = $this->client->submit($form);
+
+        $statusCode = $this->client->getResponse()->getStatusCode();
+        static::assertTrue(422 === $statusCode || 200 === $statusCode, 'Form should be re-displayed with validation errors');
+
+        $statusFieldset = $crawler->filter('.form-fieldset:contains("Status Settings")');
+        $badge = $statusFieldset->filter('.badge-danger');
+        static::assertCount(1, $badge, 'Should have exactly one error badge');
+        static::assertSame('1', trim($badge->text()), 'Error badge should show count of 1');
+    }
+
+    public function testFieldsetWithErrorsHasErrorClass(): void
+    {
+        $crawler = $this->client->request('GET', $this->generateNewFormUrl());
+
+        $form = $crawler->filter('form.ea-new-form')->form();
+
+        // submit without priority to trigger error in "Status Settings" fieldset
+        $form['FormTestEntity[name]'] = 'Test';
+        $form['FormTestEntity[email]'] = 'test@test.com';
+        $form['FormTestEntity[street]'] = '123 Street';
+        $form['FormTestEntity[city]'] = 'City';
+        $form['FormTestEntity[country]'] = 'US';
+
+        $this->client->followRedirects(false);
+        $crawler = $this->client->submit($form);
+
+        $statusCode = $this->client->getResponse()->getStatusCode();
+        static::assertTrue(422 === $statusCode || 200 === $statusCode, 'Form should be re-displayed with validation errors');
+
+        // the fieldset with errors should have 'has-fieldset-error' class
+        $statusFieldset = $crawler->filter('.form-fieldset:contains("Status Settings")');
+        static::assertCount(1, $statusFieldset->filter('.has-fieldset-error'), 'Fieldset with errors should have has-fieldset-error class');
+    }
+
     public function testEditFormWithComplexLayout(): void
     {
         $entity = new FormTestEntity();
